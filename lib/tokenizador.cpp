@@ -1,16 +1,37 @@
 
 #include "../include/tokenizador.h"
 
+#include <fstream>
+
 #include <sys/stat.h>
 #include <cstdlib>
 
 using namespace std;
 
+/*
+á, é, í, ó, ú, à, è, ì, ò, ù
+
+
+No tekinzar palabras vacías o de longitud cero
+SIEMPRE espacio en blanco como delimitador (cuanto especial = true)
+1.URL 2.Decimales 3.E-mail 4.Acrónimos 5.Guiones
+
+ALGORITMO GENERAL (recorriendo de izquierda a derecha)
+	*Encontrar un delimitador o un blanco
+		*Si es especial se ignora
+		*Si no especial toke sin delimitador
+
+
+=>Eliminar acentos
+=>Pasar de mayúsculas a míniculas
+*/
+
 Tokenizador::Tokenizador (
 	const std::string& delimitadoresPalabra,
 	const bool& kcasosEspeciales, 
-	const bool& minuscSinAcentos) 
+	const bool& minuscSinAcentos)
 	: _delimiters(delimitadoresPalabra),
+	  _delimitersAux(delimitadoresPalabra),
 	  _casosEspeciales(kcasosEspeciales),
 	  _pasarAminuscSinAcentos(minuscSinAcentos)
 
@@ -18,6 +39,7 @@ Tokenizador::Tokenizador (
 
 Tokenizador::Tokenizador (const Tokenizador& p_tk) {
 	_delimiters = p_tk._delimiters;
+	_delimitersAux = p_tk._delimitersAux;
 	_casosEspeciales = p_tk._casosEspeciales;
 	_pasarAminuscSinAcentos = p_tk._pasarAminuscSinAcentos;
 }
@@ -29,6 +51,7 @@ Tokenizador::Tokenizador () {
 }
 
 Tokenizador::~Tokenizador () {
+	_delimitersAux = "";
 	_delimiters = "";
 	_casosEspeciales = false;
 	_pasarAminuscSinAcentos = false;
@@ -36,11 +59,25 @@ Tokenizador::~Tokenizador () {
 
 Tokenizador& 
 Tokenizador::operator= (const Tokenizador& p_tk) {
+	_delimitersAux = p_tk._delimitersAux;
 	_delimiters = p_tk._delimiters;
 	_casosEspeciales = p_tk._casosEspeciales;
 	_pasarAminuscSinAcentos = p_tk._pasarAminuscSinAcentos;
 	return *this;
 }
+
+
+void
+Tokenizador::EliminarMinusAcentos (const std::string p_str) {
+/*
+	string sn = p_str;
+
+	std::cout << "+++++++++++++++++++++++++++++++++++++++++ \n";
+	std::cout << p_str << std::endl; 
+
+	char* it = sn;
+	//á, é, í, ó, ú, à, è, ì, ò, ù
+*/}
 
 void 
 Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_tokens) const {
@@ -55,8 +92,37 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 }
 
 bool 
-Tokenizador::Tokenizar (const std::string& p_i, const std::string& p_f) const {
-	return false;
+Tokenizador::Tokenizar (const std::string& p_fin, const std::string& p_fout) const {
+	ifstream i;
+	ofstream f;
+	string cadena;
+	list<string> tokens;
+
+	i.open(p_fin.c_str());
+	if (!i) {
+		cerr << "ERROR: No existe el archivo: " << p_fin << endl;
+		return false;
+	} else {
+		while (!i.eof()) {
+			cadena="";
+			getline(i, cadena);
+			if (cadena.length()!=0) {
+				Tokenizar(cadena, tokens);
+			}
+		}
+	}
+
+	i.close();
+	
+	f.open(p_fout.c_str());
+	list<string>::iterator itS;
+	for (itS= tokens.begin(); itS != tokens.end(); itS++) {
+		f << (*itS) << endl;
+	}
+
+	f.close();
+	
+	return true;
 }
 
 bool 
@@ -124,6 +190,9 @@ Tokenizador::PasarAminuscSinAcentos () {
 std::ostream& 
 operator<< (std::ostream& p_os, const Tokenizador& p_tk)
 {	
-	p_os << "vacio";
+	p_os << "DELIMITADORES: " 					 << p_tk._delimitersAux 
+		 << "TRATA CASOS ESPECIALES: " 			 << p_tk._casosEspeciales 
+		 << "PASAR A MINUSCULAS Y SIN ACENTOS: " << p_tk._pasarAminuscSinAcentos;
+
 	return p_os;
 }

@@ -97,6 +97,9 @@ public:
 	// Devuelve el contenido de la variable privada “pasarAminuscSinAcentos”
 
 private:
+
+	std::string _delimitersAux;
+
 	std::string _delimiters;
  	/* Delimitadores de términos. Aunque se
 	modifique la forma de almacenamiento interna para mejorar la eficiencia, este
@@ -111,4 +114,7 @@ private:
 	bool _pasarAminuscSinAcentos;
 	/* Si true pasará el token a minúsculas y quitará acentos, antes de
 	realizar la tokenización*/
+
+	// Quita los acentos y pasa a minúsculas las mayúsculas 
+	void EliminarMinusAcentos(const std::string);
 };
