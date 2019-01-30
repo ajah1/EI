@@ -26,6 +26,9 @@ corrector: $(EJECUTABLE)
 memory: memory.cpp
 	$(CC) -o memory  $^
 
+valgrind: $(EJECUTABLE)
+	valgrind --tool=memcheck --leak-check=full $(EJECUTABLE)
+
 clean:
 	rm -f $(_OBJ) 
 	rm -f $(EJECUTABLE)

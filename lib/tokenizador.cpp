@@ -9,24 +9,36 @@ using namespace std;
 Tokenizador::Tokenizador (
 	const std::string& delimitadoresPalabra,
 	const bool& kcasosEspeciales, 
-	const bool& minuscSinAcentos) {
+	const bool& minuscSinAcentos) 
+	: _delimiters(delimitadoresPalabra),
+	  _casosEspeciales(kcasosEspeciales),
+	  _pasarAminuscSinAcentos(minuscSinAcentos)
 
-}
+{}
 
-Tokenizador::Tokenizador (const Tokenizador&) {
-
+Tokenizador::Tokenizador (const Tokenizador& p_tk) {
+	_delimiters = p_tk._delimiters;
+	_casosEspeciales = p_tk._casosEspeciales;
+	_pasarAminuscSinAcentos = p_tk._pasarAminuscSinAcentos;
 }
 
 Tokenizador::Tokenizador () {
-
+	_delimiters = ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@";
+	_casosEspeciales = true;
+	_pasarAminuscSinAcentos = false;
 }
 
 Tokenizador::~Tokenizador () {
-
+	_delimiters = "";
+	_casosEspeciales = false;
+	_pasarAminuscSinAcentos = false;
 }
 
 Tokenizador& 
 Tokenizador::operator= (const Tokenizador& p_tk) {
+	_delimiters = p_tk._delimiters;
+	_casosEspeciales = p_tk._casosEspeciales;
+	_pasarAminuscSinAcentos = p_tk._pasarAminuscSinAcentos;
 	return *this;
 }
 
@@ -86,27 +98,27 @@ Tokenizador::AnyadirDelimitadoresPalabra (const std::string& p_nuevoDelimiters) 
 
 std::string 
 Tokenizador::DelimitadoresPalabra() const {
-	return "";
+	return _delimiters;
 }
 
 void 
 Tokenizador::CasosEspeciales (const bool& p_nuevoCasosEspeciales) {
-
+	_casosEspeciales = p_nuevoCasosEspeciales;
 }
 
 bool 
 Tokenizador::CasosEspeciales () {
-	return false;
+	return _casosEspeciales;
 }
 
 void 
 Tokenizador::PasarAminuscSinAcentos (const bool& p_PasarAminuscSinAcentos) {
-
+	_pasarAminuscSinAcentos = p_PasarAminuscSinAcentos;
 }
 
 bool 
 Tokenizador::PasarAminuscSinAcentos () {
-	return false;
+	return _pasarAminuscSinAcentos;
 }
 
 std::ostream& 
