@@ -119,8 +119,6 @@ void printusage (char **p)
 }
 
 
-#define nop_today
-#ifndef nop_today
 int main (int argc, char **argv, char **envp)
 {
   int status, mem;
@@ -158,4 +156,4 @@ int main (int argc, char **argv, char **envp)
   }
   return (EXIT_SUCCESS);
 }
-#endif
+
