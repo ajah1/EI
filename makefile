@@ -1,34 +1,42 @@
-SOURCES := $(wildcard lib/*.cpp)
-OBJECTS := $(subst .cpp,.o,$(SOURCES))
+.PHONY= clean
+CC=g++
+OPTIONS= -g -std=gnu++0x
+DEBUG= #-D DEBUG
+LIBDIR=lib
+INCLUDEDIR=include
+SOURCES := $(wildcard $(LIBDIR)/*.cpp)
+_OBJ := $(subst .cpp,.o,$(SOURCES))
 EJECUTABLE := practica1
-INCLUDE := -I /include
-CC := g++
+MAIN := main.cpp
 
-$(EJECUTABLE): $(OBJECTS)
-	$(CC) -o $@ $^ main.cpp
+all: $(EJECUTABLE)
 
-%.o: %.cpp
-	$(CC) -o $@ -c $^ $(INCLUDE)
+$(EJECUTABLE): $(MAIN) $(_OBJ)
+	$(CC) $(OPTIONS) $(DEBUG) -I$(INCLUDEDIR) $(MAIN) $(_OBJ) -o $(EJECUTABLE)
 
-clean: $(OBJECTS)
-	rm $^
-	rm $(EJECUTABLE)
-	rm memory
-	rm *.res
+$(LIBDIR)/%.o : $(LIBDIR)/%.cpp $(INCLUDEDIR)/%.h
+	$(CC) $(OPTIONS) $(DEBUG) -c -I$(INCLUDEDIR) -o $@ $<
 
 run: $(EJECUTABLE)
 	./$^
 
-corrector:
+corrector: $(EJECUTABLE)
 	sh ./corrigeAlumno.sh
 
-memoryc:
-	$(CC) -o memory memory.cpp
-	./memory $(EJECUTABLE)
+memory: memory.cpp
+	$(CC) -o memory  $^
 
+clean:
+	rm -f $(_OBJ) 
+	rm -f $(EJECUTABLE)
+	rm -f memory
+	rm *.tmp
 info:
-	$(info $(SOURCES))
-	$(info $(OBJECTS))
-	$(info $(EJECUTABLE))
-	$(info $(INCLUDE))
 	$(info $(CC))
+	$(info $(OPTIONS))
+	$(info $(DEBUG))
+	$(info $(LIBDIR))l
+	$(info $(INCLUDEDIR))
+	$(info $(SOURCES))
+	$(info $(_OBJ))
+	$(info $(EJECUTABLE))
