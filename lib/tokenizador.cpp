@@ -77,7 +77,11 @@ Tokenizador::EliminarMinusAcentos (const std::string p_str) {
 
 	char* it = sn;
 	//á, é, í, ó, ú, à, è, ì, ò, ù
-*/}
+*/
+
+
+
+}
 
 void 
 Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_tokens) const {
@@ -152,22 +156,45 @@ Tokenizador::TokenizarDirectorio (const std::string& p_dir) const {
 	}
 }
 
+/* Cambia “delimiters” por “nuevoDelimiters” comprobando que no hayan
+delimitadores repetidos (de izquierda a derecha), en cuyo caso se
+eliminarían los que hayan sido repetidos (por la derecha)*/
 void 
 Tokenizador::DelimitadoresPalabra (const std::string& p_nuevoDelimiters) {
+	/*
+	strin aux = "";
 
+	for (std::string d : p_nuevoDelimiters) {
+
+		bool repetido = false;
+		for (std::string::const_iterator it = _delimiters.begin(); it != _delimiters.end(); ++it) {
+			if (d.compare(it) == true) {
+
+			}
+		}
+	}
+	*/
 }
 
-void 
+void
 Tokenizador::AnyadirDelimitadoresPalabra (const std::string& p_nuevoDelimiters) {
+	// No repetidos
+	bool addDelimiter = true;
+	for (std::string::const_iterator it = _delimiters.begin(); it != _delimiters.end(); ++it) {
+		if (p_nuevoDelimiters.compare(&*it) == true)
+			addDelimiter = false;
+	}
 
-}
+	if (addDelimiter)
+		_delimiters.append(p_nuevoDelimiters);
+}	
 
 std::string 
 Tokenizador::DelimitadoresPalabra() const {
 	return _delimiters;
 }
 
-void 
+void
 Tokenizador::CasosEspeciales (const bool& p_nuevoCasosEspeciales) {
 	_casosEspeciales = p_nuevoCasosEspeciales;
 }

@@ -20,13 +20,14 @@ void imprimirListaSTL(const list<string>& cadena)
 int
 main(void)
 {
+
         bool kCasosEspeciales = true, kpasarAminusculas = false;
 
         list<string> lt1, lt2;
 
         Tokenizador a("@.&", true, false); 
         list<string> tokens; 
-
+        /*
         a.Tokenizar("U..S.A p1 e..g. p2. La", lt1);
         imprimirListaSTL(lt1);
 
@@ -35,4 +36,6 @@ main(void)
 
         a.Tokenizar("Hack.4.Good p1 ", lt1);
         imprimirListaSTL(lt1);
+        */
+        a.AnyadirDelimitadoresPalabra("n");
 }
