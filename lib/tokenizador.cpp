@@ -156,24 +156,15 @@ Tokenizador::TokenizarDirectorio (const std::string& p_dir) const {
 	}
 }
 
-/* Cambia “delimiters” por “nuevoDelimiters” comprobando que no hayan
-delimitadores repetidos (de izquierda a derecha), en cuyo caso se
-eliminarían los que hayan sido repetidos (por la derecha)*/
 void 
 Tokenizador::DelimitadoresPalabra (const std::string& p_nuevoDelimiters) {
-	/*
-	strin aux = "";
+	_delimiters = "";
 
-	for (std::string d : p_nuevoDelimiters) {
-
-		bool repetido = false;
-		for (std::string::const_iterator it = _delimiters.begin(); it != _delimiters.end(); ++it) {
-			if (d.compare(it) == true) {
-
-			}
+	for (char d : p_nuevoDelimiters) {
+		if (_delimiters.find_first_of(d) == string::npos) {
+			_delimiters += d;
 		}
 	}
-	*/
 }
 
 void

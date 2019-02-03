@@ -37,5 +37,7 @@ main(void)
         a.Tokenizar("Hack.4.Good p1 ", lt1);
         imprimirListaSTL(lt1);
         */
-        a.AnyadirDelimitadoresPalabra("n");
+        //a.AnyadirDelimitadoresPalabra("n");
+        a.DelimitadoresPalabra("@.&@.&*@.&");
+        
 }
