@@ -34,16 +34,12 @@ int main(void)
 
 
         std::string s = "U..S.A p1 e..g. p2. La";
-        char* i = &s.at(0);
-        char* f = i + 7;
-        a.ObtenerString(i, f);
-        /*
+
         a.Tokenizar("U..S.A p1 e..g. p2. La", lt1);
         // U, S.A, p1, e, g, p2, La, 
 
         std::cout << "TOKENS: => \n";
         imprimirListaSTL(lt1);
-        */
 
         /*a.Tokenizar("...U.S.A p1 e..g. p2. La", lt1);
         imprimirListaSTL(lt1);

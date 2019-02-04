@@ -119,14 +119,14 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 
 		std::clog << "[LOG] Tokenizar especiales \n";
 		
-		// char* p_i = &str.at(0);
+		string str(p_str);
+		char* pi = &str.at(0);
 		// char* p_f = p_i + 7;
 
-		for (string::const_iterator it = p_str.begin(); it != p_str.end(); ++it) {
-			//if (*it.compare(" ") == 0) {
-				// obtener string entre pos_i <-> it
-				//p_tokens.push_back();
-			//}
+		for (string::iterator it = str.begin(); it != str.end(); ++it) {
+			if (*it == ' ') {
+				p_tokens.push_back(ObtenerString(pi, &*it));
+			}
 		}
 	}
 }
