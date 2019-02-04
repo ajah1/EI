@@ -96,6 +96,9 @@ public:
 	bool PasarAminuscSinAcentos ();
 	// Devuelve el contenido de la variable privada “pasarAminuscSinAcentos”
 
+	// Devuelve el substring formado entre dos punteros inicial y final
+	std::string ObtenerString (const char* p_i, const char* p_f) const;
+
 private:
 
 	std::string _delimitersAux;

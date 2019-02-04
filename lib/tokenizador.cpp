@@ -68,30 +68,66 @@ Tokenizador::operator= (const Tokenizador& p_tk) {
 
 
 void
-Tokenizador::EliminarMinusAcentos (const std::string p_str) {
-/*
-	string sn = p_str;
-
-	std::cout << "+++++++++++++++++++++++++++++++++++++++++ \n";
-	std::cout << p_str << std::endl; 
-
-	char* it = sn;
-	//á, é, í, ó, ú, à, è, ì, ò, ù
-*/
+Tokenizador::EliminarMinusAcentos (const std::string p_str) {}
 
 
+std::string
+Tokenizador::ObtenerString(const char* p_i, const char* p_f) const {
+	// std::cout << "p_i: " << *p_i << std::endl;
+	// std::cout << "p_f: " << *p_f << std::endl;
 
+	// Size del substring
+	int s_size = p_f - p_i + 1;
+	//std::cout << "s_size: " << s_size << std::endl;
+
+	// Copiar en un string s_size characteres desde p_i 
+	std::string s_out(p_i, s_size);
+	//std::cout << "Substring: " << s_out << std::endl;
+
+	return s_out;
 }
 
 void 
 Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_tokens) const {
-	string::size_type lastPos 	= p_str.find_first_not_of(_delimiters, 0);
-	string::size_type pos 		= p_str.find_first_of(_delimiters, lastPos);
+	if (_casosEspeciales == false) {
+		std::clog << "[LOG] Tokenizar sin especiales \n";
+		string::size_type lastPos 	= p_str.find_first_not_of(_delimiters, 0);
+		string::size_type pos 		= p_str.find_first_of(_delimiters, lastPos);
 
-	while(string::npos != pos || string::npos != lastPos) {
-		p_tokens.push_back(p_str.substr(lastPos, pos - lastPos));
-		lastPos = p_str.find_first_not_of(_delimiters, pos);
-		pos 	= p_str.find_first_of(_delimiters, lastPos);
+		while(string::npos != pos || string::npos != lastPos) {
+			p_tokens.push_back(p_str.substr(lastPos, pos - lastPos));
+			lastPos = p_str.find_first_not_of(_delimiters, pos);
+			pos 	= p_str.find_first_of(_delimiters, lastPos);
+		}
+	} else {
+		/*ALGORITMO GENERAL (recorriendo de izquierda a derecha)
+		*Encontrar un delimitador o un blanco
+		*Si es especial se ignora
+		*Si no especial toke sin delimitador*/
+
+		//"U..S.A p1 e..g. p2. La"
+		//U, S.A, p1, e, g, p2, La,
+
+		/*
+			p2. 			=> p2
+			U..S.A 			=> U, S.A
+			U.S....A.BC.D 	=> U.S, A.BC.D
+			...U.S.A 		=> U.S.A
+			...U.S.A... 	=> U.S.A
+			...U.S.A@p1 	=> U.S.A, p1 {{{siendo @ delimitador}}}
+		*/
+
+		std::clog << "[LOG] Tokenizar especiales \n";
+		
+		// char* p_i = &str.at(0);
+		// char* p_f = p_i + 7;
+
+		for (string::const_iterator it = p_str.begin(); it != p_str.end(); ++it) {
+			//if (*it.compare(" ") == 0) {
+				// obtener string entre pos_i <-> it
+				//p_tokens.push_back();
+			//}
+		}
 	}
 }
 
