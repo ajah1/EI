@@ -26,6 +26,15 @@ ALGORITMO GENERAL (recorriendo de izquierda a derecha)
 =>Pasar de mayúsculas a míniculas
 */
 
+/////////////////////////////////////////////////////////
+// ¿Acrónimos con números? k.2.t
+//
+//
+//
+//
+//
+/////////////////////////////////////////////////////////
+
 Tokenizador::Tokenizador (
 	const std::string& delimitadoresPalabra,
 	const bool& kcasosEspeciales, 
@@ -99,6 +108,16 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 			lastPos = p_str.find_first_not_of(_delimiters, pos);
 			pos 	= p_str.find_first_of(_delimiters, lastPos);
 		}
+		/*
+		string str(p_str);
+		char* pi = &str.at(0);
+		for (string::iterator it = str.begin(); it != str.end(); ++it) {
+			if (*it == ' ') {
+				p_tokens.push_back(ObtenerString(pi, &*it));
+				pi = &*it + 1;
+			}
+		}
+		*/
 	} else {
 		/*ALGORITMO GENERAL (recorriendo de izquierda a derecha)
 		*Encontrar un delimitador o un blanco
@@ -107,31 +126,139 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 
 		//"U..S.A p1 e..g. p2. La"
 		//U, S.A, p1, e, g, p2, La,
+		//Tokenizador a("@.&", true, false); 
 
 		/*
+			.p 				=> p
 			p2. 			=> p2
+
 			U..S.A 			=> U, S.A
 			U.S....A.BC.D 	=> U.S, A.BC.D
 			...U.S.A 		=> U.S.A
 			...U.S.A... 	=> U.S.A
 			...U.S.A@p1 	=> U.S.A, p1 {{{siendo @ delimitador}}}
 		*/
-
-		std::clog << "[LOG] Tokenizar especiales \n";
-		
 		string str(p_str);
-		char* pi = &str.at(0);
-		// char* p_f = p_i + 7;
+		char* it = &str.at(0);
 
-		for (string::iterator it = str.begin(); it != str.end(); ++it) {
-			if (*it == ' ') {
-				p_tokens.push_back(ObtenerString(pi, &*it));
+		bool primera_it = true;
+		while (*it != '\0') {
+			// CASO ESPECIAL ACRONIMOS
+			if (*it == '.') {
+				std::clog << "[LOG] EspecialAcronimo() \n";
+				if (!primera_it) // es el primer caracter del string
+					EspecialAcronimo(it);
+			} 
+			// CASO GENERAL
+			else {
+				// tirar para lante hasta econtrar un " " o 
+				// encontrar un delimitador
+				std::clog << "[LOG] NormanMan() \n";
+				NormanMan(it);
+				//it++;
 			}
+			// std::cout << *it;
+
+			primera_it = false;
+			std::cout << "\n*it: " << *it << " *(it+1): " << *(it+1);
+			std::cin.get();
 		}
+
+		
 	}
 }
 
-bool 
+std::string
+Tokenizador::NormanMan(char* &p_it) const {
+
+	char* p_actual = p_it;
+
+	bool parar = false;
+
+	while (!parar) {
+		if (EsDelimitador(*p_it) || *p_it == '\0') {
+			parar = true;
+			p_it++;
+		}
+		else {
+			p_it++;
+		}
+	}
+
+	///////// NO MOSTRAR EL CASO DE SOLO DELIMITADOR
+
+	// el IT sigue por el último delimitador encontrado pero este no se muestra
+	std::cout << "NormanMan: " << ObtenerString(p_actual, p_it-2) << "\n";
+
+	return "";
+}
+
+//"U..S.A p1 e..g. p2. La"
+//U, S.A, p1, e, g, p2, La,
+std::string
+Tokenizador::EspecialAcronimo(char* &p_it) const {
+	/*
+		A.A => seguir buscando
+		A.* => generar substring hasta la izq
+		*.A => no es acronimo
+		*.* => no es acronimo
+	*/
+
+	/***final del string****/
+
+	// donde empieza el substring
+	char* copia_it = p_it;
+
+	bool estabaClaro = false;
+	bool parar = false;
+	while (!parar) {
+
+		if (*p_it == ' ') {
+			parar = true;
+		}
+		// Parte derecha no es delimitador
+		else if (!EsDelimitador(*(p_it+1))) {	// ?.A
+			if (!EsDelimitador(*(p_it-1))) {	// A.A
+				p_it += 2;						// apuntar al siguiente bloque
+				estabaClaro = true;
+			} else {							// *.A
+				p_it += 2;
+				parar = true;
+			}
+		}
+		// Parte izquierda no es delimitador
+		else if (!EsDelimitador(*(p_it-1))) {	// A.*
+			p_it += 2;
+			parar = true;
+		}
+		// Izq y Der delimitan
+		else  { 								// *.* 
+			p_it += 2;
+			parar = true;
+		}
+	}
+
+	if (estabaClaro)
+		std::cout << "EspecialAcronimo: " << ObtenerString(copia_it-1, p_it) << '\n';
+
+
+	return "";
+}
+
+bool
+Tokenizador::EsDelimitador(const char p_d) const{
+	bool es_delimitador = false;
+
+	for (const char* d = &_delimiters.at(0); *d != '\0'; ++d) {
+		if (p_d == *d || p_d == ' ') {
+			es_delimitador = true;
+		}
+	}
+
+	return es_delimitador;
+}
+
+bool
 Tokenizador::Tokenizar (const std::string& p_fin, const std::string& p_fout) const {
 	ifstream i;
 	ofstream f;
@@ -214,7 +341,7 @@ Tokenizador::AnyadirDelimitadoresPalabra (const std::string& p_nuevoDelimiters) 
 
 	if (addDelimiter)
 		_delimiters.append(p_nuevoDelimiters);
-}	
+}
 
 std::string 
 Tokenizador::DelimitadoresPalabra() const {

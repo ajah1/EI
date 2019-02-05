@@ -27,7 +27,7 @@ memory: memory.cpp
 	$(CC) -o memory  $^
 
 valgrind: $(EJECUTABLE)
-	valgrind --tool=memcheck --leak-check=full $(EJECUTABLE)
+	valgrind --tool=memcheck --leak-check=full ./practica1
 
 clean:
 	rm -f $(_OBJ) 

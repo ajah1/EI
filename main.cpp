@@ -12,38 +12,26 @@ void imprimirListaSTL(const list<string>& cadena)
         list<string>::const_iterator itCadena;
         for(itCadena=cadena.begin();itCadena!=cadena.end();itCadena++)
         {
-                cout << (*itCadena) << "|<->|";
+                cout << (*itCadena) << ", ";
         }
         cout << endl;
 }
 
-/*
-U, S.A, p1, e, g, p2, La, 
-U.S.A, p1, e, g, p2, La,
-Hack.4.Good, p1,
-*/
-
-int main(void)
+int
+main(void)
 {
-        bool kCasosEspeciales = true, kpasarAminusculas = false;
+	bool kCasosEspeciales = true, kpasarAminusculas = false;
 
-        list<string> lt1, lt2;
+	list<string> lt1, lt2;
 
-        Tokenizador a("@.&", true, false); 
-        list<string> tokens;
+	Tokenizador a("@.&", true, false); 
+	list<string> tokens; 
 
+	a.Tokenizar("U..S.A p1 e..g. p2. La", lt1); 	// U, S.A, p1, e, g, p2, La,
 
-        std::string s = "U..S.A p1 e..g. p2. La";
-
-        a.Tokenizar("U..S.A p1 e..g. p2. La", lt1);
-        // U, S.A, p1, e, g, p2, La, 
-
-        std::cout << "TOKENS: => \n";
-        imprimirListaSTL(lt1);
-
-        /*a.Tokenizar("...U.S.A p1 e..g. p2. La", lt1);
-        imprimirListaSTL(lt1);
-
-        a.Tokenizar("Hack.4.Good p1 ", lt1);
-        imprimirListaSTL(lt1);*/
+	//a.Tokenizar("...U.S.A p1 e..g. p2. La", lt1); 	// U.S.A, p1, e, g, p2, La, 
+	
+	//a.Tokenizar("Hack.4.Good p1 ", lt1);			// Hack.4.Good, p1, 
+	
+	imprimirListaSTL(lt1);
 }

@@ -98,6 +98,13 @@ public:
 
 	// Devuelve el substring formado entre dos punteros inicial y final
 	std::string ObtenerString (const char* p_i, const char* p_f) const;
+	// Comprobaciones para el caso especial acronicmo
+	std::string EspecialAcronimo(char* &p_it) const;
+	// Devuelve true si _delimiters contiene el char
+	bool EsDelimitador(const char p_d) const;
+	// Comprobaciones para el tokenizador general
+	std::string NormanMan(char* &p_it) const;
+
 
 private:
 
