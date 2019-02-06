@@ -119,52 +119,33 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 		}
 		*/
 	} else {
-		/*ALGORITMO GENERAL (recorriendo de izquierda a derecha)
-		*Encontrar un delimitador o un blanco
-		*Si es especial se ignora
-		*Si no especial toke sin delimitador*/
 
-		//"U..S.A p1 e..g. p2. La"
-		//U, S.A, p1, e, g, p2, La,
-		//Tokenizador a("@.&", true, false); 
-
-		/*
-			.p 				=> p
-			p2. 			=> p2
-
-			U..S.A 			=> U, S.A
-			U.S....A.BC.D 	=> U.S, A.BC.D
-			...U.S.A 		=> U.S.A
-			...U.S.A... 	=> U.S.A
-			...U.S.A@p1 	=> U.S.A, p1 {{{siendo @ delimitador}}}
-		*/
 		string str(p_str);
 		char* it = &str.at(0);
 
 		bool primera_it = true;
+
+	//	std::cout << "\n*it: " << *it << " *(it+1): " << *(it+1) << '\n';
+
 		while (*it != '\0') {
 			// CASO ESPECIAL ACRONIMOS
-			if (*it == '.') {
-				std::clog << "[LOG] EspecialAcronimo() \n";
-				if (!primera_it) // es el primer caracter del string
-					EspecialAcronimo(it);
+			if (*it == '.' && !primera_it) {
+	//			std::clog << "[LOG] EspecialAcronimo() \n";
+				EspecialAcronimo(it, it);
 			} 
 			// CASO GENERAL
 			else {
 				// tirar para lante hasta econtrar un " " o 
 				// encontrar un delimitador
-				std::clog << "[LOG] NormanMan() \n";
+	//			std::clog << "[LOG] NormanMan() \n";
 				NormanMan(it);
 				//it++;
 			}
-			// std::cout << *it;
 
 			primera_it = false;
-			std::cout << "\n*it: " << *it << " *(it+1): " << *(it+1);
-			std::cin.get();
+	//		std::cout << "\n*it: " << *it << " *(it+1): " << *(it+1);
+	//		std::cin.get();
 		}
-
-		
 	}
 }
 
@@ -174,21 +155,55 @@ Tokenizador::NormanMan(char* &p_it) const {
 	char* p_actual = p_it;
 
 	bool parar = false;
+	bool fake = false;
+	bool single = false;
 
 	while (!parar) {
-		if (EsDelimitador(*p_it) || *p_it == '\0') {
-			parar = true;
+		// U.
+			// U.* => generico
+			// U.U => acronimo
+		// U* => generico
+		// UU => seguir
+		
+		if (*p_it != '.' && *(p_it+1) == '.') {
+			if (EsDelimitador(*(p_it+2))) {
+				p_it += 2;
+			} else {
+				EspecialAcronimo(p_actual, ++p_it);
+				fake = true;
+			}
+			parar =  true;
+		}
+		else if (*(p_it+1) == '\0') {
 			p_it++;
+			parar = single = true;
+		}
+		else if (EsDelimitador(*p_it+1)){ //|| *(p_it+1) == '\0') {
+			p_it += 2;
+			parar = true;
+		}
+		else if (EsDelimitador(*p_it)) {
+			std::cout << "encuentra el delimitador: **" << *p_it << "**\n"; 
+			p_it++;
+			parar = true;
 		}
 		else {
+			std::cout << "iterar: " << *p_it << std::endl;
 			p_it++;
 		}
 	}
 
-	///////// NO MOSTRAR EL CASO DE SOLO DELIMITADOR
+	/*
+	    p1
+	*/
 
-	// el IT sigue por el último delimitador encontrado pero este no se muestra
-	std::cout << "NormanMan: " << ObtenerString(p_actual, p_it-2) << "\n";
+	if (!fake && (p_it - p_actual) > 1) {
+		if ( single )
+			std::cout << "NormanMan:-->" << ObtenerString(p_actual, p_it-1) << "<--\n";
+		else
+			std::cout << "NormanMan:-->" << ObtenerString(p_actual, p_it-2) << "<--\n";
+
+	}
 
 	return "";
 }
@@ -196,7 +211,7 @@ Tokenizador::NormanMan(char* &p_it) const {
 //"U..S.A p1 e..g. p2. La"
 //U, S.A, p1, e, g, p2, La,
 std::string
-Tokenizador::EspecialAcronimo(char* &p_it) const {
+Tokenizador::EspecialAcronimo(char* &p_izq, char* &p_it) const {
 	/*
 		A.A => seguir buscando
 		A.* => generar substring hasta la izq
@@ -207,7 +222,7 @@ Tokenizador::EspecialAcronimo(char* &p_it) const {
 	/***final del string****/
 
 	// donde empieza el substring
-	char* copia_it = p_it;
+	char* copia_it = p_izq;
 
 	bool estabaClaro = false;
 	bool parar = false;
@@ -222,7 +237,7 @@ Tokenizador::EspecialAcronimo(char* &p_it) const {
 				p_it += 2;						// apuntar al siguiente bloque
 				estabaClaro = true;
 			} else {							// *.A
-				p_it += 2;
+				p_it += 1;
 				parar = true;
 			}
 		}
@@ -239,7 +254,7 @@ Tokenizador::EspecialAcronimo(char* &p_it) const {
 	}
 
 	if (estabaClaro)
-		std::cout << "EspecialAcronimo: " << ObtenerString(copia_it-1, p_it) << '\n';
+		std::cout << "EspecialAcronimo:-->" << ObtenerString(copia_it, p_it-1) << "<--\n";
 
 
 	return "";
@@ -249,12 +264,24 @@ bool
 Tokenizador::EsDelimitador(const char p_d) const{
 	bool es_delimitador = false;
 
-	for (const char* d = &_delimiters.at(0); *d != '\0'; ++d) {
-		if (p_d == *d || p_d == ' ') {
-			es_delimitador = true;
+	if (_casosEspeciales == true) {
+		// ' ' siempre se considera delimitador
+		if (_delimiters.empty()) {
+			es_delimitador = p_d == ' ';
+		} else {
+			for (const char* d = &_delimiters.at(0); *d != '\0'; ++d) {
+				if (p_d == *d || p_d == ' ') {
+					es_delimitador = true;
+				}
+			}	
+		}
+	} else if (!_delimiters.empty()) {
+		for (const char* d = &_delimiters.at(0); *d != '\0'; ++d) {
+			if (p_d == *d) {
+				es_delimitador = true; 
+			}
 		}
 	}
-
 	return es_delimitador;
 }
 
