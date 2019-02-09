@@ -24,33 +24,18 @@ main(void)
 
 	list<string> lt1, lt2;
 
-Tokenizador a("-#", true, false); 
+Tokenizador a("@.&", true, false); 
 list<string> tokens; 
 
-a.DelimitadoresPalabra("@.&");
-a.Tokenizar("U.S.A p1 e.g. p2. La", tokens);
-	imprimirListaSTL(tokens);
+//a.Tokenizar("U..S.A p1 e..g. p2. La", lt1);
+imprimirListaSTL(lt1);
 
-a.DelimitadoresPalabra("");
-a.Tokenizar("U.S.A.U.S.A .p1 p1 e.g p2. La", tokens);
-	imprimirListaSTL(tokens);
+//a.Tokenizar("...U.S.A p1 e..g. p2. La", lt1);
+imprimirListaSTL(lt1);
 
-a.Tokenizar("a&U.S.A p1 e.g p2. La", tokens);
-	imprimirListaSTL(tokens);
+a.Tokenizar("Hack.44.Go p1 ", lt1);
 
-a.DelimitadoresPalabra("&");
-a.Tokenizar("a&U.S.A p1 e.g p2. La", tokens);
-	imprimirListaSTL(tokens);
-
-
-a.PasarAminuscSinAcentos(true);
-a.Tokenizar("a&U.S.A p1 e.g p2. La", tokens);
-	imprimirListaSTL(tokens);
-
-a.DelimitadoresPalabra(".&");
-a.CasosEspeciales (false);
-a.Tokenizar("a&U.S.A p1 e.g. p2. La", tokens);
-	imprimirListaSTL(tokens);
-
+a.Tokenizar("U.A.A p1 ", lt1);
+imprimirListaSTL(lt1);
 
 }

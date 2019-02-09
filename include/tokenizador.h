@@ -104,7 +104,8 @@ public:
 	bool EsDelimitador(const char p_d) const;
 	// Comprobaciones para el tokenizador general
 	std::string NormanMan(char* &p_it) const;
-
+	// Quita los acentos y pasa a minúsculas las mayúsculas 
+	void EliminarMinusAcentos(std::string&) const;
 
 private:
 
@@ -124,7 +125,4 @@ private:
 	bool _pasarAminuscSinAcentos;
 	/* Si true pasará el token a minúsculas y quitará acentos, antes de
 	realizar la tokenización*/
-
-	// Quita los acentos y pasa a minúsculas las mayúsculas 
-	void EliminarMinusAcentos(const std::string);
 };

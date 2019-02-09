@@ -26,15 +26,6 @@ ALGORITMO GENERAL (recorriendo de izquierda a derecha)
 =>Pasar de mayúsculas a míniculas
 */
 
-/////////////////////////////////////////////////////////
-// ¿Acrónimos con números? k.2.t
-//
-//
-//
-//
-//
-/////////////////////////////////////////////////////////
-
 Tokenizador::Tokenizador (
 	const std::string& delimitadoresPalabra,
 	const bool& kcasosEspeciales, 
@@ -68,16 +59,38 @@ Tokenizador::~Tokenizador () {
 
 Tokenizador& 
 Tokenizador::operator= (const Tokenizador& p_tk) {
-	_delimitersAux = p_tk._delimitersAux;
-	_delimiters = p_tk._delimiters;
-	_casosEspeciales = p_tk._casosEspeciales;
-	_pasarAminuscSinAcentos = p_tk._pasarAminuscSinAcentos;
+	if (this != &p_tk) {
+		_delimitersAux = p_tk._delimitersAux;
+		_delimiters = p_tk._delimiters;
+		_casosEspeciales = p_tk._casosEspeciales;
+		_pasarAminuscSinAcentos = p_tk._pasarAminuscSinAcentos;
+	}
+
 	return *this;
 }
 
 
 void
-Tokenizador::EliminarMinusAcentos (const std::string p_str) {}
+Tokenizador::EliminarMinusAcentos (std::string& p_str) const{
+
+	std::clog << "[LOG] EliminarMinusAcentos \n";
+
+	// á, é, í, ó, ú, à, è, ì, ò, ù
+	// Á, É, Í, Ó, Ú, À, È, Ì, Ò, Ù
+	/*
+		   **´**	**`** (-1)
+	a -> 193, 225
+	e -> 201, 233
+	i -> 205, 237
+	o -> 211, 243
+	u -> 218, 250
+	*/
+	for (char* it = &p_str.at(0); *it != '\0'; ++it) {
+		if (*it == 193 || *it == 225) {
+			*it = 97;
+		}
+	}
+}
 
 
 std::string
@@ -98,8 +111,13 @@ Tokenizador::ObtenerString(const char* p_i, const char* p_f) const {
 
 void 
 Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_tokens) const {
-	if (_casosEspeciales == false) {
-		std::clog << "[LOG] Tokenizar sin especiales \n";
+	
+	if (_pasarAminuscSinAcentos) {
+		//EliminarMinusAcentos(p_str);
+	}
+
+	if (!_casosEspeciales) {
+	//	std::clog << "[LOG] Tokenizar sin especiales \n";
 		string::size_type lastPos 	= p_str.find_first_not_of(_delimiters, 0);
 		string::size_type pos 		= p_str.find_first_of(_delimiters, lastPos);
 
@@ -108,16 +126,6 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 			lastPos = p_str.find_first_not_of(_delimiters, pos);
 			pos 	= p_str.find_first_of(_delimiters, lastPos);
 		}
-		/*
-		string str(p_str);
-		char* pi = &str.at(0);
-		for (string::iterator it = str.begin(); it != str.end(); ++it) {
-			if (*it == ' ') {
-				p_tokens.push_back(ObtenerString(pi, &*it));
-				pi = &*it + 1;
-			}
-		}
-		*/
 	} else {
 
 		string str(p_str);
@@ -125,26 +133,26 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 
 		bool primera_it = true;
 
-	//	std::cout << "\n*it: " << *it << " *(it+1): " << *(it+1) << '\n';
+		std::cout << "\n*it: " << *it << " *(it+1): " << *(it+1) << '\n';
 
 		while (*it != '\0') {
 			// CASO ESPECIAL ACRONIMOS
 			if (*it == '.' && !primera_it) {
-	//			std::clog << "[LOG] EspecialAcronimo() \n";
+				std::clog << "[LOG] EspecialAcronimo() \n";
 				EspecialAcronimo(it, it);
 			} 
 			// CASO GENERAL
 			else {
 				// tirar para lante hasta econtrar un " " o 
 				// encontrar un delimitador
-	//			std::clog << "[LOG] NormanMan() \n";
+				std::clog << "[LOG] NormanMan() \n";
 				NormanMan(it);
 				//it++;
 			}
 
 			primera_it = false;
-	//		std::cout << "\n*it: " << *it << " *(it+1): " << *(it+1);
-	//		std::cin.get();
+			std::cout << "\n*it-2: " << *(it-2) << " *it: " << *it << " *(it+1): " << *(it+1);
+			std::cin.get();
 		}
 	}
 }
@@ -165,28 +173,38 @@ Tokenizador::NormanMan(char* &p_it) const {
 		// U* => generico
 		// UU => seguir
 		
-		if (*p_it != '.' && *(p_it+1) == '.') {
-			if (EsDelimitador(*(p_it+2))) {
+		//"Hack.4.Good p1 "
+		//"...U.S.A p1 e..g. p2. La"
+
+		if (*p_it != '.' && *(p_it+1) == '.') {				// U.
+			if (EsDelimitador(*(p_it+2))) {					// U.* => generico
 				p_it += 2;
-			} else {
+			} else {										// U.U => acronimo
 				EspecialAcronimo(p_actual, ++p_it);
 				fake = true;
 			}
 			parar =  true;
 		}
-		else if (*(p_it+1) == '\0') {
-			p_it++;
-			parar = single = true;
-		}
-		else if (EsDelimitador(*p_it+1)){ //|| *(p_it+1) == '\0') {
-			p_it += 2;
-			parar = true;
-		}
-		else if (EsDelimitador(*p_it)) {
+		else if (EsDelimitador(*p_it)) {					// * => _del para
 			std::cout << "encuentra el delimitador: **" << *p_it << "**\n"; 
 			p_it++;
 			parar = true;
 		}
+		else if (*(p_it+1) == '\0') {					// U\0 => fin del string
+			std::cout << "*it-1: " << *(p_it-1) << std::endl;
+			std::cout << "entra fin string" << std::endl;
+			p_it++;
+			parar = single = true;
+		}
+		else if (EsDelimitador(*p_it+1)){ 					// U* => _del para
+				//|| *(p_it+1) == '\0') {	
+			//"Hola que tal "
+			std::cout << "*it+1: " << *(p_it+1) << std::endl;
+			std::cout << "entra EsDelimitador+1" << std::endl;
+			p_it += 2;
+			parar = true;
+		}
+
 		else {
 			std::cout << "iterar: " << *p_it << std::endl;
 			p_it++;
@@ -198,11 +216,10 @@ Tokenizador::NormanMan(char* &p_it) const {
 	*/
 
 	if (!fake && (p_it - p_actual) > 1) {
-		if ( single )
+		if (single)
 			std::cout << "NormanMan:-->" << ObtenerString(p_actual, p_it-1) << "<--\n";
 		else
 			std::cout << "NormanMan:-->" << ObtenerString(p_actual, p_it-2) << "<--\n";
-
 	}
 
 	return "";
@@ -226,7 +243,15 @@ Tokenizador::EspecialAcronimo(char* &p_izq, char* &p_it) const {
 
 	bool estabaClaro = false;
 	bool parar = false;
+	/*
+	a.Tokenizar("Hack.4.Good p1 ", lt1);
+	a.Tokenizar("U.A.Aaa p1 ", lt1);
+	*/
+	std::cout << "ACRONIMOASDSDA::::" << std::endl;
+	std::cout << "pactu: " << *copia_it << std::endl;
+	
 	while (!parar) {
+		std::cout << "it: " << *p_it << " *it+1: " << *(p_it+1) << std::endl;
 
 		if (*p_it == ' ') {
 			parar = true;
