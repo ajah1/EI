@@ -7,7 +7,7 @@ INCLUDEDIR=include
 SOURCES := $(wildcard $(LIBDIR)/*.cpp)
 _OBJ := $(subst .cpp,.o,$(SOURCES))
 EJECUTABLE := practica1
-MAIN := main.cpp
+MAIN := src/main.cpp
 
 all: $(EJECUTABLE)
 
@@ -33,7 +33,7 @@ clean:
 	rm -f $(_OBJ) 
 	rm -f $(EJECUTABLE)
 	rm -f memory
-	rm *.tmp
+	rm -f *.tmp
 info:
 	$(info $(CC))
 	$(info $(OPTIONS))
