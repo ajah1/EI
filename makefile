@@ -34,6 +34,7 @@ clean:
 	rm -f $(EJECUTABLE)
 	rm -f memory
 	rm -f *.tmp
+	rm -f *.res
 info:
 	$(info $(CC))
 	$(info $(OPTIONS))

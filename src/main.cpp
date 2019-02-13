@@ -5,8 +5,6 @@
 
 using namespace std;
 
-///////// Comprobación de que vacíe la lista resultado
-
 void imprimirListaSTL(const list<string>& cadena)
 {
         list<string>::const_iterator itCadena;
@@ -20,16 +18,20 @@ void imprimirListaSTL(const list<string>& cadena)
 int
 main(void)
 {
-	bool kCasosEspeciales = true, kpasarAminusculas = false;
+		bool kCasosEspeciales = true, kpasarAminusculas = false;
 
-	list<string> lt1, lt2;
+		list<string> lt1, lt2, lt3;
 
-Tokenizador a("-#", true, false); 
-list<string> tokens; 
+		Tokenizador a("[]# ", kCasosEspeciales, kpasarAminusculas);
+		a.Tokenizar("MS#DOS OS_2 [high low]", lt1);
+		imprimirListaSTL(lt1);
 
-a.DelimitadoresPalabra("@.&");
-std::string s = "U.S.A p1 e.g. p2. La";
-a.Tokenizar(s, tokens);
-imprimirListaSTL(tokens);
+		a.AnyadirDelimitadoresPalabra("_ []");
+		a.Tokenizar("MS#DOS OS_2 [high low]", lt2);
+		imprimirListaSTL(lt2);
+
+		a.DelimitadoresPalabra("*");
+		a.Tokenizar("MS#DOS OS*2 [high low]", lt3);
+		imprimirListaSTL(lt3);
 
 }

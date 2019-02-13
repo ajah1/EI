@@ -53,10 +53,7 @@ Tokenizador::operator= (const Tokenizador& p_tk) {
 
 
 std::string
-Tokenizador::EliminarMinusAcentos (const std::string& p_str) const{
-
-	//std::clog << "\n [LOG] EliminarMinusAcentos \n";
-
+Tokenizador::EliminarMinusAcentos (const std::string& p_str) const {
 	// á, é, í, ó, ú, à, è, ì, ò, ù
 	// Á, É, Í, Ó, Ú, À, È, Ì, Ò, Ù
 	/*
@@ -117,7 +114,6 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 	}
 
 	if (!_casosEspeciales) {
-		//sstd::cout << "\n[LOG] Tokenizar sin especiales\n";
 		string::size_type lastPos 	= s.find_first_not_of(_delimiters, 0);
 		string::size_type pos 		= s.find_first_of(_delimiters, lastPos);
 
@@ -153,47 +149,42 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 	}
 }
 
+void 
+Tokenizador::URL(char* &p_der) const {
+	
+}
+
 void
 Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
-	//std::clog << "\n[LOG] Generico() \n";
-
 	bool parar = false;
 	bool token = false;
 	char* pos_izq = p_der;
 
-	// "U.S.A.U.S.A .p1"
 	while (!parar) {
-		//std::cout << "Iterar: ->" << *p_der << "<-" << std::endl;
-		// Si a medias encuentra un caso especial
+		// SI: a medias encuentra un caso especial
 		if (*p_der == '.' &&
 			!SDelimitador(*(p_der-1)) &&
 			!SDelimitador(*(p_der+1))) {
+				// Si pos+1 es un punto no es acronimo
 				if (*(p_der+1) == '.') {
 					p_der += 2;
+				// LLamada a Acronimo()
 				} else {
 					Acronimo(pos_izq, p_der, p_tokens);
 					parar = true;
-					token = false;
 				}
-		// En otro caso: comprobar delimitadores
-		} else if (SDelimitador(*p_der)) {
+		// En otro caso: encuntra un delimitador ó \0
+		} else if (SDelimitador(*p_der) || *p_der == '\0') {
 			parar = token = true;
 			p_der++;
-		// En otro caso: final de string
-		} else if (*p_der == '\0') {
-			parar = token = true;
-			p_der++;
-		}
-		else {
+		// ELSE: seguir iterando
+		} else {
 			p_der++;
 		}
 	}
 
 	if (token && (p_der - pos_izq) > 1) {
 		p_tokens.push_back(ObtenerString(pos_izq, p_der-1));
-		/*std::cout << "Generico:-->" 
-				  << ObtenerString(pos_izq, p_der-1) 
-				  << "<--\n";*/
 	}
 }
 
@@ -210,73 +201,46 @@ Tokenizador::ObtenerString(const char* p_i, const char* p_f) const {
 	return s_out;
 }
 
-// "U..S.A p1 e..g. p2. La"
-
 void
 Tokenizador::Acronimo(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const {
 	//std::cout << "\n[LOG] Acronimo() \n";
-
 	bool token = false;
 	bool parar = false;
 
 	char* pos_der = nullptr;
 
 	while (!parar) {
-		//std::cout << "*izq: " 	<< *p_izq 
-		//		  << "  *der: " << *p_der 
-		//		  << std::endl;
-
-		// casos para el .
+		// Casos para el .
 		if (*p_der == '.') {
+			// ...
 			if (p_izq == p_der) {
 				p_der++;
 				parar = true;
-				token = false;
-			}
-			// A.
+			} // A.
 			else if (!SDelimitador(*(p_der-1))) {
 				// A.
 				if (SDelimitador(*(p_der+1)) || *(p_der+1) == '.') {
-					pos_der = p_der;
+					pos_der = p_der++;
 					parar = token = true;
-					p_der++;
-					/*std::cout << "pizq: " << *p_izq;
-					std::cout << "\npder: " << *pos_der;
-					std::cout << "\npder+1: " << *(p_der+1) << "\n";*/
 				// A.A
-				} else {
-					//std::cout << "A.A" << std::endl;
-					p_der += 1;
-				}
-			// *.
-			} else {
-				// ..A
-				if (!SDelimitador(*(p_der+1))) {
-				//	std::cout << ".A" << std::endl;
-					p_der++;
-					parar = true;
-					token = false;
-				}
+				} else { p_der += 1;}
+			// ..A
+			} else if (!SDelimitador(*(p_der+1))) {
+				p_der++;
+				parar = true;
 			}
-		// cuando encuentra un delimitador para y muestra token
+		// Encuentra un delimitador para y muestra token
 		} else if (SDelimitador(*p_der) || *p_der == '\0') {
-			//std::cout << "encuentra delimitadores" << std::endl;
 			pos_der = p_der;
 			parar = token = true;
-		}
-		// seguir incrementando
-		else {
-			// "U..S.A p1 e..g. p2. La"
-			//std::cout << "nada" << std::endl;
+		// seguir iterando
+		} else {
 			p_der++;
 		}
 	}
 
 	if (token) {
 		p_tokens.push_back(ObtenerString(p_izq, pos_der));
-		//std::cout << "Acronimo:-->" 
-		//	  << ObtenerString(p_izq, pos_der)
-		//	  << "<--\n";
 	}
 }
 

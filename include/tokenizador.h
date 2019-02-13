@@ -106,7 +106,8 @@ public:
 	void Generico(char* &p_it, std::list<std::string>&) const;
 	// Quita los acentos y pasa a minúsculas las mayúsculas 
 	std::string EliminarMinusAcentos(const std::string&) const;
-
+	// URL
+	void URL(char* &p_der) const;	
 private:
 
 	std::string _delimitersAux;
