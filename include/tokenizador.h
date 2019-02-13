@@ -22,6 +22,7 @@ public:
 	/* Inicializa delimiters a delimitadoresPalabra; casosEspeciales a
 	kcasosEspeciales; pasarAminuscSinAcentos a minuscSinAcentos*/
 	Tokenizador (const Tokenizador&);
+	Tokenizador (const std::string&);
 	Tokenizador ();
 	/*Inicializa delimiters=",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@";
 	casosEspeciales a true; pasarAminuscSinAcentos a false */

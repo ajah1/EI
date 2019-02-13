@@ -6,6 +6,8 @@
 #include <sys/stat.h>
 #include <cstdlib>
 
+#include <algorithm>
+
 using namespace std;
 
 Tokenizador::Tokenizador (
@@ -24,6 +26,12 @@ Tokenizador::Tokenizador (const Tokenizador& p_tk) {
 	_delimitersAux = p_tk._delimitersAux;
 	_casosEspeciales = p_tk._casosEspeciales;
 	_pasarAminuscSinAcentos = p_tk._pasarAminuscSinAcentos;
+}
+
+Tokenizador::Tokenizador (const std::string& p_del) {
+	_delimiters = p_del;
+	_casosEspeciales = true;
+	_pasarAminuscSinAcentos = false;
 }
 
 Tokenizador::Tokenizador () {
@@ -317,16 +325,18 @@ Tokenizador::DelimitadoresPalabra (const std::string& p_nuevoDelimiters) {
 }
 
 void
-Tokenizador::AnyadirDelimitadoresPalabra (const std::string& p_nuevoDelimiters) {
-	// No repetidos
-	bool addDelimiter = true;
-	for (std::string::const_iterator it = _delimiters.begin(); it != _delimiters.end(); ++it) {
-		if (p_nuevoDelimiters.compare(&*it) == true)
-			addDelimiter = false;
-	}
+Tokenizador::AnyadirDelimitadoresPalabra (const std::string& p_newDel) {
+	std::string aux = p_newDel;
+	
+	// Eliminar caracteres repetidos
+	aux.erase(std::unique(aux.begin(), aux.end()), aux.end());
 
-	if (addDelimiter)
-		_delimiters.append(p_nuevoDelimiters);
+	// Anyadir los caracter que no son delimitadores
+	for (char s : aux) {
+		if (_delimiters.find(s) == string::npos) {
+			_delimiters += s;
+		}
+	}
 }
 
 std::string 
@@ -358,8 +368,8 @@ std::ostream&
 operator<< (std::ostream& p_os, const Tokenizador& p_tk)
 {	
 	p_os << "DELIMITADORES: " 					 << p_tk._delimitersAux 
-		 << "TRATA CASOS ESPECIALES: " 			 << p_tk._casosEspeciales 
-		 << "PASAR A MINUSCULAS Y SIN ACENTOS: " << p_tk._pasarAminuscSinAcentos;
+		 << " TRATA CASOS ESPECIALES: " 			 << p_tk._casosEspeciales 
+		 << " PASAR A MINUSCULAS Y SIN ACENTOS: " << p_tk._pasarAminuscSinAcentos;
 
 	return p_os;
 }
