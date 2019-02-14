@@ -108,10 +108,18 @@ public:
 	// Quita los acentos y pasa a minúsculas las mayúsculas 
 	std::string EliminarMinusAcentos(const std::string&) const;
 	// URL
-	void URL(char* &p_der) const;	
-private:
+	void URL(char* &p_izq, char* &p_der, std::list<std::string>&) const;	
+	// Devuelve True si el string pertenece a _indicadores
+	bool EsIndicador(const std::string&) const;
+	// True si el caracter es delimitador para la URL
+	bool esURLDelimiter(const char* p_caracter) const;
 
+private:
 	std::string _delimitersAux;
+	
+	// String para la URL
+	std::string _indicadores = "http https ftp";
+	std::string _URLdelimiters = "_:/.?&-=#@";
 
 	std::string _delimiters;
  	/* Delimitadores de términos. Aunque se

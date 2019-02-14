@@ -145,6 +145,8 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 				!SDelimitador(*(it-1)) &&
 				!SDelimitador(*(it+1))) {
 					Acronimo(it, it, p_tokens);
+			} else if (*it == ':') {
+				URL(it, it, p_tokens);
 			} else {
 				Generico(it, p_tokens);
 			}
@@ -157,9 +159,43 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 	}
 }
 
-void 
-Tokenizador::URL(char* &p_der) const {
+bool
+Tokenizador::EsIndicador(const std::string& p_indicador) const {
+	return (_indicadores.find(p_indicador) != std::string::npos);
+}
+
+bool
+Tokenizador::esURLDelimiter(const char* p_caracter) const {
+	return (_URLdelimiters.find(p_caracter) != std::string::npos) || 
+			(*p_caracter == ' ');
+}
+
+void
+Tokenizador::URL(char* &p_izq, char* &p_der, std::list<string>& p_l) const {
 	
+	// IF p_izq != p_der THEN viene de generico()
+	if (p_izq != p_der) {
+		std::string indicador = ObtenerString(p_izq, p_der-1);
+
+		// SI el indicador es correcto
+		if (EsIndicador(indicador)) {
+			p_der++; // Saltar los :
+
+			bool parar = false;
+			while (!esURLDelimiter(p_der) || (*p_der != '\0')) {
+				p_der++; // seguir iterando el string
+			}
+		}
+		std::cout << "URL push_back" << std::endl;
+		// Push del Token
+		p_l.push_back(ObtenerString(p_izq, p_der));
+		// Saltar el delimitador de la URL
+		p_der++;
+	} //No es url => devolver el indicador como token
+
+	/*std::cout << "URL: "
+			  << ObtenerString(p_izq, p_der)
+			  << std::endl;*/
 }
 
 void
@@ -169,7 +205,7 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 	char* pos_izq = p_der;
 
 	while (!parar) {
-		// SI: a medias encuentra un caso especial
+		// SI: a medias encuentra un ACRONIMO
 		if (*p_der == '.' &&
 			!SDelimitador(*(p_der-1)) &&
 			!SDelimitador(*(p_der+1))) {
@@ -181,6 +217,10 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 					Acronimo(pos_izq, p_der, p_tokens);
 					parar = true;
 				}
+		// SI: a medias encuentra una URL
+		} else if (*p_der == ':') {
+			URL(pos_izq, p_der, p_tokens);
+			parar = true;
 		// En otro caso: encuntra un delimitador ó \0
 		} else if (SDelimitador(*p_der) || *p_der == '\0') {
 			parar = token = true;
@@ -194,19 +234,6 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 	if (token && (p_der - pos_izq) > 1) {
 		p_tokens.push_back(ObtenerString(pos_izq, p_der-1));
 	}
-}
-
-std::string
-Tokenizador::ObtenerString(const char* p_i, const char* p_f) const {
-	std::string s_out;
-
-	if (p_i == p_f) {
-		s_out.assign(p_i, 1);
-	} else {
-		s_out.assign(p_i, (p_f - p_i));
-	}
-
-	return s_out;
 }
 
 void
@@ -250,6 +277,19 @@ Tokenizador::Acronimo(char* &p_izq, char* &p_der, std::list<std::string>& p_toke
 	if (token) {
 		p_tokens.push_back(ObtenerString(p_izq, pos_der));
 	}
+}
+
+std::string
+Tokenizador::ObtenerString(const char* p_i, const char* p_f) const {
+	std::string s_out;
+
+	if (p_i == p_f) {
+		s_out.assign(p_i, 1);
+	} else {
+		s_out.assign(p_i, (p_f - p_i));
+	}
+
+	return s_out;
 }
 
 bool
@@ -327,7 +367,7 @@ Tokenizador::DelimitadoresPalabra (const std::string& p_nuevoDelimiters) {
 void
 Tokenizador::AnyadirDelimitadoresPalabra (const std::string& p_newDel) {
 	std::string aux = p_newDel;
-	
+
 	// Eliminar caracteres repetidos
 	aux.erase(std::unique(aux.begin(), aux.end()), aux.end());
 
