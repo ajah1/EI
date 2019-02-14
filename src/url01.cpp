@@ -17,6 +17,7 @@ void imprimirListaSTL(const list<string>& cadena)
         cout << endl;
 }
 
+
 int
 main(void)
 {
@@ -24,7 +25,7 @@ main(void)
 
 	list<string> lt1, lt2;
 
-Tokenizador a("", true, false); 
+Tokenizador a("-#:/.", true, false); 
 list<string> tokens; 
 
 a.Tokenizar("http:", tokens);
