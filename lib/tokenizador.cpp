@@ -129,7 +129,7 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 
 		while (*it != '\0') {
 			//std::cout << ":ASDASD";
-			if (*it == '@') {
+			if (*it == '@' && SDelimitador('@')) {
 				MAIL(it, it, p_tokens);
 			}
 			else if (*it == ':') {
@@ -156,10 +156,11 @@ Tokenizador::esMailDelimiter(const char* p_caracter) const {
 
 void
 Tokenizador::MAIL(char* &p_izq, char* &p_der, std::list<string>& p_l) const {
+	
+	//pal1 @iuii.ua.es p1 p2
 
-	// No viene de generico
-	if (p_izq != p_der) {
-
+	// Viene de generico
+	if (p_izq != p_der){	// No viene de generico
 		// Guardar la posicion del primer @
 		char* pos_arroba = p_der++; // saltar el @
 
@@ -173,9 +174,6 @@ Tokenizador::MAIL(char* &p_izq, char* &p_der, std::list<string>& p_l) const {
 				p_der++;
 			}
 		}
-		/*std::cout << "MAIL:->"
-				  << ObtenerString(p_izq, p_der) << "<-"
-				  << std::endl;*/
 		if (!parar)
 			p_l.push_back(ObtenerString(p_izq, p_der));
 		 
@@ -227,13 +225,11 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 	char* pos_izq = p_der;
 
 	while (!parar) {
-
-		if (*p_der == '@') {
+		if (*p_der == '@' && SDelimitador('@')) {
 			MAIL(pos_izq, p_der, p_tokens);
 			parar = true;
-		}
 		// SI: a medias encuentra una URL
-		else if (*p_der == ':') {
+		} else if (*p_der == ':') {
 			URL(pos_izq, p_der, p_tokens);
 			parar = true;
 		// SI: a medias encuentra un ACRONIMO
