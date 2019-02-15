@@ -114,12 +114,19 @@ public:
 	// True si el caracter es delimitador para la URL
 	bool esURLDelimiter(const char* p_caracter) const;
 
+	// MAIL
+	void MAIL(char* &p_izq, char* &p_der) const;
+	// True si el caracter es delimitador para el Mail
+	bool esMailDelimiter(const char* p_caracter) const;
+
 private:
 	std::string _delimitersAux;
 	
 	// String para la URL
 	std::string _indicadores = "http https ftp";
 	std::string _URLdelimiters = "_:/.?&-=#@";
+	// String para el MAIL
+	std::string _maildelimiters = ".-_";
 
 	std::string _delimiters;
  	/* Delimitadores de términos. Aunque se

@@ -128,15 +128,18 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 		bool primera_it = true;
 
 		while (*it != '\0') {
-			if (*it == ':') {
+			//std::cout << ":ASDASD";
+			if (*it == '@') {
+				MAIL(it, it);
+			}
+			else if (*it == ':') {
 				URL(it, it, p_tokens);
 			} else if (*it == '.' && 
 				!primera_it &&
 				!SDelimitador(*(it-1)) &&
 				!SDelimitador(*(it+1))) {
 					Acronimo(it, it, p_tokens);
-			} 
-			 else {
+			} else {
 				Generico(it, p_tokens);
 			}
 
@@ -144,6 +147,46 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 		}
 	}
 }
+
+bool
+Tokenizador::esMailDelimiter(const char* p_caracter) const {
+	return (_maildelimiters.find(p_caracter) != std::string::npos) || 
+			(*p_caracter == ' ');
+}
+
+void
+Tokenizador::MAIL(char* &p_izq, char* &p_der) const { 
+	
+
+	//cat@iuii.ua.es@cd
+
+	// No viene de generico
+	if (p_izq != p_der) {
+
+		char* pos_arroba = p_der;
+
+		p_der++; // saltar el @
+
+		bool parar = false;
+		while (!parar && !esMailDelimiter(p_der) && *p_der != '\0') {
+			std::cout << "PDERMAIL: ->" << *p_der << "<-\n";
+			if (*p_der == '@') {
+				p_der = pos_arroba-1;
+				parar = true;
+			} else {
+				p_der++;
+			}
+		}
+
+		std::cout << "MAIL:->"
+				  << ObtenerString(p_izq, p_der) << "<-"
+				  << std::endl;
+
+		 // saltar el @
+		 p_der = pos_arroba + 2;
+	}
+}
+
 
 bool
 Tokenizador::EsIndicador(const std::string& p_indicador) const {
@@ -172,7 +215,6 @@ Tokenizador::URL(char* &p_izq, char* &p_der, std::list<string>& p_l) const {
 			while (!esURLDelimiter(p_der) && (*p_der != '\0')) {
 				p_der++; // seguir iterando el string
 			}
-			//p_l.push_back(ObtenerString(p_izq, p_der));
 			p_l.push_back(ObtenerString(p_izq, p_der+1));
 		}
 		
@@ -188,8 +230,12 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 
 	while (!parar) {
 
+		if (*p_der == '@') {
+			MAIL(pos_izq, p_der);
+			parar = true;
+		}
 		// SI: a medias encuentra una URL
-		if (*p_der == ':') {
+		else if (*p_der == ':') {
 			URL(pos_izq, p_der, p_tokens);
 			parar = true;
 		// SI: a medias encuentra un ACRONIMO

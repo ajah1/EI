@@ -21,7 +21,7 @@ run: $(EJECUTABLE)
 	./$^
 
 corrector: $(EJECUTABLE)
-	sh ./corrigeAlumno.sh
+	/bin/bash ./corrigeAlumno.sh
 
 memory: memory.cpp
 	$(CC) -o memory  $^
