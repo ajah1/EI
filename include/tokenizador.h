@@ -115,7 +115,7 @@ public:
 	bool esURLDelimiter(const char* p_caracter) const;
 
 	// MAIL
-	void MAIL(char* &p_izq, char* &p_der) const;
+	void MAIL(char* &p_izq, char* &p_der, std::list<std::string>&) const;
 	// True si el caracter es delimitador para el Mail
 	bool esMailDelimiter(const char* p_caracter) const;
 
