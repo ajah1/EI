@@ -17,7 +17,6 @@ void imprimirListaSTL(const list<string>& cadena)
         cout << endl;
 }
 
-
 int
 main(void)
 {
