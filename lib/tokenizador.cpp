@@ -62,22 +62,11 @@ Tokenizador::operator= (const Tokenizador& p_tk) {
 
 std::string
 Tokenizador::EliminarMinusAcentos (const std::string& p_str) const {
-	// á, é, í, ó, ú, à, è, ì, ò, ù
-	// Á, É, Í, Ó, Ú, À, È, Ì, Ò, Ù
-	/*
-		   **´**	**`** (-1)
-	a -> 193, 225
-	e -> 201, 233
-	i -> 205, 237
-	o -> 211, 243
-	u -> 218, 250
-	*/
-
 	string str_out = p_str;
 	for (int i = 0; i < p_str.length(); ++i) {
 		if(str_out[i] == (char)192 || str_out[i] == (char)193 || str_out[i] == (char)224 || str_out[i] == (char)225) {
 			str_out[i] = 'a';
-		} else if(str_out[i] == (char)200 || str_out[i]== (char)201 || str_out[i] == (char)232 || str_out[i] == (char)233) {
+		}else if(str_out[i] == (char)200 || str_out[i] == (char)201 || str_out[i] == (char)232 || str_out[i] == (char)233) {
 			str_out[i] = 'e';
 		}else if(str_out[i] == (char)204 || str_out[i] == (char)205 || str_out[i] == (char)236 || str_out[i] == (char)237) {
 			str_out[i] = 'i';
@@ -85,6 +74,8 @@ Tokenizador::EliminarMinusAcentos (const std::string& p_str) const {
 			str_out[i] = 'o';
 		}else if(str_out[i] == (char)217 || str_out[i] == (char)218 || str_out[i] == (char)249 || str_out[i] == (char)250) {
 			str_out[i] = 'u';
+		}else if(str_out[i] == (char)209){
+			str_out[i] = (char)241; // tolower no funciona con la Ñ
 		}else{
 			str_out[i]=(char)tolower(str_out[i]);
 		}
@@ -188,27 +179,6 @@ Tokenizador::URL(char* &p_izq, char* &p_der, std::list<string>& p_l) const {
 		p_der++;
 	}
 }
-
-/*
-	// IF p_izq != p_der THEN viene de generico()
-	if (p_izq != p_der) {
-
-		// comprobar el caso "http: otra" ó "http:"
-		if (*(p_der + 1) == '\0' && SDelimitador(*p_der)) {
-			p_l.push_back(ObtenerString(p_izq, p_der));
-		}
-		// SI el indicador es correcto (http, https, ...)
-		else if (EsIndicador(ObtenerString(p_izq, p_der-1))) { // -1 para no coger los :
-			p_der++; // Saltar los :
-
-			while (!esURLDelimiter(p_der) || (*p_der != '\0')) {
-				p_der++; // seguir iterando el string
-			}
-			p_l.push_back(ObtenerString(p_izq, p_der));
-		}
-		p_der++;
-	} //No es url => devolver el indicador como token
-*/
 
 void
 Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {

@@ -5,8 +5,6 @@
 
 using namespace std;
 
-///////// Comprobación de que vacíe la lista resultado
-
 void imprimirListaSTL(const list<string>& cadena)
 {
         list<string>::const_iterator itCadena;
@@ -20,21 +18,34 @@ void imprimirListaSTL(const list<string>& cadena)
 int
 main(void)
 {
-	bool kCasosEspeciales = true, kpasarAminusculas = false;
+		bool kCasosEspeciales = true, kpasarAminusculas = true;
 
-	list<string> lt1, lt2;
+		list<string> lt1, lt2, lt3;
 
-Tokenizador a("", true, false); 
-list<string> tokens; 
-
-a.Tokenizar("http:", tokens);
-	imprimirListaSTL(tokens);
-
-a.Tokenizar("http:////ab/", tokens);
-	imprimirListaSTL(tokens);
-
-a.Tokenizar("http:////ab.", tokens);
-	imprimirListaSTL(tokens);
+		Tokenizador a("[]# ", kCasosEspeciales, kpasarAminusculas);
 
 
+		a.Tokenizar("MS#DOS OS_2 [high low]", lt1);
+		imprimirListaSTL(lt1);
+
+		a.AnyadirDelimitadoresPalabra("_ []");
+		a.Tokenizar("MS#DOS OS_2 [high low]", lt2);
+		imprimirListaSTL(lt2);
+
+		a.DelimitadoresPalabra("_");
+		a.Tokenizar("MS#DOS OS_2 [high low]", lt3);
+		imprimirListaSTL(lt3);
+
+		a.DelimitadoresPalabra(" _");
+		a.Tokenizar("MS#DOS 10 España Éspáñé OS_2 [high low]", lt3);
+		imprimirListaSTL(lt3);
+
+		a.Tokenizar("áéíóú ÁÉÍÓÚ Ññ ", lt3);
+		imprimirListaSTL(lt3);
+
+		a.PasarAminuscSinAcentos(false);
+		a.DelimitadoresPalabra(" _");
+		a.Tokenizar("MS#DOS 10 España Éspáñé OS_2 [high low]", lt3);
+		imprimirListaSTL(lt3);
+		
 }
