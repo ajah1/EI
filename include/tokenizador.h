@@ -118,6 +118,8 @@ public:
 	void MAIL(char* &p_izq, char* &p_der, std::list<std::string>&) const;
 	// True si el caracter es delimitador para el Mail
 	bool esMailDelimiter(const char* p_caracter) const;
+	// GUION
+	void Guion(char* &p_izq, char* &p_der, std::list<std::string>&) const;
 
 private:
 	std::string _delimitersAux;

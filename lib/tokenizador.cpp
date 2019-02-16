@@ -10,6 +10,8 @@
 
 using namespace std;
 
+int str_size = 0;
+
 Tokenizador::Tokenizador (
 	const std::string& delimitadoresPalabra,
 	const bool& kcasosEspeciales, 
@@ -80,7 +82,7 @@ Tokenizador::EliminarMinusAcentos (const std::string& p_str) const {
 			str_out[i]=(char)tolower(str_out[i]);
 		}
 	}
-
+	
 	return str_out;
 }
 
@@ -94,7 +96,7 @@ Tokenizador::SDelimitador(const char p_d) const{
 				es_delimitador = true;
 			}
 		}
-	} else {
+	}else {
 		es_delimitador = (p_d == ' ');
 	} 	
 
@@ -104,13 +106,21 @@ Tokenizador::SDelimitador(const char p_d) const{
 void 
 Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_tokens) const {
 	
+	//p_tokens.clear();
+	for (int i = 0; i < p_tokens.size(); ++i) {
+		p_tokens.pop_back();
+	}
 	p_tokens.clear();
 
-	std::string s(p_str);
+	std::string s;
 
 	if (_pasarAminuscSinAcentos) {
-		s = EliminarMinusAcentos(p_str);
+		s.assign(EliminarMinusAcentos(p_str));
+	} else {
+		s.assign(p_str);
 	}
+
+	int s_size = s.length();
 
 	if (!_casosEspeciales) {
 		string::size_type lastPos 	= s.find_first_not_of(_delimiters, 0);
@@ -129,11 +139,13 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 
 		while (*it != '\0') {
 			//std::cout << ":ASDASD";
-			if (*it == '@' && SDelimitador('@')) {
+			if (*it == '@') {
 				MAIL(it, it, p_tokens);
 			}
 			else if (*it == ':') {
 				URL(it, it, p_tokens);
+			} else if (*it == '-' && !primera_it) {
+					Guion(it, it, p_tokens); 
 			} else if (*it == '.' && 
 				!primera_it &&
 				!SDelimitador(*(it-1)) &&
@@ -159,14 +171,25 @@ Tokenizador::MAIL(char* &p_izq, char* &p_der, std::list<string>& p_l) const {
 	
 	//pal1 @iuii.ua.es p1 p2
 
-	// Viene de generico
-	if (p_izq != p_der){	// No viene de generico
+	/*
+		izq != der => Generico()
+			iterar hasta encontrar un delimitador y obtenerString()
+		ELSE => Main() => devolver un token norma
+			¿@ es _delimiter?
+				SI => no incluir el @
+				NO => incluir el @
+	*/
+
+	//pal1 @iuii.ua.es p1 p2
+
+	if (p_izq != p_der){
 		// Guardar la posicion del primer @
 		char* pos_arroba = p_der++; // saltar el @
 
 		bool parar = false;
-		while (!parar && !esMailDelimiter(p_der) && *p_der != '\0') {
-			if (*p_der == '@' && SDelimitador(*p_der)) {
+		while (!parar && *p_der != ' ' && *p_der != '\0') {
+			//std::cout << "mizq:->" << *p_izq << "<-mder: " << *p_der << "<-" <<std::endl;
+			if (*p_der == '@' && SDelimitador('@')) {
 				p_l.push_back(ObtenerString(p_izq, pos_arroba));
 				p_der = pos_arroba + 1;
 				parar = true;
@@ -177,7 +200,19 @@ Tokenizador::MAIL(char* &p_izq, char* &p_der, std::list<string>& p_l) const {
 		if (!parar)
 			p_l.push_back(ObtenerString(p_izq, p_der));
 		 
-	} else {
+	} 
+	else if (p_izq == p_der && !SDelimitador('@')) {
+		//std::cout << "entra == " << std::endl;
+		bool parar = false;
+		char* pos_aux = p_izq;
+		while (!parar && *p_der != ' ' && *p_der != '\0') {
+		//	std::cout << "==izq:->" << *p_izq << "<-==der: " << *p_der << "<-" <<std::endl;
+			p_der++;
+		}
+			p_l.push_back(ObtenerString(pos_aux, p_der));
+	}
+
+	else {
 		p_der++; // Saltar el @ suelto
 	}
 }
@@ -225,14 +260,15 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 	char* pos_izq = p_der;
 
 	while (!parar) {
-		if (*p_der == '@' && SDelimitador('@')) {
-			MAIL(pos_izq, p_der, p_tokens);
-			parar = true;
-		// SI: a medias encuentra una URL
-		} else if (*p_der == ':') {
+		//std::cout << "Gp_izq->" << *pos_izq << "<- Gp_der:->" << *p_der << "<-"<< std::endl;
+
+		if (*p_der == ':') {
 			URL(pos_izq, p_der, p_tokens);
 			parar = true;
-		// SI: a medias encuentra un ACRONIMO
+		} else if (*p_der == '@') {
+			MAIL(pos_izq, p_der, p_tokens);
+			parar = true;
+					// En otro caso: encuntra un delimitador ó \0
 		} else if (*p_der == '.' &&
 			!SDelimitador(*(p_der-1)) &&
 			!SDelimitador(*(p_der+1))) {
@@ -244,10 +280,25 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 					Acronimo(pos_izq, p_der, p_tokens);
 					parar = true;
 				}
+		} else if (*p_der == '-' &&
+			!SDelimitador(*(p_der-1)) &&
+			!SDelimitador(*(p_der+1))) {
+				// Si pos+1 es un punto no es acronimo
+				if (*(p_der+1) == '-') {
+					p_der += 2;
+				// LLamada a Acronimo()
+				} else {
+					Guion(pos_izq, p_der, p_tokens);
+					parar = true;
+				}
 		// En otro caso: encuntra un delimitador ó \0
-		} else if (SDelimitador(*p_der) || *p_der == '\0') {
+		//std::cout << "Encuentra el delimitador:-->" << *p_der << "<--" << std::endl;
+		} else if (SDelimitador(*p_der)) {
 			parar = token = true;
 			p_der++;
+		} else if (*p_der == '\0') {
+			parar = true;
+			p_tokens.push_back(ObtenerString(pos_izq, p_der));
 		// ELSE: seguir iterando
 		} else {
 			p_der++;
@@ -256,6 +307,49 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 
 	if (token && (p_der - pos_izq) > 1) {
 		p_tokens.push_back(ObtenerString(pos_izq, p_der-1));
+	}
+}
+
+void
+Tokenizador::Guion(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const {
+	//std::cout << "\n[LOG] Acronimo() \n";
+	bool token = false;
+	bool parar = false;
+
+	char* pos_der = nullptr;
+
+	while (!parar) {
+		// Casos para el .
+		if (*p_der == '-') {
+			// ...
+			if (p_izq == p_der) {
+				p_der++;
+				parar = true;
+			} // A.
+			else if (!SDelimitador(*(p_der-1))) {
+				// A.
+				if (SDelimitador(*(p_der+1)) || *(p_der+1) == '-' && SDelimitador('-')) {
+					pos_der = p_der++;
+					parar = token = true;
+				// A.A
+				} else { p_der += 1;}
+			// ..A
+			} else if (!SDelimitador(*(p_der+1))) {
+				p_der++;
+				parar = true;
+			}
+		// Encuentra un delimitador para y muestra token
+		} else if (SDelimitador(*p_der) || *p_der == '\0') {
+			pos_der = p_der;
+			parar = token = true;
+		// seguir iterando
+		} else {
+			p_der++;
+		}
+	}
+
+	if (token) {
+		p_tokens.push_back(ObtenerString(p_izq, pos_der));
 	}
 }
 
