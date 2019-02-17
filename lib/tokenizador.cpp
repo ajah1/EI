@@ -261,39 +261,50 @@ Tokenizador::EsURLIndicador(const std::string& p_indicador) const {
 	return (_URLindc.find(p_indicador) != std::string::npos);
 }
 /////////////////////////////////////////////////////////////
-// COMPRUEBA SI EL CARACTER ES UNO DE LOS CARÁCTERES QUE NO 
-// PUEDEN DELIMITAR A UNA URL
+// COMPRUEBA SI EL CARACTER ES DELIMITADOR Y NO SE ENCUENTRA
+// EN LAS EXCEPCIONES DE LA URL
 /////////////////////////////////////////////////////////////
 bool
 Tokenizador::EsURLDelimiter(const char* p_caracter) const {
-	return (_URLdelimiters.find(*p_caracter) != std::string::npos) || 
-			(*p_caracter == ' ');
+	return (*p_caracter == ' ') || 
+		(_delimiters.find(*p_caracter) != std::string::npos
+			&& _URLdelimiters.find(*p_caracter) == std::string::npos);
 }
 /////////////////////////////////////////////////////////////
 // POSICIONA LOS PUNTEROS AL PRINCIPIO Y FINAL DEL TOKEN
 // QUE FORMAN LA URL.
 /////////////////////////////////////////////////////////////
+
+/*
+Tokenizador a("-#:/.", true, false); 
+// http, 
+a.Tokenizar("http:", tokens);
+// http:////ab/, 
+a.Tokenizar("http:////ab/", tokens);
+// http:////ab., 
+a.Tokenizar("http:////ab.", tokens);
+*/
 void
 Tokenizador::URL(char*& p_izq, char*& p_der, std::list<std::string>& p_l) const {
 	// Solo hay una URL a obtener si el inicio y fin dado son dir. mem. distintas
 	if (p_izq != p_der) {
-		// IF: el indicador se encuntra a final de string o luego viene un _del
-		if (*(p_der + 1) == '\0' && EsDelimiter(*p_der)) {
-			// THEN: NO es una URL, devolver el token actual
-			p_l.push_back(ObtenerString(p_izq, p_der));
-		}
-		// ELSE: el indicador es aceptado por la URL (http, https, ...)
-		else if (EsURLIndicador(ObtenerString(p_izq, p_der-1))) { // -1 para no coger los :
-			p_der++; // Saltar los :
-			// Leer carácteres hasta encontrar un delimitador de la URL
-			while (!EsURLDelimiter(p_der) && (*p_der != '\0')) {
-				p_der++; // siguiente posición de memoria a leer
+		if (*(p_der+1) == '\0' || EsDelimiter(*p_der+1)) { 
+			if (EsDelimiter(*p_der)) {
+				p_l.push_back(ObtenerString(p_izq, p_der));
+			} else {
+				p_l.push_back(ObtenerString(p_izq, p_der+1));
 			}
-			// Devolver el token de la URL
+			p_der++;
+		} else if (EsURLIndicador(ObtenerString(p_izq, p_der))){
+			while (*p_der != '\0' && !EsURLDelimiter(p_der)) {
+				p_der++;
+			}
+			p_l.push_back(ObtenerString(p_izq, p_der));
+		} else {
 			p_l.push_back(ObtenerString(p_izq, p_der+1));
 		}
-		// Si no hay nada que hacer saltar el caracter
-		p_der++;
+	} else {
+		p_der++;	
 	}
 }
 
