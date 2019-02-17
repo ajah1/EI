@@ -109,18 +109,17 @@ Tokenizador::MAIL(char*& p_izq, char*& p_der, std::list<std::string>& p_l) const
 void
 Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 	//std::cout << "\n[LOG] Generico() \n";
-	bool parar = false, token = false;
+	bool aux = false, parar = false, token = false;
 	char* pos_izq = p_der;
 
 	while (!parar) {
 		//std::cout << "Gp_izq->" << *pos_izq << "<- Gp_der:->" << *p_der << "<-"<< std::endl;
+		parar = true;
 
 		if (*p_der == ':') {
 			URL(pos_izq, p_der, p_tokens);
-			parar = true;
 		} else if (*p_der == '@') {
 			MAIL(pos_izq, p_der, p_tokens);
-			parar = true;
 					// En otro caso: encuntra un delimitador ó \0
 		} else if (*p_der == '.' &&
 			!EsDelimiter(*(p_der-1)) &&
@@ -128,10 +127,10 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 				// Si pos+1 es un punto no es acronimo
 				if (*(p_der+1) == '.') {
 					p_der += 2;
+					parar = false;
 				// LLamada a Acronimo()
 				} else {
 					Acronimo(pos_izq, p_der, p_tokens);
-					parar = true;
 				}
 		} else if (*p_der == '-' &&
 			!EsDelimiter(*(p_der-1)) &&
@@ -139,21 +138,20 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 				// Si pos+1 es un punto no es acronimo
 				if (*(p_der+1) == '-') {
 					p_der += 2;
+					parar = false;
 				// LLamada a Acronimo()
 				} else {
 					Guion(pos_izq, p_der, p_tokens);
-					parar = true;
 				}
-		// En otro caso: encuntra un delimitador ó \0
 		//std::cout << "Encuentra el delimitador:-->" << *p_der << "<--" << std::endl;
 		} else if (EsDelimiter(*p_der)) {
-			parar = token = true;
+			token = true;
 			p_der++;
 		} else if (*p_der == '\0') {
-			parar = true;
 			p_tokens.push_back(ObtenerString(pos_izq, p_der));
 		// ELSE: seguir iterando
 		} else {
+			parar = false;
 			p_der++;
 		}
 	}
@@ -275,15 +273,6 @@ Tokenizador::EsURLDelimiter(const char* p_caracter) const {
 // QUE FORMAN LA URL.
 /////////////////////////////////////////////////////////////
 
-/*
-Tokenizador a("-#:/.", true, false); 
-// http, 
-a.Tokenizar("http:", tokens);
-// http:////ab/, 
-a.Tokenizar("http:////ab/", tokens);
-// http:////ab., 
-a.Tokenizar("http:////ab.", tokens);
-*/
 void
 Tokenizador::URL(char*& p_izq, char*& p_der, std::list<std::string>& p_l) const {
 	// Solo hay una URL a obtener si el inicio y fin dado son dir. mem. distintas
@@ -307,9 +296,6 @@ Tokenizador::URL(char*& p_izq, char*& p_der, std::list<std::string>& p_l) const 
 		p_der++;	
 	}
 }
-
-
-
 
 //////////////////////////////////////////////////////////////////////////////
 ////// 			TOKENIZADOR                                              ///// 
