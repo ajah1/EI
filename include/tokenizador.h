@@ -95,4 +95,8 @@ private:
 	void TokenizarGeneral(std::string&, std::list<std::string>&) const;
 	// Tokeniza el string teniendo en cuenta los casos especiales
 	void TokenizarEspecial(std::string& s, std::list<std::string>& p_tokens) const;
+
+
+	void GuionAux1(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const;
+	void GuionAux2(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const;
 };

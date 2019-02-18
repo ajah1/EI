@@ -132,17 +132,8 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 				} else {
 					Acronimo(pos_izq, p_der, p_tokens);
 				}
-		} else if (*p_der == '-' &&
-			!EsDelimiter(*(p_der-1)) &&
-			!EsDelimiter(*(p_der+1))) {
-				// Si pos+1 es un punto no es acronimo
-				if (*(p_der+1) == '-') {
-					p_der += 2;
-					parar = false;
-				// LLamada a Acronimo()
-				} else {
-					Guion(pos_izq, p_der, p_tokens);
-				}
+		} else if (*p_der == '-') {
+			Guion(pos_izq, p_der, p_tokens);
 		//std::cout << "Encuentra el delimitador:-->" << *p_der << "<--" << std::endl;
 		} else if (EsDelimiter(*p_der)) {
 			token = true;
@@ -161,45 +152,46 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 	}
 }
 
+
+void Tokenizador::GuionAux1(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const {
+	char* pos_izq = p_izq;
+	if (p_izq == p_der)
+		p_der++;
+
+	while (!EsDelimiter(*p_der) && *p_der != '\0') {
+		p_der++;
+	}
+	p_tokens.push_back(ObtenerString(pos_izq , p_der));
+}
+
+void Tokenizador::GuionAux2(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const {
+	// EL guion es forma una palabra compuesta?
+	if (!EsDelimiter(*(p_der-1)) && !EsDelimiter(*(p_der+1))) {
+
+		bool parar = false;
+		while (*p_der != '\0' && !parar && *p_der != ' ') {
+			if (*p_der == '-' && (EsDelimiter(*(p_der-1)) || EsDelimiter(*(p_der+1)))) {
+				parar = true;
+			} else if (*p_der != '-' && EsDelimiter(*p_der)) {
+				parar = true;
+			} else {
+				p_der++;
+			}
+		}
+		p_tokens.push_back(ObtenerString(p_izq , p_der));
+
+	} else {
+		p_der++;  // Dado que no es compuesta, devolver token
+	}
+}
+
 void
 Tokenizador::Guion(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const {
-	//std::cout << "\n[LOG] Acronimo() \n";
-	bool token = false, parar = false;
-	char* pos_der = nullptr;
-
-	while (!parar) {
-		// Casos para el .
-		if (*p_der == '-') {
-			// ...
-			if (p_izq == p_der) {
-				p_der++;
-				parar = true;
-			} // A.
-			else if (!EsDelimiter(*(p_der-1))) {
-				// A.
-				if (EsDelimiter(*(p_der+1)) || *(p_der+1) == '-' && EsDelimiter('-')) {
-					pos_der = p_der++;
-					parar = token = true;
-				// A.A
-				} else { p_der += 1;}
-			// ..A
-			} else if (!EsDelimiter(*(p_der+1))) {
-				p_der++;
-				parar = true;
-			}
-		// Encuentra un delimitador para y muestra token
-		} else if (EsDelimiter(*p_der) || *p_der == '\0') {
-			pos_der = p_der;
-			parar = token = true;
-		// seguir iterando
-		} else {
-			p_der++;
-		}
+	if (!EsDelimiter('-')) {
+		GuionAux1(p_izq, p_der, p_tokens);
 	}
-
-	if (token) {
-		p_tokens.push_back(ObtenerString(p_izq, pos_der));
-	}
+	else
+		GuionAux2(p_izq, p_der, p_tokens);
 }
 
 void
@@ -318,6 +310,7 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 		TokenizarGeneral(s, p_tokens);
 	// ELSE: TOKENIZAR CON LOS CASOS ESPECIALES
 	} else if (!p_str.empty()) {
+		//std::cout << "GERICO" << std::endl; 
 		TokenizarEspecial(s, p_tokens);
 	}
 }
@@ -411,7 +404,7 @@ Tokenizador::TokenizarEspecial(std::string& s, std::list<std::string>& p_tokens)
 			MAIL(it, it, p_tokens);
 		} else if (*it == ':') {					// URL
 			URL(it, it, p_tokens);
-		} else if (*it == '-' && !primera_it) {		// GUIONES
+		} else if (*it == '-') {					// GUIONES
 			Guion(it, it, p_tokens);
 		} else if (*it == '.' && !primera_it 		// ACRONIMO
 					&& !EsDelimiter(*(it-1)) 
