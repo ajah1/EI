@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <map>
+#include <sstream>
 
 // Definir el delegado
 typedef void (Tokenizador::*funcp)(char*&, char*&) const;
@@ -399,15 +400,25 @@ Tokenizador::TokenizarListaFicheros (const std::string& p_i) const {
 	using namespace std;
 
 	ifstream file;
+	file.open(p_i.c_str());
+
+	auto ss = std::ostringstream();
+	ss << file.rdbuf();
+	
+	std::string contenido = ss.str();
+	std::cout << contenido << std::endl;
+
+/*
+	ifstream file;
 	ofstream ofile;
-	string linea;
+
 	file.open(p_i.c_str());
 	struct stat dir;
 
 	if(file.is_open()){
 		//Recorre el fichero leyendo líneas y tokenizandolas
 		while(!file.eof()){
-			linea = "";
+			string linea = "";
 			getline(file, linea);
 			int err=stat(linea.c_str(), &dir);
 
@@ -423,7 +434,7 @@ Tokenizador::TokenizarListaFicheros (const std::string& p_i) const {
 		cerr << "ERROR: No existe el archivo: " << p_i << endl;
 		return false;
 	}
-	return true;
+	return true;*/
 }
 /////////////////////////////////////////////////////////////
 // Tokeniza un directorio, incluyendo los subdirectorios
