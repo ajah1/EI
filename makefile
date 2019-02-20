@@ -39,7 +39,7 @@ info:
 	$(info $(CC))
 	$(info $(OPTIONS))
 	$(info $(DEBUG))
-	$(info $(LIBDIR))l
+	$(info $(LIBDIR))
 	$(info $(INCLUDEDIR))
 	$(info $(SOURCES))
 	$(info $(_OBJ))

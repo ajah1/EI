@@ -12,7 +12,7 @@ void imprimirListaSTL(const list<string>& cadena)
         list<string>::const_iterator itCadena;
         for(itCadena=cadena.begin();itCadena!=cadena.end();itCadena++)
         {
-                cout << (*itCadena) << "\t";
+                cout << (*itCadena) << ", ";
         }
         cout << endl;
 }

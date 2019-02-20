@@ -99,4 +99,14 @@ private:
 
 	void GuionAux1(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const;
 	void GuionAux2(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const;
+
+	void AcronimoAux1(char* &p_izq, char*& p_der, std::list<std::string>& p_tokens) const;
+	void AcronimoAux2(char* &p_izq, char*& p_der, std::list<std::string>& p_tokens) const;
+ 
+	void SelEspecial(bool&, char*&, char*&, std::list<std::string>&) const;
+
+	void Numero(char* p_izq, char*p_der) const;
+
+	bool EsAcronimoDel(char* p) const;
+
 };
