@@ -5,7 +5,24 @@
 #include <sys/stat.h>
 #include <cstdlib>
 #include <algorithm>
+#include <map>
 
+// Definir el delegado
+typedef void (Tokenizador::*funcp)(char*&, char*&, std::list<std::string>&) const;
+// HasMap
+std::map<char, funcp> especial;
+// Instacia Tokenizador para usar el delegado
+Tokenizador t;
+// Referencia a  la list de tokens
+std::list<std::string>* RTokens = nullptr;
+
+void
+Tokenizador::InitMap() {
+	especial['@'] = &Tokenizador::MAIL;
+	especial['-'] = &Tokenizador::Guion;
+	especial[':'] = &Tokenizador::URL;
+	especial['.'] = &Tokenizador::Acronimo;
+}
 //////////////////////////////////////////////////////////////////////////////
 ////// 			    CONSTRUCTORES                                        ///// 
 //////////////////////////////////////////////////////////////////////////////
@@ -52,6 +69,7 @@ Tokenizador::operator= (const Tokenizador& p_tk) {
 	return *this;
 }
 
+//typedef void (*funcp)(char*&, char*&, std::list<std::string>&) const;
 
 //////////////////////////////////////////////////////////////////////////////
 ////// 						MAIL                                          ///// 
@@ -111,6 +129,13 @@ Tokenizador::Numero(char* p_izq, char* p_der) const {}
 //////////////////////////////////////////////////////////////////////////////
 ////// 					GENERICO                                          ///// 
 //////////////////////////////////////////////////////////////////////////////
+
+void
+Tokenizador::StoreToken(char*& p_izq, char*& p_der) {
+	//p_tokens.push_back(ObtenerString(pos_izq, p_der-1));
+	RTokens->push_back(ObtenerString(p_izq, p_der));
+}
+
 void
 Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 	bool aux = false, parar = false;
@@ -306,6 +331,9 @@ Tokenizador::URL(char*& p_izq, char*& p_der, std::list<std::string>& p_l) const 
 /////////////////////////////////////////////////////////////
 void 
 Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_tokens) const {
+
+	// Guardo la dirc de la lista de tokens
+	RTokens = &p_tokens;
 	// Liberar memoria de la lista y poner size a cero
 	p_tokens.clear();
 	// Copia del String a tokenizar
@@ -407,16 +435,11 @@ Tokenizador::TokenizarEspecial(std::string& s, std::list<std::string>& p_tokens)
 	char* it = &s.at(0);
 	// Iterar String hasta llegar al final
 	while (*it != '\0') {
-		if (*it == '@') {							// MAIL
-			MAIL(it, it, p_tokens);
-		} else if (*it == ':') {					// URL
-			URL(it, it, p_tokens);
-		} else if (*it == '-') {					// GUIONES
-			Guion(it, it, p_tokens);
-		} else if (*it == '.' ) {					// ACRONIMO
-			Acronimo(it, it, p_tokens);
-		} else {									// NO DETECTA ESPECIALES
-			Generico(it, p_tokens);
+		auto f = especial.find(*it); 			// Obtener el valor
+		if (f != especial.end()) {				// Si *it tiene valor
+			(t.*f->second)(it, it, p_tokens);	// Usar el delegado
+		} else {
+			Generico(it, p_tokens);				// Usa el caso Generico()
 		}
 	}
 }

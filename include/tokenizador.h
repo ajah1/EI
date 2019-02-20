@@ -34,10 +34,22 @@ public:
 	void PasarAminuscSinAcentos (const bool& p_PasarAminuscSinAcentos);
 	void CasosEspeciales (const bool& p_nuevoCasosEspeciales);
 
+	//////////////////////////////////////////////
+	// MAIL: obtiene el token MAIL
+	////////////////////////////////////////////////
+	void MAIL(char*& p_izq, char*& p_der, std::list<std::string>&) const;
+	// True si el caracter es delimitador para el Mail
+	bool EsMailDelimiter(const char* p_caracter) const;
+
+		void InitMap();
+
+
+void StoreToken(char*& p_izq, char*& p_der);
+
 private:
 	std::string _delimiters 		= "";
 	bool _casosEspeciales			= false;
-	bool _pasarAminuscSinAcentos	= false;	
+	bool _pasarAminuscSinAcentos	= false;
 
 	//////////////////////////////////////////////
 	//STRING'S AUXILIARES
@@ -70,12 +82,6 @@ private:
 	// True si el caracter es delimitador para la URL
 	bool EsURLDelimiter(const char* p_caracter) const;
 
-	//////////////////////////////////////////////
-	// MAIL: obtiene el token MAIL
-	////////////////////////////////////////////////
-	void MAIL(char*& p_izq, char*& p_der, std::list<std::string>&) const;
-	// True si el caracter es delimitador para el Mail
-	bool EsMailDelimiter(const char* p_caracter) const;
 
 	//////////////////////////////////////////////
 	// GUION: obtiene el token GUION
