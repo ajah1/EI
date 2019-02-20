@@ -34,16 +34,7 @@ public:
 	void PasarAminuscSinAcentos (const bool& p_PasarAminuscSinAcentos);
 	void CasosEspeciales (const bool& p_nuevoCasosEspeciales);
 
-	//////////////////////////////////////////////
-	// MAIL: obtiene el token MAIL
-	////////////////////////////////////////////////
-	void MAIL(char*& p_izq, char*& p_der) const;
-	// True si el caracter es delimitador para el Mail
-	bool EsMailDelimiter(const char* p_caracter) const;
 
-		void InitMap();
-
-void StoreToken(char* p_izq, char* p_der) const;
 private:
 	std::string _delimiters 		= "";
 	bool _casosEspeciales			= false;
@@ -62,11 +53,6 @@ private:
 	std::string _MAILdelimiters = ".-_";
 
 	//////////////////////////////////////////////
-	// ACRONIMO: obtiene el token acronimo
-	////////////////////////////////////////////////
-	void Acronimo(char*& p_izq, char*& p_it) const;
-
-	//////////////////////////////////////////////
 	// GENERICO:  obtiene el token cuando no detecta especial
 	////////////////////////////////////////////////
 	void Generico(char*& p_it) const;
@@ -80,11 +66,32 @@ private:
 	// True si el caracter es delimitador para la URL
 	bool EsURLDelimiter(const char* p_caracter) const;
 
+	//////////////////////////////////////////////
+	// MAIL: obtiene el token MAIL
+	////////////////////////////////////////////////
+	void MAIL(char*& p_izq, char*& p_der) const;
+	// True si el caracter es delimitador para el Mail
+	bool EsMailDelimiter(const char* p_caracter) const;
+
+	//////////////////////////////////////////////
+	// ACRONIMO: obtiene el token acronimo
+	////////////////////////////////////////////////
+	void Acronimo(char*& p_izq, char*& p_it) const;
+	void AcronimoAux1(char* &p_izq, char*& p_der) const;
+	void AcronimoAux2(char* &p_izq, char*& p_der) const;
+	bool EsAcronimoDel(char* p) const;
 
 	//////////////////////////////////////////////
 	// GUION: obtiene el token GUION
 	////////////////////////////////////////////////
 	void Guion(char*& p_izq, char*& p_der) const;
+	void GuionAux1(char* &p_izq, char* &p_der) const;
+	void GuionAux2(char* &p_izq, char* &p_der) const;
+
+	//////////////////////////////////////////////
+	// GUION: obtiene el token GUION
+	////////////////////////////////////////////////
+	void Numero(char* p_izq, char*p_der) const;
 
 	////////////////////////////////////////////////
 	//FUNCIONES AUXILIARES
@@ -99,18 +106,7 @@ private:
 	void TokenizarGeneral(std::string&, std::list<std::string>&) const;
 	// Tokeniza el string teniendo en cuenta los casos especiales
 	void TokenizarEspecial(std::string&, std::list<std::string>&) const;
-
-
-	void GuionAux1(char* &p_izq, char* &p_der) const;
-	void GuionAux2(char* &p_izq, char* &p_der) const;
-
-	void AcronimoAux1(char* &p_izq, char*& p_der) const;
-	void AcronimoAux2(char* &p_izq, char*& p_der) const;
- 
-	void SelEspecial(bool&, char*&, char*&) const;
-
-	void Numero(char* p_izq, char*p_der) const;
-
-	bool EsAcronimoDel(char* p) const;
-
+	// Inicializar los pares del hasmap
+	void InitMap() const;
+	void StoreToken(char* p_izq, char* p_der) const;
 };

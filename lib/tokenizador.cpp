@@ -16,18 +16,12 @@ Tokenizador t;
 // Puntero a la lista de tokens
 std::list<std::string>* PTokens = nullptr;
 
-
 void
-Tokenizador::StoreToken(char* p_izq, char* p_der) const{
-	PTokens->push_back(ObtenerString(p_izq, p_der));
-}
-
-void
-Tokenizador::InitMap() {
-	especial['@'] = &Tokenizador::MAIL;
-	especial['-'] = &Tokenizador::Guion;
+Tokenizador::InitMap() const{
 	especial[':'] = &Tokenizador::URL;
+	especial['@'] = &Tokenizador::MAIL;
 	especial['.'] = &Tokenizador::Acronimo;
+	especial['-'] = &Tokenizador::Guion;
 }
 //////////////////////////////////////////////////////////////////////////////
 ////// 			    CONSTRUCTORES                                        ///// 
@@ -75,7 +69,91 @@ Tokenizador::operator= (const Tokenizador& p_tk) {
 	return *this;
 }
 
-//typedef void (*funcp)(char*&, char*&, std::list<std::string>&) const;
+void 
+Tokenizador::Numero(char* p_izq, char* p_der) const {}
+
+//////////////////////////////////////////////////////////////////////////////
+////// 					GENERICO                                          ///// 
+//////////////////////////////////////////////////////////////////////////////
+void
+Tokenizador::Generico(char* &p_der) const {
+	bool aux = false, parar = false;
+	char* pos_izq = p_der;
+
+	while (!parar) {
+		//std::cout << "Gp_izq->" << *pos_izq << "<- Gp_der:->" << *p_der << "<-"<< std::endl;
+		parar = true;
+
+		if (*p_der == ':') {
+			URL(pos_izq, p_der);
+		} else if (*p_der == '@') {
+			MAIL(pos_izq, p_der);
+		} else if (*p_der == '.') {
+			Acronimo(pos_izq, p_der);
+		} else if (*p_der == '-') {
+			Guion(pos_izq, p_der);
+		} else if (EsDelimiter(*p_der)) {
+			p_der++; // Saltar el delimitador
+			if ((p_der - pos_izq) > 1)
+				StoreToken(pos_izq, p_der-1);
+		} else if (*p_der == '\0') {
+			StoreToken(pos_izq, p_der);
+		// ELSE: seguir iterando
+		} else {
+			parar = false;
+			p_der++;
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////
+////// 						URL                                          ///// 
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+// COMPRUEBA SI P_INDICADOR, PERTENECE A LA LISTA DE 
+// INDICADORES ACEPTADOS EN UNA URL (http, https, ...)
+/////////////////////////////////////////////////////////////
+bool
+Tokenizador::EsURLIndicador(const std::string& p_indicador) const {
+	return (_URLindc.find(p_indicador) != std::string::npos);
+}
+/////////////////////////////////////////////////////////////
+// COMPRUEBA SI EL CARACTER ES DELIMITADOR Y NO SE ENCUENTRA
+// EN LAS EXCEPCIONES DE LA URL
+/////////////////////////////////////////////////////////////
+bool
+Tokenizador::EsURLDelimiter(const char* p_caracter) const {
+	return (*p_caracter == ' ') || 
+		(_delimiters.find(*p_caracter) != std::string::npos
+			&& _URLdelimiters.find(*p_caracter) == std::string::npos);
+}
+/////////////////////////////////////////////////////////////
+// POSICIONA LOS PUNTEROS AL PRINCIPIO Y FINAL DEL TOKEN
+// QUE FORMAN LA URL.
+/////////////////////////////////////////////////////////////
+void
+Tokenizador::URL(char*& p_izq, char*& p_der) const {
+	// Solo hay una URL a obtener si el inicio y fin dado son dir. mem. distintas
+	if (p_izq != p_der) {
+		if (*(p_der+1) == '\0' || EsDelimiter(*p_der+1)) { 
+			if (EsDelimiter(*p_der)) {
+				StoreToken(p_izq, p_der);
+			} else {
+				StoreToken(p_izq, p_der+1);
+			}
+			p_der++;
+		} else if (EsURLIndicador(ObtenerString(p_izq, p_der))){
+			while (*p_der != '\0' && !EsURLDelimiter(p_der)) {
+				p_der++;
+			}
+			StoreToken(p_izq, p_der);
+		} else {
+			StoreToken(p_izq, p_der+1);
+		}
+	} else {
+		p_der++;	
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////////
 ////// 						MAIL                                          ///// 
@@ -126,43 +204,6 @@ Tokenizador::MAIL(char*& p_izq, char*& p_der) const {
 			StoreToken(pos_aux, p_der);
 	} else {
 		p_der++; // Saltar el @ suelto
-	}
-}
-
-void 
-Tokenizador::Numero(char* p_izq, char* p_der) const {}
-
-//////////////////////////////////////////////////////////////////////////////
-////// 					GENERICO                                          ///// 
-//////////////////////////////////////////////////////////////////////////////
-void
-Tokenizador::Generico(char* &p_der) const {
-	bool aux = false, parar = false;
-	char* pos_izq = p_der;
-
-	while (!parar) {
-		//std::cout << "Gp_izq->" << *pos_izq << "<- Gp_der:->" << *p_der << "<-"<< std::endl;
-		parar = true;
-
-		if (*p_der == ':') {
-			URL(pos_izq, p_der);
-		} else if (*p_der == '@') {
-			MAIL(pos_izq, p_der);
-		} else if (*p_der == '.') {
-			Acronimo(pos_izq, p_der);
-		} else if (*p_der == '-') {
-			Guion(pos_izq, p_der);
-		} else if (EsDelimiter(*p_der)) {
-			p_der++; // Saltar el delimitador
-			if ((p_der - pos_izq) > 1)
-				StoreToken(pos_izq, p_der-1);
-		} else if (*p_der == '\0') {
-			StoreToken(pos_izq, p_der);
-		// ELSE: seguir iterando
-		} else {
-			parar = false;
-			p_der++;
-		}
 	}
 }
 
@@ -226,7 +267,23 @@ Tokenizador::Acronimo(char* &p_izq, char*& p_der) const {
 	}
 }
 
-
+//////////////////////////////////////////////////////////////////////////////
+////// 						Guion                                          ///// 
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
+void
+Tokenizador::Guion(char* &p_izq, char* &p_der) const {
+	if (!EsDelimiter('-')) {
+		GuionAux1(p_izq, p_der);
+	}
+	else
+		GuionAux2(p_izq, p_der);
+}
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
 void Tokenizador::GuionAux1(char* &p_izq, char* &p_der) const {
 	char* pos_izq = p_izq;
 	if (p_izq == p_der)
@@ -237,7 +294,9 @@ void Tokenizador::GuionAux1(char* &p_izq, char* &p_der) const {
 	}
 	StoreToken(pos_izq , p_der);
 }
-
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
 void Tokenizador::GuionAux2(char* &p_izq, char* &p_der) const {
 	// EL guion es forma una palabra compuesta?
 	if (!EsDelimiter(*(p_der-1)) && !EsDelimiter(*(p_der+1))) {
@@ -256,69 +315,6 @@ void Tokenizador::GuionAux2(char* &p_izq, char* &p_der) const {
 
 	} else {
 		p_der++;  // Dado que no es compuesta, devolver token
-	}
-}
-
-void
-Tokenizador::Guion(char* &p_izq, char* &p_der) const {
-	if (!EsDelimiter('-')) {
-		GuionAux1(p_izq, p_der);
-	}
-	else
-		GuionAux2(p_izq, p_der);
-}
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////
-////// 						URL                                          ///// 
-//////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
-// COMPRUEBA SI P_INDICADOR, PERTENECE A LA LISTA DE 
-// INDICADORES ACEPTADOS EN UNA URL (http, https, ...)
-/////////////////////////////////////////////////////////////
-bool
-Tokenizador::EsURLIndicador(const std::string& p_indicador) const {
-	return (_URLindc.find(p_indicador) != std::string::npos);
-}
-/////////////////////////////////////////////////////////////
-// COMPRUEBA SI EL CARACTER ES DELIMITADOR Y NO SE ENCUENTRA
-// EN LAS EXCEPCIONES DE LA URL
-/////////////////////////////////////////////////////////////
-bool
-Tokenizador::EsURLDelimiter(const char* p_caracter) const {
-	return (*p_caracter == ' ') || 
-		(_delimiters.find(*p_caracter) != std::string::npos
-			&& _URLdelimiters.find(*p_caracter) == std::string::npos);
-}
-/////////////////////////////////////////////////////////////
-// POSICIONA LOS PUNTEROS AL PRINCIPIO Y FINAL DEL TOKEN
-// QUE FORMAN LA URL.
-/////////////////////////////////////////////////////////////
-
-void
-Tokenizador::URL(char*& p_izq, char*& p_der) const {
-	// Solo hay una URL a obtener si el inicio y fin dado son dir. mem. distintas
-	if (p_izq != p_der) {
-		if (*(p_der+1) == '\0' || EsDelimiter(*p_der+1)) { 
-			if (EsDelimiter(*p_der)) {
-				StoreToken(p_izq, p_der);
-			} else {
-				StoreToken(p_izq, p_der+1);
-			}
-			p_der++;
-		} else if (EsURLIndicador(ObtenerString(p_izq, p_der))){
-			while (*p_der != '\0' && !EsURLDelimiter(p_der)) {
-				p_der++;
-			}
-			StoreToken(p_izq, p_der);
-		} else {
-			StoreToken(p_izq, p_der+1);
-		}
-	} else {
-		p_der++;	
 	}
 }
 
@@ -435,9 +431,9 @@ Tokenizador::TokenizarEspecial(std::string& s, std::list<std::string>& p_tokens)
 	while (*it != '\0') {
 		auto f = especial.find(*it); 			// Obtener el valor
 		if (f != especial.end()) {				// Si *it tiene valor
-			(t.*f->second)(it, it);	// Usar el delegado
+			(t.*f->second)(it, it);				// Usar el delegado
 		} else {
-			Generico(it);				// Usa el caso Generico()
+			Generico(it);						// Usa el caso Generico()
 		}
 	}
 }
@@ -522,7 +518,13 @@ Tokenizador::EsDelimiter(const char p_d) const{
 
 	return es_delimitador;
 }
-
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
+void
+Tokenizador::StoreToken(char* p_izq, char* p_der) const{
+	PTokens->push_back(ObtenerString(p_izq, p_der));
+}
 
 //////////////////////////////////////////////////////////////////////////////
 ////// 			     GETTERS-SETTERS                                     ///// 
@@ -566,7 +568,6 @@ Tokenizador::AnyadirDelimitadoresPalabra (const std::string& p_newDel) {
 		}
 	}
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 ////// 			SOBRECARGA DE OPERADORES                                 ///// 
