@@ -8,13 +8,19 @@
 #include <map>
 
 // Definir el delegado
-typedef void (Tokenizador::*funcp)(char*&, char*&, std::list<std::string>&) const;
+typedef void (Tokenizador::*funcp)(char*&, char*&) const;
 // HasMap
 std::map<char, funcp> especial;
 // Instacia Tokenizador para usar el delegado
 Tokenizador t;
-// Referencia a  la list de tokens
-std::list<std::string>* RTokens = nullptr;
+// Puntero a la lista de tokens
+std::list<std::string>* PTokens = nullptr;
+
+
+void
+Tokenizador::StoreToken(char* p_izq, char* p_der) const{
+	PTokens->push_back(ObtenerString(p_izq, p_der));
+}
 
 void
 Tokenizador::InitMap() {
@@ -87,7 +93,7 @@ Tokenizador::EsMailDelimiter(const char* p_caracter) const {
 // OBTIENE EL TOKEN MAIL Y HACE PUSH A LA LISTA DE TOKENS
 /////////////////////////////////////////////////////////////
 void
-Tokenizador::MAIL(char*& p_izq, char*& p_der, std::list<std::string>& p_l) const {
+Tokenizador::MAIL(char*& p_izq, char*& p_der) const {
 	if (p_izq != p_der){
 		// Guardar la posicion del primer @
 		char* pos_arroba = p_der++; // saltar el @
@@ -101,12 +107,12 @@ Tokenizador::MAIL(char*& p_izq, char*& p_der, std::list<std::string>& p_l) const
 			}
 		}
 		if (!parar)
-			p_l.push_back(ObtenerString(p_izq, p_der));
+			StoreToken(p_izq, p_der);
 		else {
 			// Token hasta el primer @
-			p_l.push_back(ObtenerString(p_izq, pos_arroba));
+			StoreToken(p_izq, pos_arroba);
 			// Token desde el 1er @ hasta el segundo
-			p_l.push_back(ObtenerString(pos_arroba+1, p_der));
+			StoreToken(pos_arroba+1, p_der);
 			++p_der; // Saltar el segundo @
 		}
 	}
@@ -117,7 +123,7 @@ Tokenizador::MAIL(char*& p_izq, char*& p_der, std::list<std::string>& p_l) const
 		while (!parar && *p_der != ' ' && *p_der != '\0') {
 			p_der++;
 		}
-			p_l.push_back(ObtenerString(pos_aux, p_der));
+			StoreToken(pos_aux, p_der);
 	} else {
 		p_der++; // Saltar el @ suelto
 	}
@@ -129,15 +135,8 @@ Tokenizador::Numero(char* p_izq, char* p_der) const {}
 //////////////////////////////////////////////////////////////////////////////
 ////// 					GENERICO                                          ///// 
 //////////////////////////////////////////////////////////////////////////////
-
 void
-Tokenizador::StoreToken(char*& p_izq, char*& p_der) {
-	//p_tokens.push_back(ObtenerString(pos_izq, p_der-1));
-	RTokens->push_back(ObtenerString(p_izq, p_der));
-}
-
-void
-Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
+Tokenizador::Generico(char* &p_der) const {
 	bool aux = false, parar = false;
 	char* pos_izq = p_der;
 
@@ -146,19 +145,19 @@ Tokenizador::Generico(char* &p_der, std::list<std::string>& p_tokens) const {
 		parar = true;
 
 		if (*p_der == ':') {
-			URL(pos_izq, p_der, p_tokens);
+			URL(pos_izq, p_der);
 		} else if (*p_der == '@') {
-			MAIL(pos_izq, p_der, p_tokens);
+			MAIL(pos_izq, p_der);
 		} else if (*p_der == '.') {
-			Acronimo(pos_izq, p_der, p_tokens);
+			Acronimo(pos_izq, p_der);
 		} else if (*p_der == '-') {
-			Guion(pos_izq, p_der, p_tokens);
+			Guion(pos_izq, p_der);
 		} else if (EsDelimiter(*p_der)) {
 			p_der++; // Saltar el delimitador
 			if ((p_der - pos_izq) > 1)
-				p_tokens.push_back(ObtenerString(pos_izq, p_der-1));
+				StoreToken(pos_izq, p_der-1);
 		} else if (*p_der == '\0') {
-			p_tokens.push_back(ObtenerString(pos_izq, p_der));
+			StoreToken(pos_izq, p_der);
 		// ELSE: seguir iterando
 		} else {
 			parar = false;
@@ -172,11 +171,11 @@ Tokenizador::EsAcronimoDel(char* p) const{
 	return (*p == '.') || EsDelimiter(*p);
 }
 void
-Tokenizador::AcronimoAux1(char* &p_izq, char*& p_der, std::list<std::string>& p_tokens) const {
+Tokenizador::AcronimoAux1(char* &p_izq, char*& p_der) const {
 	if (EsDelimiter(*(p_der-1)) || EsDelimiter(*(p_der+1))) {
 	//std::cout << "Ap_izq->" << *p_izq << "<- Ap_der+1:->" << *(p_der+1) << "<-"<< std::endl;
 		//std::cout << "no es acronimo\n";
-		p_tokens.push_back(ObtenerString(p_izq, p_der++)); // Saltar el caracter q
+		StoreToken(p_izq, p_der++); // Saltar el caracter q
 	// Si es acronimo :D seguir iterando"
 	} else {
 		//std::cout << "ES acronimo\n";
@@ -187,14 +186,14 @@ Tokenizador::AcronimoAux1(char* &p_izq, char*& p_der, std::list<std::string>& p_
 			parar = ((*p_der == '.' && EsAcronimoDel(p_der+1))) || *p_der == ' ';
 			p_der++;
 		}
-		p_tokens.push_back(ObtenerString(p_izq, p_der-1));
+		StoreToken(p_izq, p_der-1);
 	}
 }
 
 void
-Tokenizador::AcronimoAux2(char* &p_izq, char*& p_der, std::list<std::string>& p_tokens) const {
+Tokenizador::AcronimoAux2(char* &p_izq, char*& p_der) const {
 	if (EsDelimiter(*(p_der-1)) || EsDelimiter(*(p_der+1))) {
-		p_tokens.push_back(ObtenerString(p_izq, ++p_der)); // Saltar el caracter q
+		StoreToken(p_izq, ++p_der); // Saltar el caracter q
 	} else {
 		p_der++; // Saltar el .
 		bool parar = false;
@@ -203,24 +202,24 @@ Tokenizador::AcronimoAux2(char* &p_izq, char*& p_der, std::list<std::string>& p_
 			p_der++;
 		}
 		if (*(p_der-1) == ' ')
-			p_tokens.push_back(ObtenerString(p_izq, p_der-1));
+			StoreToken(p_izq, p_der-1);
 		else
-			p_tokens.push_back(ObtenerString(p_izq, p_der));
+			StoreToken(p_izq, p_der);
 	}
 }
 
 void
-Tokenizador::Acronimo(char* &p_izq, char*& p_der, std::list<std::string>& p_tokens) const {
+Tokenizador::Acronimo(char* &p_izq, char*& p_der) const {
 	if (p_izq != p_der) {
 		if (EsDelimiter('.'))
-			AcronimoAux1(p_izq, p_der, p_tokens);
+			AcronimoAux1(p_izq, p_der);
 		else
-			AcronimoAux2(p_izq, p_der, p_tokens);
+			AcronimoAux2(p_izq, p_der);
 	} 
 	else if (!EsDelimiter('.') && *(p_der+1) != '.'){
 		char* aux = p_izq;
 		p_der+=3;
-		p_tokens.push_back(ObtenerString(aux, p_der));
+		StoreToken(aux, p_der);
 	} 
 	else {
 		p_der++;
@@ -228,7 +227,7 @@ Tokenizador::Acronimo(char* &p_izq, char*& p_der, std::list<std::string>& p_toke
 }
 
 
-void Tokenizador::GuionAux1(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const {
+void Tokenizador::GuionAux1(char* &p_izq, char* &p_der) const {
 	char* pos_izq = p_izq;
 	if (p_izq == p_der)
 		p_der++;
@@ -236,10 +235,10 @@ void Tokenizador::GuionAux1(char* &p_izq, char* &p_der, std::list<std::string>& 
 	while (!EsDelimiter(*p_der) && *p_der != '\0') {
 		p_der++;
 	}
-	p_tokens.push_back(ObtenerString(pos_izq , p_der));
+	StoreToken(pos_izq , p_der);
 }
 
-void Tokenizador::GuionAux2(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const {
+void Tokenizador::GuionAux2(char* &p_izq, char* &p_der) const {
 	// EL guion es forma una palabra compuesta?
 	if (!EsDelimiter(*(p_der-1)) && !EsDelimiter(*(p_der+1))) {
 
@@ -253,7 +252,7 @@ void Tokenizador::GuionAux2(char* &p_izq, char* &p_der, std::list<std::string>& 
 				p_der++;
 			}
 		}
-		p_tokens.push_back(ObtenerString(p_izq , p_der));
+		StoreToken(p_izq , p_der);
 
 	} else {
 		p_der++;  // Dado que no es compuesta, devolver token
@@ -261,12 +260,12 @@ void Tokenizador::GuionAux2(char* &p_izq, char* &p_der, std::list<std::string>& 
 }
 
 void
-Tokenizador::Guion(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const {
+Tokenizador::Guion(char* &p_izq, char* &p_der) const {
 	if (!EsDelimiter('-')) {
-		GuionAux1(p_izq, p_der, p_tokens);
+		GuionAux1(p_izq, p_der);
 	}
 	else
-		GuionAux2(p_izq, p_der, p_tokens);
+		GuionAux2(p_izq, p_der);
 }
 
 
@@ -300,23 +299,23 @@ Tokenizador::EsURLDelimiter(const char* p_caracter) const {
 /////////////////////////////////////////////////////////////
 
 void
-Tokenizador::URL(char*& p_izq, char*& p_der, std::list<std::string>& p_l) const {
+Tokenizador::URL(char*& p_izq, char*& p_der) const {
 	// Solo hay una URL a obtener si el inicio y fin dado son dir. mem. distintas
 	if (p_izq != p_der) {
 		if (*(p_der+1) == '\0' || EsDelimiter(*p_der+1)) { 
 			if (EsDelimiter(*p_der)) {
-				p_l.push_back(ObtenerString(p_izq, p_der));
+				StoreToken(p_izq, p_der);
 			} else {
-				p_l.push_back(ObtenerString(p_izq, p_der+1));
+				StoreToken(p_izq, p_der+1);
 			}
 			p_der++;
 		} else if (EsURLIndicador(ObtenerString(p_izq, p_der))){
 			while (*p_der != '\0' && !EsURLDelimiter(p_der)) {
 				p_der++;
 			}
-			p_l.push_back(ObtenerString(p_izq, p_der));
+			StoreToken(p_izq, p_der);
 		} else {
-			p_l.push_back(ObtenerString(p_izq, p_der+1));
+			StoreToken(p_izq, p_der+1);
 		}
 	} else {
 		p_der++;	
@@ -331,9 +330,6 @@ Tokenizador::URL(char*& p_izq, char*& p_der, std::list<std::string>& p_l) const 
 /////////////////////////////////////////////////////////////
 void 
 Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_tokens) const {
-
-	// Guardo la dirc de la lista de tokens
-	RTokens = &p_tokens;
 	// Liberar memoria de la lista y poner size a cero
 	p_tokens.clear();
 	// Copia del String a tokenizar
@@ -431,15 +427,17 @@ Tokenizador::TokenizarDirectorio (const std::string& p_dir) const {
 /////////////////////////////////////////////////////////////
 void 
 Tokenizador::TokenizarEspecial(std::string& s, std::list<std::string>& p_tokens) const {
+	// Puntero a la lista de tokens
+	PTokens = &p_tokens;
 	// Puntero a la primera posición del string
 	char* it = &s.at(0);
 	// Iterar String hasta llegar al final
 	while (*it != '\0') {
 		auto f = especial.find(*it); 			// Obtener el valor
 		if (f != especial.end()) {				// Si *it tiene valor
-			(t.*f->second)(it, it, p_tokens);	// Usar el delegado
+			(t.*f->second)(it, it);	// Usar el delegado
 		} else {
-			Generico(it, p_tokens);				// Usa el caso Generico()
+			Generico(it);				// Usa el caso Generico()
 		}
 	}
 }

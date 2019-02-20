@@ -27,175 +27,52 @@ main(void)
 Tokenizador a("-#", true, false); 
 list<string> tokens; 
 
-a.Tokenizar("MS-DOS p1 p2 UN-DOS-TRES", tokens);
+a.DelimitadoresPalabra("@.&");
+a.Tokenizar("U.S.A p1 e.g. p2. La", tokens);
         imprimirListaSTL(tokens);
 
-a.Tokenizar("pal1 -MS-DOS p1 p2", tokens);
+a.DelimitadoresPalabra("");
+a.Tokenizar("U.S.A.U.S.A .p1 p1 e.g p2. La", tokens);
         imprimirListaSTL(tokens);
 
-a.Tokenizar("pal1 MS-DOS#p3 p1 p2", tokens);
+a.Tokenizar("a&U.S.A p1 e.g p2. La", tokens);
         imprimirListaSTL(tokens);
 
-a.Tokenizar("pal1#MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.DelimitadoresPalabra("/ ");
-a.Tokenizar("MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 -MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1#MS-DOS#p3 p1 p2", tokens);
+a.DelimitadoresPalabra("&");
+a.Tokenizar("a&U.S.A p1 e.g p2. La", tokens);
         imprimirListaSTL(tokens);
 
 
 a.PasarAminuscSinAcentos(true);
-a.Tokenizar("pal1#MS-DOSaA#p3 p1 p2", tokens);
+a.Tokenizar("a&U.S.A p1 e.g p2. La", tokens);
         imprimirListaSTL(tokens);
 
-a.DelimitadoresPalabra("/-");
+a.DelimitadoresPalabra(".&");
 a.CasosEspeciales (false);
-a.Tokenizar("pal1#MS-DOSaA#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-a.Tokenizar("MS-DOS p1 p2 UN-DOS-TRES", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 -MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1#MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.DelimitadoresPalabra("/ ");
-a.Tokenizar("MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 -MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1#MS-DOS#p3 p1 p2", tokens);
+a.Tokenizar("a&U.S.A p1 e.g. p2. La", tokens);
         imprimirListaSTL(tokens);
 
 
-a.PasarAminuscSinAcentos(true);
-a.Tokenizar("pal1#MS-DOSaA#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
+                a.Tokenizar("MS#DOS OS_2 [high low]", tokens);
+                imprimirListaSTL(tokens);
 
-a.DelimitadoresPalabra("/-");
-a.CasosEspeciales (false);
-a.Tokenizar("pal1#MS-DOSaA#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-        a.Tokenizar("MS-DOS p1 p2 UN-DOS-TRES", tokens);
-        imprimirListaSTL(tokens);
+                a.AnyadirDelimitadoresPalabra("_ []");
+                a.Tokenizar("MS#DOS OS_2 [high low]", tokens);
+                imprimirListaSTL(tokens);
 
-a.Tokenizar("pal1 -MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
+                a.DelimitadoresPalabra("_");
+                a.Tokenizar("MS#DOS OS_2 [high low]", tokens);
+                imprimirListaSTL(tokens);
 
-a.Tokenizar("pal1 MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
+                a.DelimitadoresPalabra(" _");
+                a.Tokenizar("MS#DOS 10 España Éspáñé OS_2 [high low]", tokens);
+                imprimirListaSTL(tokens);
 
-a.Tokenizar("pal1#MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
+                a.Tokenizar("áéíóú ÁÉÍÓÚ Ññ ", tokens);
+                imprimirListaSTL(tokens);
 
-a.DelimitadoresPalabra("/ ");
-a.Tokenizar("MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 -MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1#MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-
-a.PasarAminuscSinAcentos(true);
-a.Tokenizar("pal1#MS-DOSaA#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.DelimitadoresPalabra("/-");
-a.CasosEspeciales (false);
-a.Tokenizar("pal1#MS-DOSaA#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-        a.Tokenizar("MS-DOS p1 p2 UN-DOS-TRES", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 -MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1#MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.DelimitadoresPalabra("/ ");
-a.Tokenizar("MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 -MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1#MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-
-a.PasarAminuscSinAcentos(true);
-a.Tokenizar("pal1#MS-DOSaA#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.DelimitadoresPalabra("/-");
-a.CasosEspeciales (false);
-a.Tokenizar("pal1#MS-DOSaA#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-        a.Tokenizar("MS-DOS p1 p2 UN-DOS-TRES", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 -MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1#MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.DelimitadoresPalabra("/ ");
-a.Tokenizar("MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 -MS-DOS p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1#MS-DOS#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-
-a.PasarAminuscSinAcentos(true);
-a.Tokenizar("pal1#MS-DOSaA#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
-a.DelimitadoresPalabra("/-");
-a.CasosEspeciales (false);
-a.Tokenizar("pal1#MS-DOSaA#p3 p1 p2", tokens);
-        imprimirListaSTL(tokens);
-
+                a.PasarAminuscSinAcentos(false);
+                a.DelimitadoresPalabra(" _");
+                a.Tokenizar("MS#DOS 10 España Éspáñé OS_2 [high low]", tokens);
+                imprimirListaSTL(tokens);
 }

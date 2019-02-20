@@ -37,15 +37,13 @@ public:
 	//////////////////////////////////////////////
 	// MAIL: obtiene el token MAIL
 	////////////////////////////////////////////////
-	void MAIL(char*& p_izq, char*& p_der, std::list<std::string>&) const;
+	void MAIL(char*& p_izq, char*& p_der) const;
 	// True si el caracter es delimitador para el Mail
 	bool EsMailDelimiter(const char* p_caracter) const;
 
 		void InitMap();
 
-
-void StoreToken(char*& p_izq, char*& p_der);
-
+void StoreToken(char* p_izq, char* p_der) const;
 private:
 	std::string _delimiters 		= "";
 	bool _casosEspeciales			= false;
@@ -66,17 +64,17 @@ private:
 	//////////////////////////////////////////////
 	// ACRONIMO: obtiene el token acronimo
 	////////////////////////////////////////////////
-	void Acronimo(char*& p_izq, char*& p_it, std::list<std::string>&) const;
+	void Acronimo(char*& p_izq, char*& p_it) const;
 
 	//////////////////////////////////////////////
 	// GENERICO:  obtiene el token cuando no detecta especial
 	////////////////////////////////////////////////
-	void Generico(char*& p_it, std::list<std::string>&) const;
+	void Generico(char*& p_it) const;
 
 	//////////////////////////////////////////////
 	// URL: obtiene el token URL
 	////////////////////////////////////////////////
-	void URL(char*& p_izq, char*& p_der, std::list<std::string>&) const;	
+	void URL(char*& p_izq, char*& p_der) const;	
 	// Devuelve True si el string pertenece a _indicadores
 	bool EsURLIndicador(const std::string&) const;
 	// True si el caracter es delimitador para la URL
@@ -86,7 +84,7 @@ private:
 	//////////////////////////////////////////////
 	// GUION: obtiene el token GUION
 	////////////////////////////////////////////////
-	void Guion(char*& p_izq, char*& p_der, std::list<std::string>&) const;
+	void Guion(char*& p_izq, char*& p_der) const;
 
 	////////////////////////////////////////////////
 	//FUNCIONES AUXILIARES
@@ -100,16 +98,16 @@ private:
 	// Tokeniza el string sin tener en cuenta los casos especiales
 	void TokenizarGeneral(std::string&, std::list<std::string>&) const;
 	// Tokeniza el string teniendo en cuenta los casos especiales
-	void TokenizarEspecial(std::string& s, std::list<std::string>& p_tokens) const;
+	void TokenizarEspecial(std::string&, std::list<std::string>&) const;
 
 
-	void GuionAux1(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const;
-	void GuionAux2(char* &p_izq, char* &p_der, std::list<std::string>& p_tokens) const;
+	void GuionAux1(char* &p_izq, char* &p_der) const;
+	void GuionAux2(char* &p_izq, char* &p_der) const;
 
-	void AcronimoAux1(char* &p_izq, char*& p_der, std::list<std::string>& p_tokens) const;
-	void AcronimoAux2(char* &p_izq, char*& p_der, std::list<std::string>& p_tokens) const;
+	void AcronimoAux1(char* &p_izq, char*& p_der) const;
+	void AcronimoAux2(char* &p_izq, char*& p_der) const;
  
-	void SelEspecial(bool&, char*&, char*&, std::list<std::string>&) const;
+	void SelEspecial(bool&, char*&, char*&) const;
 
 	void Numero(char* p_izq, char*p_der) const;
 
