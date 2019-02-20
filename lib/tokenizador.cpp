@@ -343,9 +343,10 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 		TokenizarEspecial(s, p_tokens);
 	}
 }
-/////////////////////////////////////////////////////////////
-//	 
-/////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+// Tokeniza el fichero i guardando la salida en el fichero f (una
+// palabra en cada línea del fichero). Devolverá true si se realiza
+////////////////////////////////////////////////////////////////////
 bool
 Tokenizador::Tokenizar (const std::string& p_fin, const std::string& p_fout) const {
 	using namespace std;
@@ -381,22 +382,51 @@ Tokenizador::Tokenizar (const std::string& p_fin, const std::string& p_fout) con
 	
 	return true;
 }
-/////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// Tokeniza el fichero i guardando la salida en un fichero de nombre i
+// añadiéndole extensión .tk (sin eliminar previamente la extensión de i
+// por ejemplo, del archivo pp.txt se generaría el resultado en pp.txt.tk),
+////////////////////////////////////////////////////////////////////////////
 bool 
-Tokenizador::Tokenizar (const std::string& p_i) const {
-	return false;
+Tokenizador::Tokenizar (const std::string& p_fin) const {
+	return Tokenizar(p_fin, p_fin+".tk");
 }
 /////////////////////////////////////////////////////////////
 // 
 /////////////////////////////////////////////////////////////
 bool 
 Tokenizador::TokenizarListaFicheros (const std::string& p_i) const {
-	return false;
+	using namespace std;
+
+	ifstream file;
+	ofstream ofile;
+	string linea;
+	file.open(p_i.c_str());
+	struct stat dir;
+
+	if(file.is_open()){
+		//Recorre el fichero leyendo líneas y tokenizandolas
+		while(!file.eof()){
+			linea = "";
+			getline(file, linea);
+			int err=stat(linea.c_str(), &dir);
+
+			if(err==-1 || !S_ISDIR(dir.st_mode)){
+				if(linea.length()!=0){
+					Tokenizar(linea);
+				}
+			}
+		}
+		file.close();
+	}
+	else{
+		cerr << "ERROR: No existe el archivo: " << p_i << endl;
+		return false;
+	}
+	return true;
 }
 /////////////////////////////////////////////////////////////
-// Tokeniza un directorio
+// Tokeniza un directorio, incluyendo los subdirectorios
 /////////////////////////////////////////////////////////////
 bool 
 Tokenizador::TokenizarDirectorio (const std::string& p_dir) const {
