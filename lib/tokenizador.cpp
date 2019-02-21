@@ -333,7 +333,7 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 	std::string s(p_str);
 	// IF: pasar == true, eliminar antes de tokenizar
 	if (_pasarAminuscSinAcentos) {
-		s.assign(EliminarMinusAcentos(p_str));
+		EliminarMinusAcentos(s);
 	}
 	// IF: CASOSESPECIALES == FALSE
 	if (!_casosEspeciales) {
@@ -398,17 +398,6 @@ Tokenizador::Tokenizar (const std::string& p_fin) const {
 bool 
 Tokenizador::TokenizarListaFicheros (const std::string& p_i) const {
 	using namespace std;
-
-	ifstream file;
-	file.open(p_i.c_str());
-
-	auto ss = std::ostringstream();
-	ss << file.rdbuf();
-	
-	std::string contenido = ss.str();
-	std::cout << contenido << std::endl;
-
-/*
 	ifstream file;
 	ofstream ofile;
 
@@ -434,7 +423,7 @@ Tokenizador::TokenizarListaFicheros (const std::string& p_i) const {
 		cerr << "ERROR: No existe el archivo: " << p_i << endl;
 		return false;
 	}
-	return true;*/
+	return true;
 }
 /////////////////////////////////////////////////////////////
 // Tokeniza un directorio, incluyendo los subdirectorios
@@ -514,28 +503,26 @@ Tokenizador::ObtenerString(const char* p_i, const char* p_f) const {
 // ELIMINA LOS ACENTOS DE LAS VOCALES a, e, i, o, u
 // Y PASA A MINÚSCULAS LOS CARACTERES
 /////////////////////////////////////////////////////////////
-std::string
-Tokenizador::EliminarMinusAcentos (const std::string& p_str) const {
-	std::string str_out = p_str;
-	for (int i = 0; i < p_str.length(); ++i) {
-		if(str_out[i] == (char)192 || str_out[i] == (char)193 || str_out[i] == (char)224 || str_out[i] == (char)225) {
-			str_out[i] = 'a';
-		}else if(str_out[i] == (char)200 || str_out[i] == (char)201 || str_out[i] == (char)232 || str_out[i] == (char)233) {
-			str_out[i] = 'e';
-		}else if(str_out[i] == (char)204 || str_out[i] == (char)205 || str_out[i] == (char)236 || str_out[i] == (char)237) {
-			str_out[i] = 'i';
-		}else if(str_out[i] == (char)210 || str_out[i] == (char)211 || str_out[i] == (char)242 || str_out[i] == (char)243) {
-			str_out[i] = 'o';
-		}else if(str_out[i] == (char)217 || str_out[i] == (char)218 || str_out[i] == (char)249 || str_out[i] == (char)250) {
-			str_out[i] = 'u';
-		}else if(str_out[i] == (char)209){
-			str_out[i] = (char)241; // tolower no funciona con la Ñ
-		}else{
-			str_out[i]=(char)tolower(str_out[i]);
-		}
-	}
+const char*
+        //   "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏŴÑÒÓÔÕÖṪØÙÚÛÜÝŶßàáâãäåæçèéêëìíîïŵñòóôõöṫøùúûüýŷÿ"
+        tr = "aaaaaaceeeeiiiiDñooooox0uuuuypbaaaaaaeceeeeiiiiOñooooo/0uuuuypy";	
 
-	return str_out;
+void
+Tokenizador::EliminarMinusAcentos (std::string& p_str) const {
+ //  cout << (long)ptr << endl;
+ //  cout << (long)str.data() << endl;
+    //cout << "ptr1: " << ptr << endl;
+    char* ptr = &p_str.at(0);
+    while (*ptr != '\0') {
+        std::cout << "prt" << (int)*ptr << std::endl;
+
+        if ( (int)(*ptr) >= 192 ) {
+        	std::cout << "entra;" << std::endl;
+            *ptr = tr[*ptr-192];
+        }
+      ptr++;
+    }
+    //cout << "ptr2: " << ptr << endl;
 }
 /////////////////////////////////////////////////////////////
 // COMPRUEBA SI EL CARACTER P_D ES UN DELIMITADOR (_delimiter)

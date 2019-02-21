@@ -97,7 +97,7 @@ private:
 	//FUNCIONES AUXILIARES
 	////////////////////////////////////////////////
 	// Quita los acentos y pasa a minúsculas las mayúsculas 
-	std::string EliminarMinusAcentos(const std::string&) const;
+	void EliminarMinusAcentos(std::string&) const;
 	// Devuelve el substring formado entre dos punteros inicial y final
 	std::string ObtenerString (const char* p_i, const char* p_f) const;
 	// Devuelve true si _delimiters contiene el char
