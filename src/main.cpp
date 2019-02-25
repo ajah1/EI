@@ -27,35 +27,10 @@ main(void)
 Tokenizador a("-#", true, false); 
 list<string> tokens; 
 
-a.DelimitadoresPalabra("@.&");
-a.Tokenizar("catedraTelefonicaUA@iuii.ua.es p1 p2", tokens);
+a.DelimitadoresPalabra("@.,&");
+a.Tokenizar("pal1 10.35% 10,35% 23.000,3% 23$ 23.05$ 23,05$ 11$ 11.05$ 3% 4%", tokens);
 	imprimirListaSTL(tokens);
 
-a.Tokenizar("pal1 @iuii.ua.es p1 p2", tokens);
-	imprimirListaSTL(tokens);
-
-a.DelimitadoresPalabra("&.");
-a.Tokenizar("catedraTelefonicaUA@iuii.ua.es p1 p2", tokens);
-	imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1 @iuii.ua.es p1 p2", tokens);
-	imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1&@iuii.ua.es p1 p2", tokens);
-	imprimirListaSTL(tokens);
-
-a.Tokenizar("pal1&catedra@iuii.ua.es p1 p2", tokens);
-	imprimirListaSTL(tokens);
-
-a.PasarAminuscSinAcentos(true);
-a.Tokenizar("catedraTelefonicaUA@iuii.ua.es p1 p2", tokens);
-	imprimirListaSTL(tokens);
-
-
-a.DelimitadoresPalabra("@.&");
-a.CasosEspeciales (false);
-a.Tokenizar("catedraTelefonicaUA@iuii.ua.es p1 p2", tokens);
-	imprimirListaSTL(tokens);
 
 
 }

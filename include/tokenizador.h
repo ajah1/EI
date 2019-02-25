@@ -51,6 +51,12 @@ private:
 	std::string _URLdelimiters 	= "_:/.?&-=#@";
 	// Delimitadores que no afectan en medio a la URL
 	std::string _MAILdelimiters = ".-_";
+	// Delimitadores para los decimales
+	std::string _NUMdelimiters1 = ".,";
+	std::string _NUMdelimiters2 = "%$"; 
+
+	bool EsDecimalDel1(char* p_c) const;
+	bool EsDecimalDel2(char* p_c) const;
 
 	//////////////////////////////////////////////
 	// GENERICO:  obtiene el token cuando no detecta especial
@@ -89,13 +95,15 @@ private:
 	void GuionAux2(char* &p_izq, char* &p_der) const;
 
 	//////////////////////////////////////////////
-	// GUION: obtiene el token GUION
+	// DIGITO: obtiene el token numero
 	////////////////////////////////////////////////
-	void Numero(char* p_izq, char*p_der) const;
-
+	void Decimal(char*& p_izq, char*& p_der) const;
+	void DecimalAux1(char*& p_izq, char*& p_der) const;
+	void DecimalAux2(char*& p_izq, char*& p_der) const;
 	////////////////////////////////////////////////
 	//FUNCIONES AUXILIARES
 	////////////////////////////////////////////////
+	void Punto(char*& p_izq, char*& p_der) const;
 	// Quita los acentos y pasa a minúsculas las mayúsculas 
 	void EliminarMinusAcentos(std::string&) const;
 	// Devuelve el substring formado entre dos punteros inicial y final

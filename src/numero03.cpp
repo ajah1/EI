@@ -43,7 +43,7 @@ a.Tokenizar("pal1&10.00@10.000&aaa@10/12/85", tokens);
 a.Tokenizar(".34@@&,56", tokens);
 	imprimirListaSTL(tokens);
 
-
+/*
 a.PasarAminuscSinAcentos(true);
 a.Tokenizar("Pal1&10.00@10.000&aaa@10/12/85 La", tokens);
 	imprimirListaSTL(tokens);
@@ -51,6 +51,6 @@ a.Tokenizar("Pal1&10.00@10.000&aaa@10/12/85 La", tokens);
 a.CasosEspeciales (false);
 a.Tokenizar("Pal1&10.00@10.000&000@10/12/85 La", tokens);
 	imprimirListaSTL(tokens);
-
+*/
 
 }
