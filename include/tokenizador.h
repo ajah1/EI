@@ -51,9 +51,6 @@ private:
 	std::string _URLdelimiters 	= "_:/.?&-=#@";
 	// Delimitadores que no afectan en medio a la URL
 	std::string _MAILdelimiters = ".-_";
-	// Delimitadores para los decimales
-	std::string _NUMdelimiters1 = ".,";
-	std::string _NUMdelimiters2 = "%$"; 
 
 	bool EsDecimalDel1(char* p_c) const;
 	bool EsDecimalDel2(char* p_c) const;

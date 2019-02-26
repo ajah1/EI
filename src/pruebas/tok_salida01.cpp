@@ -20,7 +20,7 @@ main(void)
 {
 list<string> lt1, lt2, lt3, lt4;
 
-TokenizadorClase a(". /");
+Tokenizador a(". /");
 cout << a << endl;
 a.Tokenizar("MS DOS OS 2 high low", lt1);
 imprimirListaSTL(lt1);

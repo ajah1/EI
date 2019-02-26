@@ -127,8 +127,15 @@ Tokenizador::DecimalAux1(char*& p_izq, char*& p_der) const {
 			StoreToken(p_izq,p_izq);
 			p_der = p_izq+2;
 		} else if (EsDecimalDel2(p_der) || EsDelimiter(*p_der)){
+			//std::cout << "Encuentra el delimitador:-->" << *p_der << "<---\n";
 			StoreToken(p_izq,p_der);
-			p_der+=1;
+			//p_der+=1;
+			if (*p_der ==  '%' || *p_der ==  '$') {
+				//std::cout << "ETNERADASD:" << std::endl;
+				PTokens->push_back(ObtenerString(p_der,p_der));
+				p_der++;
+			}
+			p_der++;
 		}else { parar = false; p_der++; }
 	}
 
@@ -171,17 +178,20 @@ Tokenizador::DecimalAux2(char*& p_izq, char*& p_der) const {
 
 void
 Tokenizador::Punto(char*& p_izq, char*& p_der) const {
-//	std::cout << "========> PUNTOOOO\n";
-	//std::cout << "<- Gp_der:->" << *p_der << "<- Gp_der+1:->" << *(p_der+1) << "<-"<< std::endl;
+	//std::cout << "========> PUNTOOOO\n";
+//	std::cout << "<- Pp_der:->" << *p_der << "<- Pp_der+1:->" << *(p_der+1) << "<-"<< std::endl;
 	// IF: es un token decimal
 	if (isdigit(*(p_der+1))) {
+		//std::cout << "Numero" << std::endl;
 		Decimal(p_izq, p_der);
 	// ELSE: es acronimo
-	} else if (EsDelimiter(*(p_der+1))){
-		Acronimo(p_izq, p_der);
-	} else {
-		p_der++;
-	}
+	//} else if (*(p_der+1) == '.'){
+	//	std::cout << "Acronimo\n";
+	}else Acronimo(p_izq, p_der);
+//	} else {
+		//StoreToken(p_izq, p_der);
+	//	p_der++;
+	//}
 }
 
 
