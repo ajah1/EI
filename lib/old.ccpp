@@ -49,7 +49,7 @@ Tokenizador::Tokenizador (const std::string& p_del) {
 	_pasarAminuscSinAcentos = false;
 }
 Tokenizador::Tokenizador () {
-	_delimiters = ",;:.-/+*\\ '\"{}[]()<>°!ø?&#=\t\n\r@";
+	_delimiters = ",;:.-/+*\\ '\"{}[]()<>¬°!¬ø?&#=\t\n\r@";
 	_casosEspeciales = true;
 	_pasarAminuscSinAcentos = false;
 }
@@ -470,7 +470,7 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 }
 ////////////////////////////////////////////////////////////////////
 // Tokeniza el fichero i guardando la salida en el fichero f (una
-// palabra en cada lÌnea del fichero). Devolver· true si se realiza
+// palabra en cada l√≠nea del fichero). Devolver√° true si se realiza
 ////////////////////////////////////////////////////////////////////
 bool
 Tokenizador::Tokenizar (const std::string& p_fin, const std::string& p_fout) const {
@@ -509,8 +509,8 @@ Tokenizador::Tokenizar (const std::string& p_fin, const std::string& p_fout) con
 }
 ////////////////////////////////////////////////////////////////////////////
 // Tokeniza el fichero i guardando la salida en un fichero de nombre i
-// aÒadiÈndole extensiÛn .tk (sin eliminar previamente la extensiÛn de i
-// por ejemplo, del archivo pp.txt se generarÌa el resultado en pp.txt.tk),
+// a√±adi√©ndole extensi√≥n .tk (sin eliminar previamente la extensi√≥n de i
+// por ejemplo, del archivo pp.txt se generar√≠a el resultado en pp.txt.tk),
 ////////////////////////////////////////////////////////////////////////////
 bool 
 Tokenizador::Tokenizar (const std::string& p_fin) const {
@@ -529,7 +529,7 @@ Tokenizador::TokenizarListaFicheros (const std::string& p_i) const {
 	struct stat dir;
 
 	if(file.is_open()){
-		//Recorre el fichero leyendo lÌneas y tokenizandolas
+		//Recorre el fichero leyendo l√≠neas y tokenizandolas
 		while(!file.eof()){
 			string linea = "";
 			getline(file, linea);
@@ -579,7 +579,7 @@ void
 Tokenizador::TokenizarEspecial(std::string& s, std::list<std::string>& p_tokens) const {
 	// Puntero a la lista de tokens
 	PTokens = &p_tokens;
-	// Puntero a la primera posiciÛn del string
+	// Puntero a la primera posici√≥n del string
 	char* it = &s.at(0);
 	// Iterar String hasta llegar al final
 	while (*it != '\0') {
@@ -608,7 +608,7 @@ Tokenizador::TokenizarGeneral(std::string& s, std::list<std::string>& p_tokens) 
 }
 /////////////////////////////////////////////////////////////
 // DEVUELVE EL STRING QUE SE ECUENTRA ENTRE
-// LAS POSICÕON DE MEMORIA P_I y P_F
+// LAS POSIC√çON DE MEMORIA P_I y P_F
 /////////////////////////////////////////////////////////////
 std::string
 Tokenizador::ObtenerString(const char* p_i, const char* p_f) const {
@@ -625,27 +625,43 @@ Tokenizador::ObtenerString(const char* p_i, const char* p_f) const {
 }
 /////////////////////////////////////////////////////////////
 // ELIMINA LOS ACENTOS DE LAS VOCALES a, e, i, o, u
-// Y PASA A MIN⁄SCULAS LOS CARACTERES
+// Y PASA A MIN√öSCULAS LOS CARACTERES
 /////////////////////////////////////////////////////////////
-
-const char* tr = "aaaaaaNNeeeeiiiiNÒoooooNNuuuuNNNaaaaaaNNeeeeiiiiNÒoooooNNuuuuNNN";
 
 void
 Tokenizador::EliminarMinusAcentos (std::string& s) const {
-
 	unsigned char a;
 	for (int i = 0; i < s.size(); ++i) {
 		a = s[i];
 		if ((int)a >= 192){
-			s[i] = tr[(int)a - 192];
-		} else{
-			s[i] = tolower(s[i]);
+			s[i]  = tr[(int)a - 192];
+		}
+		else{
+			s[i]  = tolower(s[i]);
 		}
 	}
+    //cout << "ptr2: " << ptr << endl;
+	/*for (int i = 0; i < str_out.length(); ++i) {
+		if(str_out[i] == (char)192 || str_out[i] == (char)193 || str_out[i] == (char)224 || str_out[i] == (char)225) {
+			str_out[i] = 'a';
+		}else if(str_out[i] == (char)200 || str_out[i] == (char)201 || str_out[i] == (char)232 || str_out[i] == (char)233) {
+			str_out[i] = 'e';
+		}else if(str_out[i] == (char)204 || str_out[i] == (char)205 || str_out[i] == (char)236 || str_out[i] == (char)237) {
+			str_out[i] = 'i';
+		}else if(str_out[i] == (char)210 || str_out[i] == (char)211 || str_out[i] == (char)242 || str_out[i] == (char)243) {
+			str_out[i] = 'o';
+		}else if(str_out[i] == (char)217 || str_out[i] == (char)218 || str_out[i] == (char)249 || str_out[i] == (char)250) {
+			str_out[i] = 'u';
+		}else if(str_out[i] == (char)209){
+			str_out[i] = (char)241; // tolower no funciona con la √ë
+		}else{
+			str_out[i]=(char)tolower(str_out[i]);
+		}
+	}*/
 }
 /////////////////////////////////////////////////////////////
 // COMPRUEBA SI EL CARACTER P_D ES UN DELIMITADOR (_delimiter)
-// ESTA FUNCION SOLO SE USA EN LOS CASOS ESPECIALES. ADEM¡S
+// ESTA FUNCION SOLO SE USA EN LOS CASOS ESPECIALES. ADEM√ÅS
 // DE LOS DELIMITADORES COMPRUEBA EL ESPACIO (' ')
 /////////////////////////////////////////////////////////////
 bool

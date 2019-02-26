@@ -34,6 +34,9 @@ public:
 	void PasarAminuscSinAcentos (const bool& p_PasarAminuscSinAcentos);
 	void CasosEspeciales (const bool& p_nuevoCasosEspeciales);
 
+	// Quita los acentos y pasa a minúsculas las mayúsculas 
+	void EliminarMinusAcentos(std::string&) const;
+	// Devuelve el substring formado entre dos punteros inicial y final
 
 private:
 	std::string _delimiters 		= "";
@@ -101,9 +104,6 @@ private:
 	//FUNCIONES AUXILIARES
 	////////////////////////////////////////////////
 	void Punto(char*& p_izq, char*& p_der) const;
-	// Quita los acentos y pasa a minúsculas las mayúsculas 
-	void EliminarMinusAcentos(std::string&) const;
-	// Devuelve el substring formado entre dos punteros inicial y final
 	std::string ObtenerString (const char* p_i, const char* p_f) const;
 	// Devuelve true si _delimiters contiene el char
 	bool EsDelimiter(const char p_d) const;
