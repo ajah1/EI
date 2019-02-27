@@ -490,9 +490,7 @@ Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
     FILE* fp = fopen(fin, "r");
     size_t len = 0;
 	// Abrir fichero de salida
-	char* finout = new char [p_fout.length()+1];
-	strcpy(finout, p_fout.c_str());
-    FILE* fp2 = fopen(finout, "w");
+	 std::ofstream out(p_fout);
 
     // Leer linea del fichero de entrada
 	while (getline(&line, &len, fp) != -1) {
@@ -501,17 +499,16 @@ Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
 		Tokenizar(line, tokens);
 		// Escribir los tokens en el fichero de salida
 		for (std::string s : tokens) {
-			fprintf(fp2, "%s\n", s);
+			out << s << '\n';
 		}
     }
 
     // Cerrar ficheros
     fclose(fp);
-    fclose(fp2);
+	out.close();
     // Liberar linea
     if (line) free(line);
     if (fin) free(fin);
-    if (finout) free(finout);
 
 	return true;
 }
@@ -532,9 +529,7 @@ Tokenizador::Tokenizar (const std::string& p_fin) const {
 bool 
 Tokenizador::TokenizarListaFicheros (const std::string& p_i) const {
 	using namespace std;
-
-	std::string lista_ficheros;
-
+	
     FILE* fp = fopen("listaFicheros.txt", "r");
     char* line = NULL;
     size_t len = 0;

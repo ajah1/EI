@@ -18,7 +18,7 @@ double getcputime(void) {
 }
 int main() {
 	long double aa=getcputime();
-	Tokenizador a("\t ,;:.-+/*_`'{}[]()!?&#\"\\<>", false, true);
+	Tokenizador a("\t ,;:.-+/*_`'{}[]()!?&#\"\\<>", true, true);
 	a.TokenizarListaFicheros("listaFicheros.txt");
 	 // TODO EL CORPUS
 	cout << "Ha tardado " << getcputime() - aa << " segundos" << endl;
