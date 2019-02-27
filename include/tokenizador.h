@@ -20,8 +20,8 @@ public:
 	Tokenizador& operator= (const Tokenizador& p_tk);
 	// TOKENIZADOR
 	void Tokenizar (const std::string& p_str, std::list<std::string>& p_tokens) const;
-	bool Tokenizar (const std::string& p_i, const std::string& p_f) const;
-	bool Tokenizar (const std::string & p_i) const;
+	bool Tokenizar (std::string& p_i,  std::string& p_f) const;
+	bool Tokenizar (const std::string& p_i) const;
 	bool TokenizarListaFicheros (const std::string& p_i) const;
 	bool TokenizarDirectorio (const std::string& p_i) const;
 	// GETTERS

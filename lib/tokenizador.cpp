@@ -3,10 +3,12 @@
 
 #include <fstream>
 #include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <algorithm>
 #include <map>
 #include <sstream>
-
 // Definir el delegado
 typedef void (Tokenizador::*funcp)(char*&, char*&) const;
 // HasMap
@@ -473,38 +475,44 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 // palabra en cada línea del fichero). Devolverá true si se realiza
 ////////////////////////////////////////////////////////////////////
 bool
-Tokenizador::Tokenizar (const std::string& p_fin, const std::string& p_fout) const {
+Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
 	using namespace std;
-
-	ifstream i;
-	ofstream f;
-	std::string cadena;
+	
 	std::list<std::string> tokens;
 
-	i.open(p_fin.c_str());
-	if (!i) {
-		std::cerr << "ERROR: No existe el archivo: " << p_fin << std::endl;
-		return false;
-	} else {
-		while (!i.eof()) {
-			cadena="";
-			getline(i, cadena);
-			if (cadena.length()!=0) {
-				Tokenizar(cadena, tokens);
-			}
+	std::string lista_ficheros;
+
+	// Linea a tokenizar
+	char* line = NULL;
+	// Abrir fichero de entrada
+	char* fin = new char [p_fin.length()+1];
+	strcpy(fin, p_fin.c_str());
+    FILE* fp = fopen(fin, "r");
+    size_t len = 0;
+	// Abrir fichero de salida
+	char* finout = new char [p_fout.length()+1];
+	strcpy(finout, p_fout.c_str());
+    FILE* fp2 = fopen(finout, "w");
+
+    // Leer linea del fichero de entrada
+	while (getline(&line, &len, fp) != -1) {
+		//fprintf(fp2, "%s\n", line);
+		// Tokenizar la linea leida
+		Tokenizar(line, tokens);
+		// Escribir los tokens en el fichero de salida
+		for (std::string s : tokens) {
+			fprintf(fp2, "%s\n", s);
 		}
-	}
+    }
 
-	i.close();
-	
-	f.open(p_fout.c_str());
-	std::list<std::string>::iterator itS;
-	for (itS= tokens.begin(); itS != tokens.end(); itS++) {
-		f << (*itS) << std::endl;
-	}
+    // Cerrar ficheros
+    fclose(fp);
+    fclose(fp2);
+    // Liberar linea
+    if (line) free(line);
+    if (fin) free(fin);
+    if (finout) free(finout);
 
-	f.close();
-	
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -512,9 +520,11 @@ Tokenizador::Tokenizar (const std::string& p_fin, const std::string& p_fout) con
 // añadiéndole extensión .tk (sin eliminar previamente la extensión de i
 // por ejemplo, del archivo pp.txt se generaría el resultado en pp.txt.tk),
 ////////////////////////////////////////////////////////////////////////////
-bool 
+bool
 Tokenizador::Tokenizar (const std::string& p_fin) const {
-	return Tokenizar(p_fin, p_fin+".tk");
+	std::string in(p_fin);
+	std::string out(p_fin+".tk");
+	return Tokenizar(in, out);
 }
 /////////////////////////////////////////////////////////////
 // 
@@ -522,31 +532,22 @@ Tokenizador::Tokenizar (const std::string& p_fin) const {
 bool 
 Tokenizador::TokenizarListaFicheros (const std::string& p_i) const {
 	using namespace std;
-	ifstream file;
-	ofstream ofile;
 
-	file.open(p_i.c_str());
-	struct stat dir;
+	std::string lista_ficheros;
 
-	if(file.is_open()){
-		//Recorre el fichero leyendo líneas y tokenizandolas
-		while(!file.eof()){
-			string linea = "";
-			getline(file, linea);
-			int err=stat(linea.c_str(), &dir);
+    FILE* fp = fopen("listaFicheros.txt", "r");
+    char* line = NULL;
+    size_t len = 0;
+    ssize_t read;
 
-			if(err==-1 || !S_ISDIR(dir.st_mode)){
-				if(linea.length()!=0){
-					Tokenizar(linea);
-				}
-			}
-		}
-		file.close();
-	}
-	else{
-		cerr << "ERROR: No existe el archivo: " << p_i << endl;
-		return false;
-	}
+    while ((read = getline(&line, &len, fp)) != -1) {
+       line[read-1] = 0;
+       Tokenizar(line);
+    }
+
+    fclose(fp);
+    if (line) free(line);
+
 	return true;
 }
 /////////////////////////////////////////////////////////////
