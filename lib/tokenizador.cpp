@@ -9,6 +9,12 @@
 #include <algorithm>
 #include <map>
 #include <sstream>
+
+/* This contains the mmap calls. */
+#include <sys/mman.h> 
+#include <fcntl.h>
+#include <ctype.h>
+
 // Definir el delegado
 typedef void (Tokenizador::*funcp)(char*&, char*&) const;
 // HasMap
@@ -453,6 +459,8 @@ void Tokenizador::GuionAux2(char* &p_izq, char* &p_der) const {
 /////////////////////////////////////////////////////////////
 void 
 Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_tokens) const {
+	
+	//std::cout << p_str;
 	// Liberar memoria de la lista y poner size a cero
 	p_tokens.clear();
 	// Copia del String a tokenizar
@@ -480,6 +488,53 @@ Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
 	
 	std::list<std::string> tokens;
 
+   	
+    
+    struct stat s;
+    const char* file_name = p_fin.c_str();
+    int fd = open (file_name, O_RDONLY);
+
+    /* Get the size of the file. */
+    int status = fstat (fd, &s);
+    int size = s.st_size;
+    //std::cout << "file size: " << size << '\n';
+
+    char* f = (char *) mmap (0, size, PROT_READ, MAP_PRIVATE, fd, 0);
+
+	// Abrir fichero de salida
+ 	std::ofstream out(p_fout);
+
+    int i = 0;
+    for (int i = 0; i < size; ++i) {
+    	//std::cout << "\nLINE" << i << std::endl;
+
+    	char* pendline = f+i;
+    	while (*pendline != '\n') {
+    		pendline++;	
+    	}
+    	//std::cout << ObtenerString(f+i, pendline+1);
+    	Tokenizar( ObtenerString(f+i, pendline+1), tokens );
+
+		for (std::string s : tokens) {
+			out << s << '\n';
+		}
+
+    	i += pendline - (f+i);
+        //char c;
+        //c = f[i];
+        //putchar(c);
+
+        // buscar el \n
+        // tokenizar
+    }
+
+    out.close();
+
+    /*for (std::string s : tokens) {
+    	std::cout << s << std::endl;
+    }*/
+
+	/*
 	std::string lista_ficheros;
 
 	// Linea a tokenizar
@@ -508,7 +563,7 @@ Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
 	out.close();
     // Liberar linea
     if (line) free(line);
-    if (fin) free(fin);
+    if (fin) free(fin);*/
 
 	return true;
 }
