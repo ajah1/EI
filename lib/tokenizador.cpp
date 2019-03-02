@@ -141,16 +141,10 @@ Tokenizador::DecimalAux1(char*& p_izq, char*& p_der) const {
 			//StoreToken(p_izq,p_izq);
 			PTokens->push_back(ObtenerString(p_izq,p_izq));
 			p_der = p_izq+2;
-		} else if (EsDecimalDel2(p_der) || EsDelimiter(*p_der)){
+		} else if (EsDelimiter(*p_der)){
 			//std::cout << "Encuentra el delimitador:-->" << *p_der << "<---\n";
 			//StoreToken(p_izq,p_der);
 			PTokens->push_back(ObtenerString(p_izq,p_der));
-			//p_der+=1;
-			if (*p_der ==  '%' || *p_der ==  '$') {
-				//std::cout << "ETNERADASD:" << std::endl;
-				PTokens->push_back(ObtenerString(p_der,p_der));
-				p_der++;
-			}
 			p_der++;
 		}else { parar = false; p_der++; }
 	}
@@ -194,6 +188,7 @@ Tokenizador::DecimalAux2(char*& p_izq, char*& p_der) const {
 			PTokens->push_back("0" + ObtenerString(pizq,p_der));
 			p_der++;
 			break;
+
 		}else { parar = false; p_der++; }
 	}
 
