@@ -55,7 +55,7 @@ private:
 	// Delimitadores que no afectan en medio a la URL
 	std::string _MAILdelimiters = ".-_";
 
-	bool EsDecimalDel1(char* p_c) const;
+	bool EsDecimalDel1(char*& p_c) const;
 	bool EsDecimalDel2(char* p_c) const;
 
 	//////////////////////////////////////////////
@@ -106,12 +106,12 @@ private:
 	void Punto(char*& p_izq, char*& p_der) const;
 	std::string ObtenerString (const char* p_i, const char* p_f) const;
 	// Devuelve true si _delimiters contiene el char
-	bool EsDelimiter(const char p_d) const;
+	bool EsDelimiter(const char& p_d) const;
 	// Tokeniza el string sin tener en cuenta los casos especiales
 	void TokenizarGeneral(std::string&, std::list<std::string>&) const;
 	// Tokeniza el string teniendo en cuenta los casos especiales
 	void TokenizarEspecial(std::string&, std::list<std::string>&) const;
 	// Inicializar los pares del hasmap
-	void InitMap() const;
-	void StoreToken(char* p_izq, char* p_der) const;
+	//void InitMap() const;
+	//void StoreToken(char* p_izq, char* p_der) const;
 };
