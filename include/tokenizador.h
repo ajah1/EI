@@ -43,6 +43,8 @@ private:
 	bool _casosEspeciales			= false;
 	bool _pasarAminuscSinAcentos	= false;
 
+	int _delimitersLength = 0;
+
 	//////////////////////////////////////////////
 	//STRING'S AUXILIARES
 	////////////////////////////////////////////////
@@ -70,14 +72,14 @@ private:
 	// Devuelve True si el string pertenece a _indicadores
 	bool EsURLIndicador(const std::string&) const;
 	// True si el caracter es delimitador para la URL
-	bool EsURLDelimiter(const char* p_caracter) const;
+	bool EsURLDelimiter( char*& p_caracter) const;
 
 	//////////////////////////////////////////////
 	// MAIL: obtiene el token MAIL
 	////////////////////////////////////////////////
 	void MAIL(char*& p_izq, char*& p_der) const;
 	// True si el caracter es delimitador para el Mail
-	bool EsMailDelimiter(const char* p_caracter) const;
+	//bool EsMailDelimiter(const char*& p_caracter) const;
 
 	//////////////////////////////////////////////
 	// ACRONIMO: obtiene el token acronimo
