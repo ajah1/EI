@@ -34,19 +34,16 @@ public:
 	void PasarAminuscSinAcentos (const bool& p_PasarAminuscSinAcentos);
 	void CasosEspeciales (const bool& p_nuevoCasosEspeciales);
 
-	// Quita los acentos y pasa a minúsculas las mayúsculas 
-	void EliminarMinusAcentos(std::string&) const;
-	// Devuelve el substring formado entre dos punteros inicial y final
+
 
 private:
 	std::string _delimiters 		= "";
 	bool _casosEspeciales			= false;
 	bool _pasarAminuscSinAcentos	= false;
-
-	int _delimitersLength = 0;
+	
 
 	//////////////////////////////////////////////
-	//STRING'S AUXILIARES
+	//VARIABLES'S AUXILIARES
 	////////////////////////////////////////////////
 	// Copia de los delimitadores iniciales
 	std::string _delimitersAux	= "";
@@ -56,15 +53,13 @@ private:
 	std::string _URLdelimiters 	= "_:/.?&-=#@";
 	// Delimitadores que no afectan en medio a la URL
 	std::string _MAILdelimiters = ".-_";
-
-	bool EsDecimalDel1(char*& p_c) const;
-	bool EsDecimalDel2(char* p_c) const;
+	// Length del string delimiters
+	int 		_delimitersLength = 0;
 
 	//////////////////////////////////////////////
 	// GENERICO:  obtiene el token cuando no detecta especial
 	////////////////////////////////////////////////
 	void Generico(char*& p_it) const;
-
 	//////////////////////////////////////////////
 	// URL: obtiene el token URL
 	////////////////////////////////////////////////
@@ -73,14 +68,10 @@ private:
 	bool EsURLIndicador(const std::string&) const;
 	// True si el caracter es delimitador para la URL
 	bool EsURLDelimiter( char*& p_caracter) const;
-
 	//////////////////////////////////////////////
 	// MAIL: obtiene el token MAIL
 	////////////////////////////////////////////////
 	void MAIL(char*& p_izq, char*& p_der) const;
-	// True si el caracter es delimitador para el Mail
-	//bool EsMailDelimiter(const char*& p_caracter) const;
-
 	//////////////////////////////////////////////
 	// ACRONIMO: obtiene el token acronimo
 	////////////////////////////////////////////////
@@ -88,14 +79,12 @@ private:
 	void AcronimoAux1(char* &p_izq, char*& p_der) const;
 	void AcronimoAux2(char* &p_izq, char*& p_der) const;
 	bool EsAcronimoDel(char* p) const;
-
 	//////////////////////////////////////////////
 	// GUION: obtiene el token GUION
 	////////////////////////////////////////////////
 	void Guion(char*& p_izq, char*& p_der) const;
 	void GuionAux1(char* &p_izq, char* &p_der) const;
 	void GuionAux2(char* &p_izq, char* &p_der) const;
-
 	//////////////////////////////////////////////
 	// DIGITO: obtiene el token numero
 	////////////////////////////////////////////////
@@ -105,7 +94,11 @@ private:
 	////////////////////////////////////////////////
 	//FUNCIONES AUXILIARES
 	////////////////////////////////////////////////
+	// Quita los acentos y pasa a minúsculas las mayúsculas 
+	void EliminarMinusAcentos(std::string&) const;
+	// Comprueba si un ., trata de un acronimo o un digito
 	void Punto(char*& p_izq, char*& p_der) const;
+	// Devuelve el string obtenido entre las dos posiciones de memoria
 	std::string ObtenerString (const char* p_i, const char* p_f) const;
 	// Devuelve true si _delimiters contiene el char
 	bool EsDelimiter(const char& p_d) const;
@@ -113,7 +106,4 @@ private:
 	void TokenizarGeneral(std::string&, std::list<std::string>&) const;
 	// Tokeniza el string teniendo en cuenta los casos especiales
 	void TokenizarEspecial(std::string&, std::list<std::string>&) const;
-	// Inicializar los pares del hasmap
-	//void InitMap() const;
-	//void StoreToken(char* p_izq, char* p_der) const;
 };
