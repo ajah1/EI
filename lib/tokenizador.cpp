@@ -79,7 +79,7 @@ Tokenizador::Generico(char*& p_der) const {
 		} else if (*p_der == '-') {
 			Guion(pos_izq, p_der);
 		} else if (EsDelimiter(*p_der)) {
-			p_der++; // Saltar el delimitador
+			++p_der; // Saltar el delimitador
 			if ((p_der - pos_izq) > 1)
 				PTokens->push_back(ObtenerString(pos_izq,p_der-1));
 		} else if (*p_der == '\0') {
@@ -87,7 +87,7 @@ Tokenizador::Generico(char*& p_der) const {
 		// ELSE: seguir iterando
 		} else {
 			parar = false;
-			p_der++;
+			++p_der;
 		}
 	}
 }
@@ -129,17 +129,17 @@ Tokenizador::URL(char*& p_izq, char*& p_der) const {
 				return;
 			}
 			PTokens->push_back(ObtenerString(p_izq,p_der+1));
-			p_der++;
+			++p_der;
 		} else if (EsURLIndicador(ObtenerString(p_izq, p_der))){
 			while (*p_der != '\0' && !EsURLDelimiter(p_der)) {
-				p_der++;
+				++p_der;
 			}
 			PTokens->push_back(ObtenerString(p_izq,p_der));
 		} else {
 			PTokens->push_back(ObtenerString(p_izq,p_der+1));
 		}
 	} else {
-		p_der++;	
+		++p_der;	
 	}
 }
 
@@ -158,7 +158,7 @@ Tokenizador::MAIL(char*& p_izq, char*& p_der) const {
 		// iterar hasta encontrar un delimitador y obtenerString()
 		while (!parar && *p_der != ' ' && *p_der != '\0') {
 			if (*p_der != '@' || !EsDelimiter('@')) {
-				p_der++;
+				++p_der;
 			} else {
 				parar = true;
 			}
@@ -176,11 +176,11 @@ Tokenizador::MAIL(char*& p_izq, char*& p_der) const {
 		//bool parar = false;
 		char* pos_aux = p_izq;
 		while (*p_der != ' ' && *p_der != '\0') {
-			p_der++;
+			++p_der;
 		}
 		PTokens->push_back(ObtenerString(pos_aux, p_der));
 	} else {
-		p_der++; // Saltar el @ suelto
+		++p_der; // Saltar el @ suelto
 	}
 }
 
@@ -197,12 +197,12 @@ Tokenizador::AcronimoAux1(char* &p_izq, char*& p_der) const {
 	// Si es acronimo :D seguir iterando"
 	} else {
 		//std::cout << "ES acronimo\n";
-		p_der++; // Saltar el .
+		++p_der; // Saltar el .
 		bool parar = false;
 		while (!parar && *p_der != '\0') {
 			//std::cout << "<- Ap_der:->" << *p_der << "<-"<< std::endl;
 			parar = ((*p_der == '.' && EsAcronimoDel(p_der+1))) || *p_der == ' ';
-			p_der++;
+			++p_der;
 		}
 		PTokens->push_back(ObtenerString(p_izq, p_der-1));
 	}
@@ -214,11 +214,11 @@ Tokenizador::AcronimoAux2(char* &p_izq, char*& p_der) const {
 		//StoreToken(p_izq, ++p_der); // Saltar el caracter q
 		PTokens->push_back(ObtenerString(p_izq, ++p_der));
 	} else {
-		p_der++; // Saltar el .
+		++p_der; // Saltar el .
 		bool parar = false;
 		while (!parar && *p_der != '\0') {
 			parar = ((*p_der == '.' && EsDelimiter(*(p_der+1)))) || *p_der == ' ';
-			p_der++;
+			++p_der;
 		}
 		if (*(p_der-1) == ' ')
 			PTokens->push_back(ObtenerString(p_izq, p_der-1));
@@ -236,7 +236,7 @@ Tokenizador::Acronimo(char*& p_izq, char*& p_der) const {
 			AcronimoAux2(p_izq, p_der);
 	} 
 	else if (*(p_der+1) == '.' || EsDelimiter('.')){
-		p_der++;
+		++p_der;
 	} 
 	else {
 		char* aux = p_izq;
@@ -265,10 +265,10 @@ Tokenizador::Guion(char*& p_izq, char*& p_der) const {
 void Tokenizador::GuionAux1(char* &p_izq, char* &p_der) const {
 	char* pos_izq = p_izq;
 	if (p_izq == p_der)
-		p_der++;
+		++p_der;
 
 	while (!EsDelimiter(*p_der) && *p_der != '\0') {
-		p_der++;
+		++p_der;
 	}
 	PTokens->push_back(ObtenerString(p_izq,p_der));
 }
@@ -278,7 +278,7 @@ void Tokenizador::GuionAux1(char* &p_izq, char* &p_der) const {
 void Tokenizador::GuionAux2(char* &p_izq, char* &p_der) const {
 	// EL guion es forma una palabra compuesta?
 	if (EsDelimiter(*(p_der-1)) || EsDelimiter(*(p_der+1))) {
-		p_der++;  // Dado que no es compuesta, devolver token
+		++p_der;  // Dado que no es compuesta, devolver token
 	} else {
 		bool parar = false;
 		while (!parar && *p_der != ' ' && *p_der != '\0') {
@@ -287,7 +287,7 @@ void Tokenizador::GuionAux2(char* &p_izq, char* &p_der) const {
 			} else if (*p_der != '-' && EsDelimiter(*p_der)) {
 				parar = true;
 			} else {
-				p_der++;
+				++p_der;
 			}
 		}
 		PTokens->push_back(ObtenerString(p_izq,p_der));
@@ -340,7 +340,7 @@ Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
 
     	char* pendline = f+i;
     	while (*pendline != '\n') {
-    		pendline++;	
+    		++pendline;	
     	}
 
     	std::string Stokenizar = ObtenerString(f+i, pendline+1);
@@ -426,7 +426,7 @@ Tokenizador::Decimal(char*& p_izq, char*& p_der) const {
 /////////////////////////////////////////////////////////////
 void 
 Tokenizador::DecimalAux1(char*& p_izq, char*& p_der) const {
-	p_der++;
+	++p_der;
 	bool parar = false;
 	while(*p_der != '\0' && *p_der != ' ' && !parar) {
 		parar = true;
@@ -434,17 +434,17 @@ Tokenizador::DecimalAux1(char*& p_izq, char*& p_der) const {
 		if (c == '.' || c == ',') {
 			if (*(p_der+1) == ' ') {
 				PTokens->push_back(ObtenerString(p_izq,p_der-1));
-				p_der++;
+				++p_der;
 			} else if (!isdigit(*(p_der+1))){
 				Acronimo(p_izq, p_der);
-			} else { parar = false; p_der++; }
+			} else { parar = false; ++p_der; }
 		} else if (*p_der == 'E' && EsDelimiter(',')) {
 			PTokens->push_back(ObtenerString(p_izq,p_izq));
 			p_der = p_izq+2;
 		} else if (EsDelimiter(*p_der)){
 			PTokens->push_back(ObtenerString(p_izq,p_der));
-			p_der++;
-		}else { parar = false; p_der++; }
+			++p_der;
+		}else { parar = false; ++p_der; }
 	}
 
 	if (!parar)
@@ -464,17 +464,17 @@ Tokenizador::DecimalAux2(char*& p_izq, char*& p_der) const {
 		if (c == '.' || c == ',') {
 			if (*(p_der+1) == ' ') {
 				PTokens->push_back("0" + ObtenerString(pizq,p_der-1));
-				p_der++;
+				++p_der;
 				break;
 			} else if (*(p_der+1) < '0' || *(p_der+1) > '9'){
 				Acronimo(++pizq, p_der);
 				break;
-			} else { parar = false; p_der++; }
+			} else { parar = false; ++p_der; }
 		} else if (EsDelimiter(*p_der)) {
 			PTokens->push_back("0" + ObtenerString(pizq,p_der));
-			p_der++;
+			++p_der;
 			break;
-		}else { parar = false; p_der++; }
+		}else { parar = false; ++p_der; }
 	}
 	if (!parar)
 		PTokens->push_back("0" + ObtenerString(pizq,p_der));
@@ -569,7 +569,7 @@ Tokenizador::EliminarMinusAcentos (std::string& s) const {
 		} else{
 			*c = tolower(*c);
 		}
-		c++;
+		++c;
 	}
 }
 /////////////////////////////////////////////////////////////
