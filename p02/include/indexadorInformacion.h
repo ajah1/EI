@@ -108,6 +108,34 @@ private:
 	documento. El tipo “Fecha/hora” lo elegirá/implementará el alumno*/
 };
 
+class InfColeccionDocs {
+	friend std::ostream& operator<<(std::ostream& s, const InfColeccionDocs& p);
+	/*s << “numDocs: “ << p.numDocs << “\tnumTotalPal: “ << p.numTotalPal <<
+	“\tnumTotalPalSinParada:“ << p.numTotalPalSinParada <<
+	“\tnumTotalPalDiferentes: “ << numTotalPalDiferentes << “\ttamBytes: “ <<
+	p.tamBytes; return s;*/
+public:
+	InfColeccionDocs (const InfColeccionDocs &);
+	InfColeccionDocs ();
+	~InfColeccionDocs ();
+	/*InfColeccionDocs & operator= (const InfColeccionDocs &);
+	Añadir cuantos métodos se consideren necesarios para manejar la parte
+	privada de la clase*/
+private:
+	long int numDocs;
+	// No total de documentos en la colección
+	long int numTotalPal;
+	// No total de palabras en la colección
+	long int numTotalPalSinParada;
+	// No total de palabras sin stop-words en la colección
+	long int numTotalPalDiferentes;
+	/* No total de palabras diferentes en la colección que no sean stop-
+	words (sin acumular la frecuencia de cada una de ellas)*/
+	long int tamBytes;
+	// Tamaño total en bytes de la colección
+};
+
+
 class InformacionTerminoPregunta {
 	friend std::ostream& operator<<(std::ostream& s, const InformacionTerminoPregunta& p);
 public:
