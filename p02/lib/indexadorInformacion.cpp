@@ -5,9 +5,9 @@
 //////////////////////////////////////////////////////////////////////////////
 ////// 			InfTermDoc                       						///// 
 //////////////////////////////////////////////////////////////////////////////
-InfTermDoc::InfTermDoc (const InfTermDoc& p_td) :
-	_ft(p_td._ft),
-	_posTerm(p_td._posTerm)
+InfTermDoc::InfTermDoc (const InfTermDoc& p_itd) :
+	_ft(p_itd._ft),
+	_posTerm(p_itd._posTerm)
 {}
 
 InfTermDoc::InfTermDoc () : 
@@ -20,11 +20,11 @@ InfTermDoc::~InfTermDoc () {
 }
 
 InfTermDoc& 
-InfTermDoc::operator= (const InfTermDoc& p_td) {
-	if (this != &p_td) {
-		_ft = p_td._ft;
+InfTermDoc::operator= (const InfTermDoc& p_itd) {
+	if (this != &p_itd) {
+		_ft = p_itd._ft;
 		_posTerm.clear();
-		_posTerm = p_td._posTerm;
+		_posTerm = p_itd._posTerm;
 	}
 	return *this;
 }
@@ -33,9 +33,9 @@ InfTermDoc::operator= (const InfTermDoc& p_td) {
 //////////////////////////////////////////////////////////////////////////////
 ////// 			InformacionTermino                       			///// 
 //////////////////////////////////////////////////////////////////////////////
-InformacionTermino::InformacionTermino (const InformacionTermino& p_t) :
-	_ftc(p_t._ftc),
-	_l_docs(p_t._l_docs) 
+InformacionTermino::InformacionTermino (const InformacionTermino& p_it) :
+	_ftc(p_it._ftc),
+	_l_docs(p_it._l_docs) 
 {}
 
 InformacionTermino::InformacionTermino () :
@@ -48,11 +48,11 @@ InformacionTermino::~InformacionTermino () {
 }
 
 InformacionTermino& 
-InformacionTermino::operator= (const InformacionTermino& p_t) {
-	if (this != &p_t) {
-		_ftc = p_t._ftc;
+InformacionTermino::operator= (const InformacionTermino& p_it) {
+	if (this != &p_it) {
+		_ftc = p_it._ftc;
 		_l_docs.clear();
-		_l_docs = p_t._l_docs;
+		_l_docs = p_it._l_docs;
 	}
 	return *this;
 }
@@ -61,13 +61,13 @@ InformacionTermino::operator= (const InformacionTermino& p_t) {
 //////////////////////////////////////////////////////////////////////////////
 ////// 			InfoDOc 				                      			///// 
 //////////////////////////////////////////////////////////////////////////////
-InfDoc::InfDoc (const InfDoc& p_d) : 
-	_idDoc(p_d._idDoc),
-	_numPal(p_d._numPal),
-	_numPalSinParada(p_d._numPalSinParada),
-	_numPalDiferentes(p_d._numPalDiferentes),
-	_tamBytes(p_d._tamBytes),
-	_fechaModificacion(p_d._fechaModificacion)
+InfDoc::InfDoc (const InfDoc& p_id) : 
+	_idDoc(p_id._idDoc),
+	_numPal(p_id._numPal),
+	_numPalSinParada(p_id._numPalSinParada),
+	_numPalDiferentes(p_id._numPalDiferentes),
+	_tamBytes(p_id._tamBytes),
+	_fechaModificacion(p_id._fechaModificacion)
 {}
 
 InfDoc::InfDoc () : 
@@ -85,25 +85,61 @@ InfDoc::~InfDoc () {
 }
 
 InfDoc& 
-InfDoc::operator= (const InfDoc& p_d) {
-	if (this != &p_d) {
-		_idDoc				= p_d._idDoc;
-		_numPal 			= p_d._numPal;
-		_numPalSinParada 	= p_d._numPalSinParada;
-		_numPalDiferentes 	= p_d._numPalDiferentes;
-		_tamBytes 			= p_d._tamBytes;
-		_fechaModificacion 	= p_d._fechaModificacion;
+InfDoc::operator= (const InfDoc& p_id) {
+	if (this != &p_id) {
+		_idDoc				= p_id._idDoc;
+		_numPal 			= p_id._numPal;
+		_numPalSinParada 	= p_id._numPalSinParada;
+		_numPalDiferentes 	= p_id._numPalDiferentes;
+		_tamBytes 			= p_id._tamBytes;
+		_fechaModificacion 	= p_id._fechaModificacion;
 	}
 	return *this;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+////// 			InfColeccionDocs 				                      			///// 
+//////////////////////////////////////////////////////////////////////////////
+InfColeccionDocs::InfColeccionDocs (const InfColeccionDocs& p_id) :
+	_numDocs(p_id._numDocs),
+	_numTotalPal(p_id._numTotalPal),
+	_tamBytes(p_id._tamBytes),
+	_numTotalPalSinParada(p_id._numTotalPalSinParada),
+	_numTotalPalDiferentes(p_id._numTotalPalDiferentes)
+{}
+
+InfColeccionDocs::InfColeccionDocs () :
+	_numDocs(0.0),
+	_numTotalPal(0.0),
+	_tamBytes(0.0),
+	_numTotalPalSinParada(0.0),
+	_numTotalPalDiferentes(0.0)
+
+{}
+
+InfColeccionDocs::~InfColeccionDocs () {
+	_numDocs = _numTotalPal = _tamBytes = 0.0;
+	_numTotalPalSinParada = _numTotalPalDiferentes = 0.0;
+}
+
+InfColeccionDocs&
+InfColeccionDocs::operator= (const InfColeccionDocs& p_id) {
+	if (this != &p_id) {
+		_numDocs 				= p_id._numDocs;
+		_numTotalPal 			= p_id._numTotalPal;
+		_tamBytes 				= p_id._tamBytes;
+		_numTotalPalSinParada 	= p_id._numTotalPalSinParada;
+		_numTotalPalDiferentes 	= p_id._numTotalPalDiferentes;
+	}
+	return *this;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 ////// 			InformacionTerminoPregunta 				                 ///// 
 //////////////////////////////////////////////////////////////////////////////
-InformacionTerminoPregunta::InformacionTerminoPregunta (const InformacionTerminoPregunta& p_tp) :
-	_ft(p_tp._ft),
-	_posTerm(p_tp._posTerm)
+InformacionTerminoPregunta::InformacionTerminoPregunta (const InformacionTerminoPregunta& p_itp) :
+	_ft(p_itp._ft),
+	_posTerm(p_itp._posTerm)
 {}
 
 InformacionTerminoPregunta::InformacionTerminoPregunta () :
@@ -116,11 +152,11 @@ InformacionTerminoPregunta::~InformacionTerminoPregunta () {
 }
 
 InformacionTerminoPregunta& 
-InformacionTerminoPregunta::operator= (const InformacionTerminoPregunta& p_tp) {
-	if (this != &p_tp) {
-		_ft = p_tp._ft;
+InformacionTerminoPregunta::operator= (const InformacionTerminoPregunta& p_itp) {
+	if (this != &p_itp) {
+		_ft = p_itp._ft;
 		_posTerm.clear();
-		_posTerm = p_tp._posTerm;
+		_posTerm = p_itp._posTerm;
 	}
 	return *this;
 }
@@ -159,34 +195,54 @@ InformacionPregunta::operator= (const InformacionPregunta& p_ip) {
 ////// 			SOBRECARGA DE OPERADORES                                 ///// 
 //////////////////////////////////////////////////////////////////////////////
 std::ostream& 
-operator<< (std::ostream& p_os, const InfTermDoc& p_inft) {
-	//p_os << "ft: " << p_inft._ft;
-	//A continuación se mostrarían todos los elementos de p.posTerm (“posicion
-	//TAB posicion TAB ... posicion, es decir nunca finalizará en un TAB”): s <<
-	//“\t“ << posicion;
-	return p_os;	
+operator<< (std::ostream& p_os, const InfTermDoc& p) {
+	p_os << "ft: " << p._ft;
+
+	for (int posicion : p._posTerm) {
+		p_os << "\t" << posicion;	
+	}
+	return p_os;
 }
 std::ostream&
-operator<< (std::ostream& p_os, const InformacionTermino& p_t) {
-	/*s << “Frecuencia total: “ << p.ftc << “\tfd: ” << p.l_docs.size();
-	// A continuación se mostrarían todos los elementos de p.l_docs: s <<
-	“\tId.Doc: “ << idDoc << “\t” << InfTermDoc;
-	}*/	
+operator<< (std::ostream& p_os, const InformacionTermino& p) {
+	p_os << "Frecuencia total: " << p._ftc << "\tfd: " << p._l_docs.size();
+
+	for (auto it = p._l_docs.begin(); it != p._l_docs.end(); ++it) {
+		p_os << "\tId.Doc: " << it->first << "\t" << it->second;
+	}
 	return p_os;
 }
 std::ostream& 
-operator<< (std::ostream& p_os, const InfDoc& p_d) {
-	return p_os;
+operator<< (std::ostream& p_os, const InfDoc& p_id) {
+	return p_os 
+	<< "idDoc: " 				<< p_id._idDoc 
+	<< "\tnumPal: "  			<< p_id._numPal
+	<< "\tnumPalSinParada: " 	<< p_id._numPalSinParada 
+	<< "\tnumPalDiferentes: " 	<< p_id._numPalDiferentes
+	<< "\ttamBytes: " 			<< p_id._tamBytes;	
 }
 std::ostream& 
-operator<<(std::ostream& p_os, const InformacionTerminoPregunta& p_tp) {
-	return p_os;
-	/*s << “ft: “ << p.ft;
-	// A continuación se mostrarían todos los elementos de p.posTerm (“posicion
-	TAB posicion TAB ... posicion, es decir nunca finalizará en un TAB”): s <<
-	“\t“ << posicion;*/
+operator<< (std::ostream& s, const InfColeccionDocs& p) {
+	return  s 
+	<< "numDocs: " 					<< p._numDocs 
+	<< "\tnumTotalPal: " 			<< p._numTotalPal 
+	<< "\tnumTotalPalSinParada: " 	<< p._numTotalPalSinParada
+ 	<< "\tnumTotalPalDiferentes: " 	<< p._numTotalPalDiferentes 
+ 	<< "\ttamBytes: " 				<< p._tamBytes;
 }
 std::ostream& 
-operator<< (std::ostream& p_os, const InformacionPregunta& p_ip) {
-	return p_os;
+operator<< (std::ostream& s, const InformacionTerminoPregunta& p) {
+	s << "ft: " << p._ft;
+
+	for (int posicion : p._posTerm) {
+		s << "\t" << posicion;
+	}
+	return s;
+}
+std::ostream& 
+operator<< (std::ostream& s, const InformacionPregunta& p) {
+	return s 
+	<< "numTotalPal: " 				<< p._numTotalPal 
+	<< "\tnumTotalPalSinParada: " 	<< p._numTotalPalSinParada 
+	<< "\tnumTotalPalDiferentes: " 	<< p._numTotalPalDiferentes;
 }

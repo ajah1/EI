@@ -2,28 +2,19 @@
 
 #include <unordered_map>
 #include <list>
+#include <iostream>
 
 class InfTermDoc {
-	friend std::ostream& operator<<(std::ostream&, const InfTermDoc&);
-	/*s << “ft: “ << p.ft;
-	 A continuación se mostrarían todos los elementos de p.posTerm (“posicion
-	TAB posicion TAB ... posicion, es decir nunca finalizará en un TAB”): s <<
-	“\t“ << posicion;
-	}
-	return s;*/
+friend std::ostream& operator<<(std::ostream&, const InfTermDoc&);
+
 public:
 	InfTermDoc (const InfTermDoc &);
-	InfTermDoc ();
-	// Inicializa ft = 0
-	~InfTermDoc ();
-	// Pone ft = 0
+	InfTermDoc ();  // Inicializa ft = 0
+	~InfTermDoc (); // Pone ft = 0
 	InfTermDoc & operator= (const InfTermDoc &);
-	/* Añadir cuantos métodos se consideren necesarios para manejar la parte
-	privada de la clase*/
 
 private:
-	int _ft;
-	// Frecuencia del término en el documento
+	int _ft; // Frecuencia del término en el documento
 	std::list<int> _posTerm;
 	/* Solo se almacenará esta información si el campo privado del indexador
 	almacenarPosTerm == true*/
@@ -35,21 +26,13 @@ private:
 
 
 class InformacionTermino {
-	friend std::ostream& operator<<(std::ostream& s, const InformacionTermino& p);
-	/*s << “Frecuencia total: “ << p.ftc << “\tfd: ” << p.l_docs.size();
-	// A continuación se mostrarían todos los elementos de p.l_docs: s <<
-	“\tId.Doc: “ << idDoc << “\t” << InfTermDoc;
-	}
-	return s;*/
+friend std::ostream& operator<<(std::ostream& s, const InformacionTermino& p);
+
 public:
 	InformacionTermino (const InformacionTermino &);
-	InformacionTermino ();
-	 // Inicializa ftc = 0
-	~InformacionTermino ();
-	 // Pone ftc = 0 y vacía l_docs
+	InformacionTermino ();  // Inicializa ftc = 0
+	~InformacionTermino (); // Pone ftc = 0 y vacía l_docs
 	InformacionTermino & operator= (const InformacionTermino &);
-	/* Añadir cuantos métodos se consideren necesarios para manejar la parte
-	privada de la clase*/
 	
 private:
 	int _ftc; // Frecuencia total del término en la colección
@@ -64,12 +47,8 @@ struct Fecha
 {
 	int _d, _m, _y;
 	
-	Fecha () {
-		_d = _m = _y = 0;
-	}
-	~Fecha () {
-		_d = _m = _y = 0;
-	}
+	Fecha  () { _d = _m = _y = 0; }
+	~Fecha () { _d = _m = _y = 0; }
 	Fecha& operator= (const Fecha& p_f) {
 		if (this != &p_f){
 			_d = p_f._d;
@@ -81,63 +60,52 @@ struct Fecha
 };
 
 class InfDoc {
-	friend std::ostream& operator<<(std::ostream& s, const InfDoc& p);
+friend std::ostream& operator<<(std::ostream& s, const InfDoc& p);
+
 public:
 	InfDoc (const InfDoc &);
 	InfDoc ();
 	~InfDoc ();
 	InfDoc& operator= (const InfDoc &);
-	/* Añadir cuantos métodos se consideren necesarios para manejar la parte
-	privada de la clase*/
 
 private:
 	long int _idDoc;
 	/* Identificador del documento. El primer documento indexado en la
 	colección será el identificador 1*/
-	int _numPal;
- 	// No total de palabras del documento
-	int _numPalSinParada;
-	 // No total de palabras sin stop-words del documento
+	int _numPal; 		  // No total de palabras del documento
+	int _numPalSinParada; // No total de palabras sin stop-words del documento
 	int _numPalDiferentes;
 	/* No total de palabras diferentes que no sean stop-words (sin acumular
 	la frecuencia de cada una de ellas)*/
-	int _tamBytes;
-	// Tamaño en bytes del documento
+	int _tamBytes; 		  // Tamaño en bytes del documento
 	Fecha _fechaModificacion;
 	/* Atributo correspondiente a la fecha y hora de modificación del
 	documento. El tipo “Fecha/hora” lo elegirá/implementará el alumno*/
 };
 
 class InfColeccionDocs {
-	friend std::ostream& operator<<(std::ostream& s, const InfColeccionDocs& p);
-	/*s << “numDocs: “ << p.numDocs << “\tnumTotalPal: “ << p.numTotalPal <<
-	“\tnumTotalPalSinParada:“ << p.numTotalPalSinParada <<
-	“\tnumTotalPalDiferentes: “ << numTotalPalDiferentes << “\ttamBytes: “ <<
-	p.tamBytes; return s;*/
+friend std::ostream& operator<<(std::ostream& s, const InfColeccionDocs& p);
+
 public:
 	InfColeccionDocs (const InfColeccionDocs &);
 	InfColeccionDocs ();
 	~InfColeccionDocs ();
-	/*InfColeccionDocs & operator= (const InfColeccionDocs &);
-	Añadir cuantos métodos se consideren necesarios para manejar la parte
-	privada de la clase*/
+	InfColeccionDocs & operator= (const InfColeccionDocs &);
+
 private:
-	long int numDocs;
-	// No total de documentos en la colección
-	long int numTotalPal;
-	// No total de palabras en la colección
-	long int numTotalPalSinParada;
-	// No total de palabras sin stop-words en la colección
-	long int numTotalPalDiferentes;
+	long int _numDocs; // No total de documentos en la colección
+	long int _numTotalPal; // No total de palabras en la colección
+	long int _numTotalPalSinParada; // No total de palabras sin stop-words en la colección
+	long int _numTotalPalDiferentes;
 	/* No total de palabras diferentes en la colección que no sean stop-
 	words (sin acumular la frecuencia de cada una de ellas)*/
-	long int tamBytes;
-	// Tamaño total en bytes de la colección
+	long int _tamBytes; // Tamaño total en bytes de la colección
 };
 
 
 class InformacionTerminoPregunta {
-	friend std::ostream& operator<<(std::ostream& s, const InformacionTerminoPregunta& p);
+friend std::ostream& operator<<(std::ostream& s, const InformacionTerminoPregunta& p);
+
 public:
 	InformacionTerminoPregunta (const InformacionTerminoPregunta &);
 	InformacionTerminoPregunta ();
@@ -159,16 +127,15 @@ private:
 
 class InformacionPregunta {
 friend std::ostream& operator<<(std::ostream& s, const InformacionPregunta& p);
+
 public:
 	InformacionPregunta (const InformacionPregunta &);
 	InformacionPregunta ();
 	~InformacionPregunta ();
 	InformacionPregunta & operator= (const InformacionPregunta &);
 private:
-	long int _numTotalPal;
-	// No total de palabras en la pregunta
-	long int _numTotalPalSinParada;
-	// No total de palabras sin stop-words en la pregunta
+	long int _numTotalPal; // No total de palabras en la pregunta
+	long int _numTotalPalSinParada; // No total de palabras sin stop-words en la pregunta
 	long int _numTotalPalDiferentes;
 	/*No total de palabras diferentes en la pregunta que no sean stop-words
 	(sin acumular la frecuencia de cada una de ellas)*/
