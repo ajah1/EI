@@ -1,20 +1,46 @@
 .PHONY= clean
-
 CC=g++
-OPTIONS= -g -std=c++11
+OPTIONS= -g -std=gnu++0x
 DEBUG= #-D DEBUG
 LIBDIR=lib
 INCLUDEDIR=include
-_OBJ= indexadorHash.o tokenizador.o stemmer.o indexadorInformacion.o
-OBJ = $(patsubst %,$(LIBDIR)/%,$(_OBJ))
+SOURCES := $(wildcard $(LIBDIR)/*.cpp)
+_OBJ := $(subst .cpp,.o,$(SOURCES))
+EJECUTABLE := practica2
+MAIN := src/main.cpp
 
-all: indexador
+all: $(EJECUTABLE)
 
-indexador:    src/main.cpp $(OBJ)
-	$(CC) $(OPTIONS) $(DEBUG) -I$(INCLUDEDIR) src/main.cpp $(OBJ) -o indexador
+$(EJECUTABLE): $(MAIN) $(_OBJ)
+	$(CC) $(OPTIONS) $(DEBUG) -I$(INCLUDEDIR) $(MAIN) $(_OBJ) -o $(EJECUTABLE)
 
 $(LIBDIR)/%.o : $(LIBDIR)/%.cpp $(INCLUDEDIR)/%.h
 	$(CC) $(OPTIONS) $(DEBUG) -c -I$(INCLUDEDIR) -o $@ $<
 
+run: $(EJECUTABLE)
+	./$^
+
+corrector: $(EJECUTABLE)
+	/bin/bash ./corrigeAlumno.sh
+
+memory: memory.cpp
+	$(CC) -o memory  $^
+
+valgrind: $(EJECUTABLE)
+	valgrind --tool=memcheck --leak-check=full ./practica2
+
 clean:
-	rm -f $(OBJ) 
+	rm -f $(_OBJ) 
+	rm -f $(EJECUTABLE)
+	rm -f memory
+	rm -f *.tmp
+	rm -f *.res
+info:
+	$(info $(CC))
+	$(info $(OPTIONS))
+	$(info $(DEBUG))
+	$(info $(LIBDIR))
+	$(info $(INCLUDEDIR))
+	$(info $(SOURCES))
+	$(info $(_OBJ))
+	$(info $(EJECUTABLE))

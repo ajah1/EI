@@ -333,8 +333,10 @@ Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
     int status = fstat (fd, &s);
     int size = s.st_size;
     char* f = (char *) mmap (0, size, PROT_READ, MAP_PRIVATE, fd, 0);
+	
 	// Abrir fichero de salida
  	std::ofstream out(p_fout);
+ 	
  	char p = '\n';
     for (int i = 0; i < size; ++i) {
 
@@ -346,8 +348,9 @@ Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
     	std::string Stokenizar = ObtenerString(f+i, pendline+1);
     	tokens.clear();
     	//if (_casosEspeciales) 
-		EliminarMinusAcentos(Stokenizar);
-    	TokenizarEspecial( Stokenizar, tokens );
+		// EliminarMinusAcentos(Stokenizar);
+    	//TokenizarEspecial( Stokenizar, tokens );
+    	TokenizarGeneral(Stokenizar, tokens);
     	
 		for (std::string s : tokens) {
 			char* buffer = &s.at(0);
@@ -358,7 +361,7 @@ Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
     	i += pendline - (f+i);
     }
 
-    out.close();
+   	out.close();
 
 	return true;
 }
@@ -378,7 +381,7 @@ Tokenizador::Tokenizar (const std::string& p_fin) const {
 /////////////////////////////////////////////////////////////
 bool 
 Tokenizador::TokenizarListaFicheros (const std::string& p_i) const {
-    FILE* fp = fopen("listaFicheros.txt", "r");
+    FILE* fp = fopen("listaFicheros_corto.txt", "r");
     char* line = NULL;
     size_t len = 0;
     ssize_t read;

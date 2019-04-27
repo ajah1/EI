@@ -4,19 +4,16 @@
 #include "indexadorInformacion.h"
 #include <unordered_set>
 
-
 class IndexadorHash {
+
+
+friend std::ostream& operator<<(std::ostream& s, const IndexadorHash& p);
 
 public:
 	IndexadorHash(const std::string& fichStopWords, const std::string& delimitadores,
 	const bool& detectComp, const bool& minuscSinAcentos, const std::string&
 	dirIndice, const int& tStemmer, const bool& almEnDisco, const bool&
 	almPosTerm);
-
-	IndexadorHash();
-	/* Este constructor se pone en la parte privada porque no se permitirá
-	crear un indexador sin inicializarlo convenientemente. La inicialización
-	la decidirá el alumno*/
 
 	IndexadorHash(const std::string& directorioIndexacion);
 	IndexadorHash(const IndexadorHash&);
@@ -48,8 +45,8 @@ public:
 	void ListarPalParada() const;
 	int NumPalParada() const;
 	std::string DevolverDelimitadores () const;
-	bool DevolverCasosEspeciales () const;
-	bool DevolverPasarAminuscSinAcentos () const;
+	bool DevolverCasosEspeciales () ;
+	bool DevolverPasarAminuscSinAcentos () ;
 	bool DevolverAlmacenarPosTerm () const;
 	std::string DevolverDirIndice () const;
 	int DevolverTipoStemming () const;
@@ -61,25 +58,33 @@ public:
 	
 private:
 
-	std::unordered_map<std::string, InformacionTermino> indice;
+	// Leer las stopwords del fichero
+	void ObtenerPalParada();
+
+	IndexadorHash();
+	/* Este constructor se pone en la parte privada porque no se permitirá
+	crear un indexador sin inicializarlo convenientemente. La inicialización
+	la decidirá el alumno*/
+
+	std::unordered_map<std::string, InformacionTermino> _indice;
 	// Índice de términos indexados accesible por el término
 
-	std::unordered_map<std::string, InfDoc> indiceDocs;
+	std::unordered_map<std::string, InfDoc> _indiceDocs;
 	// Índice de documentos indexados accesible por el nombre del documento
 
-	InfColeccionDocs informacionColeccionDocs;
+	InfColeccionDocs _informacionColeccionDocs;
 	// Información recogida de la colección de documentos indexada
 
-	std::string pregunta;
+	std::string _pregunta;
 	// Pregunta indexada actualmente. Si no hay ninguna indexada, contendría el valor “”
 
-	std::unordered_map<std::string, InformacionTerminoPregunta> indicePregunta;
+	std::unordered_map<std::string, InformacionTerminoPregunta> _indicePregunta;
 	// Índice de términos indexados en una pregunta. Se almacenará en memoria 
 
-	InformacionPregunta infPregunta;
+	InformacionPregunta _infPregunta;
 	// Información recogida de la pregunta indexada. Se almacenará en memoria principal
 
-	std::unordered_set<std::string> stopWords;
+	std::unordered_set<std::string> _stopWords;
 	/* Palabras de parada. Se almacenará en memoria principal. El filtrado
 	de palabras de parada se realizará teniendo en cuenta el parámetro
 	minuscSinAcentos. Es decir que se le aplicará el mismo proceso a las
@@ -88,22 +93,22 @@ private:
 	documento a indexar, para comprobar si se ha de eliminar el término,
 	éste se comparará con la versión de palabras de parada en minúsculas)*/
 
-	std::string ficheroStopWords;
+	std::string _ficheroStopWords;
 	// Nombre del fichero que contiene las palabras de parada
 
-	Tokenizador tok;
+	Tokenizador _tok;
 	/* Tokenizador que se usará en la indexación. Se inicializará con los
 	parámetros del constructor: detectComp y minuscSinAcentos, los cuales
 	determinarán qué término se ha de indexar (p.ej. si se activa
 	minuscSinAcentos, entonces se guardarán los términos en minúsculas y sin
 	acentos)*/
 
-	std::string directorioIndice;
+	std::string _directorioIndice;
 	/* “directorioIndice” será el directorio del disco duro donde se
 	almacenará el índice. En caso que contenga la cadena vacía se creará en
 	el directorio donde se ejecute el indexador*/
 
-	int tipoStemmer;
+	int _tipoStemmer;
 	/* 0 = no se aplica stemmer: se indexa el término tal y como aparece
 	tokenizado
 	// Los siguientes valores harán que los términos a indexar se les
@@ -114,7 +119,7 @@ private:
 	stemmer.cpp y stemmer.h, concretamente las funciones de nombre
 	“stemmer”*/
 
-	bool almacenarEnDisco;
+	bool _almacenarEnDisco;
 	/* Esta opción está ideada para poder indexar colecciones de documentos
 	lo suficientemente grandes para que su indexación no quepa en memoria,
 	por lo que si es true se almacenará la mínima parte de los índices de
@@ -129,7 +134,7 @@ private:
 	almacenará todo el índice en memoria principal (tal y como se ha
 	descrito anteriormente).*/
 
-	bool almacenarPosTerm;
+	bool _almacenarPosTerm;
 	/* Si es true se almacenará la posición en la que aparecen los términos
 	dentro del documento en la clase InfTermDoc*/
 

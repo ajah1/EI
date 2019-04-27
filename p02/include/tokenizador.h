@@ -34,7 +34,8 @@ public:
 	void PasarAminuscSinAcentos (const bool& p_PasarAminuscSinAcentos);
 	void CasosEspeciales (const bool& p_nuevoCasosEspeciales);
 
-
+	// Quita los acentos y pasa a minúsculas las mayúsculas 
+	void EliminarMinusAcentos(std::string&) const;
 
 private:
 	std::string _delimiters 		= "";
@@ -94,8 +95,6 @@ private:
 	////////////////////////////////////////////////
 	//FUNCIONES AUXILIARES
 	////////////////////////////////////////////////
-	// Quita los acentos y pasa a minúsculas las mayúsculas 
-	void EliminarMinusAcentos(std::string&) const;
 	// Comprueba si un ., trata de un acronimo o un digito
 	void Punto(char*& p_izq, char*& p_der) const;
 	// Devuelve el string obtenido entre las dos posiciones de memoria
