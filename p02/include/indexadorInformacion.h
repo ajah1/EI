@@ -30,9 +30,11 @@ friend std::ostream& operator<<(std::ostream& s, const InformacionTermino& p);
 
 public:
 	InformacionTermino (const InformacionTermino &);
+	InformacionTermino (int p_ftc) {_ftc = p_ftc;}
 	InformacionTermino ();  // Inicializa ftc = 0
 	~InformacionTermino (); // Pone ftc = 0 y vacía l_docs
 	InformacionTermino & operator= (const InformacionTermino &);
+	void incFTC() { ++_ftc;}
 	
 private:
 	int _ftc; // Frecuencia total del término en la colección

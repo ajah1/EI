@@ -60,6 +60,12 @@ private:
 
 	// Leer las stopwords del fichero
 	void ObtenerPalParada();
+	// Indexar los tokens guardados en ficheros
+	void indexar_tokens();
+	// Comprobar si el token es stop word
+	bool EsParada(const std::string& p_token);
+	// Actualizar el objeto InformacionTermino de un indice ya indexado
+	void actualizar_token_indexado(std::string& p_token);
 
 	IndexadorHash();
 	/* Este constructor se pone en la parte privada porque no se permitirá

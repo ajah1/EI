@@ -33,3 +33,5 @@
 
 # Ficheros de salida
 *,tk
+/p02_net/build/
+/p02_net/dist/
