@@ -66,6 +66,8 @@ private:
 	bool EsParada(const std::string& p_token);
 	// Actualizar el objeto InformacionTermino de un indice ya indexado
 	void actualizar_token_indexado(std::string& p_token);
+	// OBtener el size en B de un archivo
+	double GetFileSize(std::string filename);
 
 	IndexadorHash();
 	/* Este constructor se pone en la parte privada porque no se permitirá

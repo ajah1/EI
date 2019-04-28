@@ -35,6 +35,7 @@ clean:
 	rm -f memory
 	rm -f *.tmp
 	rm -f *.res
+	rm -f ./corpus/*.tk
 info:
 	$(info $(CC))
 	$(info $(OPTIONS))

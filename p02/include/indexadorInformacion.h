@@ -103,6 +103,18 @@ public:
 	~InfColeccionDocs ();
 	InfColeccionDocs & operator= (const InfColeccionDocs &);
 
+	void setnumDocs (long int n) {_numDocs = n;} // No total de documentos en la colección
+	void setnumTotalPal (long int n) {_numTotalPal = n;} // No total de palabras en la colección
+	void settamBytes (long int n) {_tamBytes = n;} // Tamaño total en bytes de la colección
+	void setnumTotalPalSinParada (long int n) {_numTotalPalSinParada = n;} // No total de palabras sin stop-words en la colección
+	void setnumTotalPalDiferentes (long int n) {_numTotalPalDiferentes = n;}
+
+	long int getnumDocs () const {return _numDocs;} // No total de documentos en la colección
+	long int getnumTotalPal () const {return _numTotalPal;} // No total de palabras en la colección
+	long int gettamBytes () const {return _tamBytes;} // Tamaño total en bytes de la colección
+	long int getnumTotalPalSinParada () const {return _numTotalPalSinParada;} // No total de palabras sin stop-words en la colección
+	long int getnumTotalPalDiferentes () const {return _numTotalPalDiferentes;}
+
 private:
 	long int _numDocs; // No total de documentos en la colección
 	long int _numTotalPal; // No total de palabras en la colección
