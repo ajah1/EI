@@ -37,7 +37,7 @@ bool
 IndexadorHash::Indexar (const std::string& ficheroDocumentos) {
 	
 	// Tokenizar los documentos
-	_tok.TokenizarListaFicheros("noImporta");
+	_tok.TokenizarListaFicheros("no_se_usa_este_parametro");
 
 	// Indexar los tokens
 	indexar_tokens();
@@ -56,6 +56,14 @@ IndexadorHash::indexar_tokens() {
     size_t len = 0;
     ssize_t read;
 
+   	long int aux_idDoc = 1;
+	int aux_numPal = 0; 		  // No total de palabras del documento
+	int aux_numParada = 0; // No total de palabras stop-words del documento
+	int aux_numPalDiferentes = 0;
+	//No total de palabras diferentes que no sean stop-words (sin acumular
+	//la frecuencia de cada una de ellas)
+	int aux_tamBytes = 0;
+
     while ((read = getline(&line, &len, fp)) != -1) {
        line[read-1] = 0;
        std::string aux_line = line;
@@ -70,18 +78,34 @@ IndexadorHash::indexar_tokens() {
        		// un nuevo token
        		std::cout << "leyendo token->" << token << "<-\n"; 
        		// comrpobar si es parado o vacio
-       		if (!EsParada(token) && token != "") {
-       			// Indexar el token
-       			if  (_indice.find(token)  == _indice.end()) {
-       				//std::cout << "indexar el token:-->" << token << "<--\n";
-       				_indice.insert({token, InformacionTermino(1)});
-       			// Ya está indexado, actualizar informacionTerminod el token
+       		if (token != "") {
+       			++aux_numPal;
+	       		if (!EsParada(token)) {
+	       			// Indexar el token
+	       			if  (_indice.find(token)  == _indice.end()) {
+	       				std::cout << "indexar el token:-->" << token << "<--\n";
+	       				_indice.insert({token, InformacionTermino(1)});
+	       				++aux_numPalDiferentes;
+	       			// Ya está indexado, actualizar informacionTerminod el token
+		       		} else {
+		       			std::cout << "actualizar ft" << std::endl;
+		       			actualizar_token_indexado(token);
+		       		}
 	       		} else {
-	       			std::cout << "actualizar ft" << std::endl;
-	       			actualizar_token_indexado(token);
+	       			++aux_numParada;
 	       		}
-       		}
+	       	}
        	}
+       	//idDoc: 1	numPal: 6	 numPalSinParada: 4	numPalDiferentes: 3	tamBytes: 30
+       	_indiceDocs.insert(
+       		{aux_line, 
+       		InfDoc(aux_idDoc++, aux_numPal, (aux_numPal-aux_numParada), aux_numPalDiferentes, aux_tamBytes)}
+   		);
+
+		aux_numPal = 0; 		  // No total de palabras del documento
+		aux_numParada = 0;
+		aux_numPalDiferentes = 0;
+
     }
 
     fclose(fp);
@@ -104,7 +128,7 @@ IndexadorHash::NumPalIndexadas() const {
 bool 
 IndexadorHash::ListarDocs(const std::string& nomDoc) {
 	//corpus_corto/fichero1.txt	idDoc: 1	numPal: 6	numPalSinParada: 4	numPalDiferentes: 3	tamBytes: 30
-	/*if (_indiceDocs.find(nomDoc) != _indiceDocs.end()) {
+	if (_indiceDocs.find(nomDoc) != _indiceDocs.end()) {
 		InfDoc* infdoc = &_indiceDocs.find(nomDoc)->second;
 		std::cout 	
 			<< nomDoc
@@ -117,8 +141,7 @@ IndexadorHash::ListarDocs(const std::string& nomDoc) {
 	} else {
 		std::cout << "no puede listar el documento \n";
 		return false;
-	}*/
-	return true;
+	}
 }
 
 

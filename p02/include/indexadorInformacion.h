@@ -70,6 +70,15 @@ public:
 	~InfDoc ();
 	InfDoc& operator= (const InfDoc &);
 
+   	//idDoc: 1	numPal: 6	numPalSinParada: 4	numPalDiferentes: 3	tamBytes: 30
+	InfDoc(const int p_idDoc, const int p_numPal, const int p_numPalSinParada, 
+		const int p_numPalDiferentes, const int p_tamBytes);
+	long int getidDoc() const;
+	int getnumPal() const;
+	int getnumPalSinParada() const;
+	int getnumPalDiferentes() const;
+	int gettamBytes() const;
+
 private:
 	long int _idDoc;
 	/* Identificador del documento. El primer documento indexado en la

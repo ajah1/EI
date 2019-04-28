@@ -329,7 +329,7 @@ Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
     const char* file_name = p_fin.c_str();
     int fd = open (file_name, O_RDONLY);
     /* Get the size of the file. */
-    //int status = fstat (fd, &s);
+    fstat (fd, &s);
     int size = s.st_size;
     char* f = (char *) mmap (0, size, PROT_READ, MAP_PRIVATE, fd, 0);
 	

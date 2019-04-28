@@ -245,3 +245,37 @@ operator<< (std::ostream& s, const InformacionPregunta& p) {
 	<< "\tnumTotalPalSinParada: " 	<< p._numTotalPalSinParada 
 	<< "\tnumTotalPalDiferentes: " 	<< p._numTotalPalDiferentes;
 }
+
+
+//////////////////////////////////////////////////////////////////////////////
+////// 			OTROS                                 ///// 
+//////////////////////////////////////////////////////////////////////////////
+long int 
+InfDoc::getidDoc() const { 
+	return _idDoc; 
+} 
+int 
+InfDoc::getnumPal() const { 
+	return _numPal; 
+}
+int 
+InfDoc::getnumPalSinParada() const { 
+	return _numPalSinParada; 
+}
+int 
+InfDoc::getnumPalDiferentes() const { 
+	return _numPalDiferentes; 
+}
+int 
+InfDoc::gettamBytes() const { 
+	return _tamBytes; 
+}
+
+InfDoc::InfDoc(const int p_idDoc, const int p_numPal, const int p_numPalSinParada, 
+			const int p_numPalDiferentes, const int p_tamBytes) :
+	_idDoc(p_idDoc),
+	_numPal(p_numPal),
+	_numPalSinParada(p_numPalSinParada),
+	_numPalDiferentes(p_numPalDiferentes),
+	_tamBytes(p_tamBytes)
+{}

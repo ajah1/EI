@@ -32,6 +32,6 @@
 *.app
 
 # Ficheros de salida
-*,tk
+*.tk
 /p02_net/build/
 /p02_net/dist/
