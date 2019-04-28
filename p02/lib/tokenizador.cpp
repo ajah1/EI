@@ -16,11 +16,11 @@ Tokenizador::Tokenizador (
 	const std::string& delimitadoresPalabra,
 	const bool& kcasosEspeciales, 
 	const bool& minuscSinAcentos)
-	: _delimiters(delimitadoresPalabra),
-	  _delimitersAux(delimitadoresPalabra),
-	  _casosEspeciales(kcasosEspeciales),
-	  _pasarAminuscSinAcentos(minuscSinAcentos),
-	  _delimitersLength(_delimiters.length())
+	: 	_delimiters(delimitadoresPalabra),
+		_casosEspeciales(kcasosEspeciales),
+		_pasarAminuscSinAcentos(minuscSinAcentos),
+	  	_delimitersAux(delimitadoresPalabra),
+	  	_delimitersLength(_delimiters.length())
 
 {}
 Tokenizador::Tokenizador (const Tokenizador& p_tk) {
@@ -63,7 +63,7 @@ Tokenizador::operator= (const Tokenizador& p_tk) {
 //////////////////////////////////////////////////////////////////////////////
 void
 Tokenizador::Generico(char*& p_der) const {
-	bool aux = false, parar = false;
+	bool parar = false;
 	char* pos_izq = p_der;
 	//std::cout << "========> GENERICO\n";
 	while (!parar) {
@@ -263,7 +263,6 @@ Tokenizador::Guion(char*& p_izq, char*& p_der) const {
 //
 /////////////////////////////////////////////////////////////
 void Tokenizador::GuionAux1(char* &p_izq, char* &p_der) const {
-	char* pos_izq = p_izq;
 	if (p_izq == p_der)
 		++p_der;
 
@@ -330,7 +329,7 @@ Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
     const char* file_name = p_fin.c_str();
     int fd = open (file_name, O_RDONLY);
     /* Get the size of the file. */
-    int status = fstat (fd, &s);
+    //int status = fstat (fd, &s);
     int size = s.st_size;
     char* f = (char *) mmap (0, size, PROT_READ, MAP_PRIVATE, fd, 0);
 	
@@ -403,7 +402,7 @@ Tokenizador::TokenizarListaFicheros (const std::string& p_i) const {
 /////////////////////////////////////////////////////////////
 bool 
 Tokenizador::TokenizarDirectorio (const std::string& p_dir) const {
-	struct stat dir;
+	//struct stat dir;
 	//int err = stat(p_dir.c_str(), &dir);
 	std::string cmd = "find " +p_dir+ " -follow |sort > .lista_fich";
 	system(cmd.c_str());
@@ -562,7 +561,7 @@ Tokenizador::ObtenerString(const char* p_i, const char* p_f) const {
 const char* tr = "aaaaaaNNeeeeiiiiNñoooooNNuuuuNNNaaaaaaNNeeeeiiiiNñoooooNNuuuuNNN";
 void
 Tokenizador::EliminarMinusAcentos (std::string& s) const {
-	int i = 0;
+	long unsigned int i = 0;
 	unsigned char a;
 	char* c = &s.at(0);
 	for (;i < s.size(); ++i) {

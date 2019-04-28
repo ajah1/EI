@@ -114,7 +114,6 @@ InfColeccionDocs::InfColeccionDocs () :
 	_tamBytes(0.0),
 	_numTotalPalSinParada(0.0),
 	_numTotalPalDiferentes(0.0)
-
 {}
 
 InfColeccionDocs::~InfColeccionDocs () {

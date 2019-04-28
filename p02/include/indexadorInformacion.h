@@ -97,11 +97,12 @@ public:
 private:
 	long int _numDocs; // No total de documentos en la colección
 	long int _numTotalPal; // No total de palabras en la colección
+	long int _tamBytes; // Tamaño total en bytes de la colección
 	long int _numTotalPalSinParada; // No total de palabras sin stop-words en la colección
 	long int _numTotalPalDiferentes;
 	/* No total de palabras diferentes en la colección que no sean stop-
 	words (sin acumular la frecuencia de cada una de ellas)*/
-	long int _tamBytes; // Tamaño total en bytes de la colección
+	
 };
 
 

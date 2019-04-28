@@ -97,8 +97,29 @@ bool
 IndexadorHash::EsParada(const std::string& p_token) {
 	return (_stopWords.find(p_token) != _stopWords.end());
 }
-
-
+int 
+IndexadorHash::NumPalIndexadas() const {
+	return _indice.size();
+}
+bool 
+IndexadorHash::ListarDocs(const std::string& nomDoc) {
+	//corpus_corto/fichero1.txt	idDoc: 1	numPal: 6	numPalSinParada: 4	numPalDiferentes: 3	tamBytes: 30
+	/*if (_indiceDocs.find(nomDoc) != _indiceDocs.end()) {
+		InfDoc* infdoc = &_indiceDocs.find(nomDoc)->second;
+		std::cout 	
+			<< nomDoc
+			<< " idDoc: " 				<< infdoc->getidDoc()
+			<< "	numPal: " 			<< infdoc->getnumPal()
+			<< "	numPalSinParada: " 	<< infdoc->getnumPalSinParada()
+			<< " numPalDiferentes: " 	<< infdoc->getnumPalDiferentes()
+			<< " tamBytes: " 			<< infdoc->gettamBytes() << '\n';
+		return true;
+	} else {
+		std::cout << "no puede listar el documento \n";
+		return false;
+	}*/
+	return true;
+}
 
 
 void

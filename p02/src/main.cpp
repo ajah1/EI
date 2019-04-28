@@ -19,11 +19,12 @@ if(a.Indexar("./listaFicheros_corto.txt"))
 else
 	cout << "Indexacion NO terminada" << endl;
 
-/*
+
 cout << a.NumPalIndexadas() << endl;
 
 a.ListarDocs("corpus_corto/fichero1.txt");
 a.ListarDocs("corpus_corto/fichero2.txt");
+/*
 if(a.ListarDocs("corpus_corto/fichero3.txt"))
 	cout << "Existe el archivo corpus_corto/fichero3.txt" << endl;
 else

@@ -54,7 +54,7 @@ public:
 	void ListarInfColeccDocs() const;
 	void ListarTerminos() const;
 	bool ListarTerminos(const std::string& nomDoc) const;
-	bool ListarDocs(const std::string& nomDoc) const;
+	bool ListarDocs(const std::string& nomDoc);
 	
 private:
 
