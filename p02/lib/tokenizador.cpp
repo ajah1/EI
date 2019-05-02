@@ -36,7 +36,7 @@ Tokenizador::Tokenizador (const std::string& p_del) {
 	_pasarAminuscSinAcentos = false;
 }
 Tokenizador::Tokenizador () {
-	_delimiters = ",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@";
+	_delimiters = ",;:.-/+*\\ '\"{}[]()<>ï¿½!ï¿½?&#=\t\n\r@";
 	_casosEspeciales = true;
 	_pasarAminuscSinAcentos = false;
 }
@@ -319,7 +319,7 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 }
 ////////////////////////////////////////////////////////////////////
 // Tokeniza el fichero i guardando la salida en el fichero f (una
-// palabra en cada línea del fichero). Devolverá true si se realiza
+// palabra en cada lï¿½nea del fichero). Devolverï¿½ true si se realiza
 ////////////////////////////////////////////////////////////////////
 bool
 Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
@@ -366,8 +366,8 @@ Tokenizador::Tokenizar (std::string& p_fin, std::string& p_fout) const {
 }
 ////////////////////////////////////////////////////////////////////////////
 // Tokeniza el fichero i guardando la salida en un fichero de nombre i
-// añadiéndole extensión .tk (sin eliminar previamente la extensión de i
-// por ejemplo, del archivo pp.txt se generaría el resultado en pp.txt.tk),
+// aï¿½adiï¿½ndole extensiï¿½n .tk (sin eliminar previamente la extensiï¿½n de i
+// por ejemplo, del archivo pp.txt se generarï¿½a el resultado en pp.txt.tk),
 ////////////////////////////////////////////////////////////////////////////
 bool
 Tokenizador::Tokenizar (const std::string& p_fin) const {
@@ -380,7 +380,8 @@ Tokenizador::Tokenizar (const std::string& p_fin) const {
 /////////////////////////////////////////////////////////////
 bool 
 Tokenizador::TokenizarListaFicheros (const std::string& p_i) const {
-    FILE* fp = fopen("listaFicheros_corto.txt", "r");
+	std::string s = p_i;
+    FILE* fp = fopen(s.c_str(), "r");
     char* line = NULL;
     size_t len = 0;
     ssize_t read;
@@ -424,7 +425,7 @@ Tokenizador::Decimal(char*& p_izq, char*& p_der) const {
 	else 				 { DecimalAux1(p_izq, p_der); }
 }
 /////////////////////////////////////////////////////////////
-// Distinta posición de memoria
+// Distinta posiciï¿½n de memoria
 /////////////////////////////////////////////////////////////
 void 
 Tokenizador::DecimalAux1(char*& p_izq, char*& p_der) const {
@@ -453,7 +454,7 @@ Tokenizador::DecimalAux1(char*& p_izq, char*& p_der) const {
 		PTokens->push_back(ObtenerString(p_izq,p_der));
 }
 /////////////////////////////////////////////////////////////
-// Misma posición de memoria
+// Misma posiciï¿½n de memoria
 /////////////////////////////////////////////////////////////
 void 
 Tokenizador::DecimalAux2(char*& p_izq, char*& p_der) const {
@@ -509,7 +510,7 @@ void
 Tokenizador::TokenizarEspecial(std::string& s, std::list<std::string>& p_tokens) const {
 	// Puntero a la lista de tokens
 	PTokens = &p_tokens;
-	// Puntero a la primera posición del string
+	// Puntero a la primera posiciï¿½n del string
 	char* it = &s.at(0);
 	// Iterar String hasta llegar al final
 	while (*it != '\0') {
@@ -539,7 +540,7 @@ Tokenizador::TokenizarGeneral(std::string& s, std::list<std::string>& p_tokens) 
 }
 /////////////////////////////////////////////////////////////
 // DEVUELVE EL STRING QUE SE ECUENTRA ENTRE
-// LAS POSICÍON DE MEMORIA P_I y P_F
+// LAS POSICï¿½ON DE MEMORIA P_I y P_F
 /////////////////////////////////////////////////////////////
 std::string
 Tokenizador::ObtenerString(const char* p_i, const char* p_f) const {
@@ -556,9 +557,9 @@ Tokenizador::ObtenerString(const char* p_i, const char* p_f) const {
 }
 /////////////////////////////////////////////////////////////
 // ELIMINA LOS ACENTOS DE LAS VOCALES a, e, i, o, u
-// Y PASA A MINÚSCULAS LOS CARACTERES
+// Y PASA A MINï¿½SCULAS LOS CARACTERES
 /////////////////////////////////////////////////////////////
-const char* tr = "aaaaaaNNeeeeiiiiNñoooooNNuuuuNNNaaaaaaNNeeeeiiiiNñoooooNNuuuuNNN";
+const char* tr = "aaaaaaNNeeeeiiiiNï¿½oooooNNuuuuNNNaaaaaaNNeeeeiiiiNï¿½oooooNNuuuuNNN";
 void
 Tokenizador::EliminarMinusAcentos (std::string& s) const {
 	long unsigned int i = 0;
@@ -576,7 +577,7 @@ Tokenizador::EliminarMinusAcentos (std::string& s) const {
 }
 /////////////////////////////////////////////////////////////
 // COMPRUEBA SI EL CARACTER P_D ES UN DELIMITADOR (_delimiter)
-// ESTA FUNCION SOLO SE USA EN LOS CASOS ESPECIALES. ADEMÁS
+// ESTA FUNCION SOLO SE USA EN LOS CASOS ESPECIALES. ADEMï¿½S
 // DE LOS DELIMITADORES COMPRUEBA EL ESPACIO (' ')
 /////////////////////////////////////////////////////////////
 bool
@@ -640,6 +641,10 @@ Tokenizador::AnyadirDelimitadoresPalabra (const std::string& p_newDel) {
 		}
 	}
 }
+void
+Tokenizador::SetDelimitadoresPalabraAux (std::string p_del) {
+	_delimitersAux = p_del;
+}
 //////////////////////////////////////////////////////////////////////////////
 ////// 			SOBRECARGA DE OPERADORES                                 ///// 
 //////////////////////////////////////////////////////////////////////////////
@@ -647,7 +652,7 @@ std::ostream&
 operator<< (std::ostream& p_os, const Tokenizador& p_tk)
 {	
 	if (p_tk._casosEspeciales)
-		p_os << "DELIMITADORES: " 					  << p_tk._delimitersAux 
+		p_os << "DELIMITADORES: " 					  << p_tk._delimitersAux
 			 << " TRATA CASOS ESPECIALES: " 		  << p_tk._casosEspeciales 
 			 << " PASAR A MINUSCULAS Y SIN ACENTOS: " << p_tk._pasarAminuscSinAcentos;
 	 else 

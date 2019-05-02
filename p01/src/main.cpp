@@ -1,25 +1,25 @@
-#include "tokenizador.h"
-#include <sys/resource.h>
-#include <list>
+#include <iostream> 
 #include <string>
-#include <iostream>
+#include <list> 
+#include "indexadorHash.h"
 
 using namespace std;
 
-double getcputime(void) {
-	struct timeval tim;
-	struct rusage ru;
-	getrusage(RUSAGE_SELF, &ru);
-	tim=ru.ru_utime;
-	double t=(double)tim.tv_sec + (double)tim.tv_usec / 1000000.0;
-	tim=ru.ru_stime;
-	t+=(double)tim.tv_sec + (double)tim.tv_usec / 1000000.0;
-	return t;
-}
-int main() {
-	long double aa=getcputime();
-	Tokenizador a("\t ,;:.-+/*_`'{}[]()!?&#\"\\<>", true, true);
-	a.TokenizarListaFicheros("listaFicheros.txt");
-	 // TODO EL CORPUS
-	cout << "Ha tardado " << getcputime() - aa << " segundos" << endl;
+int
+main(void)
+{
+IndexadorHash a("./StopWordsEspanyol.txt", ". ,:", true, true, "./indicePrueba", 1, false, true);
+cout << "IndexadorHash a:\n################\n" << a << endl;
+
+IndexadorHash b("./StopWordsIngles.txt", ". ,:", true, false, "./indicePruebaIngles", 2, true, true);
+cout << "IndexadorHash b:\n################\n" << b << endl;
+
+cout << b.DevolverDelimitadores () << endl; 
+cout << b.DevolverDirIndice () << endl; 
+cout << b.DevolverTipoStemming () << endl; 
+cout << b.DevolverAlmEnDisco () << endl; 
+cout << b.DevolverAlmacenarPosTerm () << endl; 
+cout << b.DevolverPasarAminuscSinAcentos () << endl; 
+cout << b.DevolverCasosEspeciales () << endl; 
+
 }

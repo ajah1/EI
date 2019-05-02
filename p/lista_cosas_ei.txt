@@ -3,5 +3,5 @@ IndexadorHash(...) ver que pasa con el bool para eliminarMinusAcentos
 El numero de obtenerPalarasParada() parece que no evita los campos ""
 Calcular bien el numerodepalabrasdiferentes
 Calcular las posiciones de las palabras encontradas
-La lista de delimitadoresAux en algun momento se sobreescribe o se inicializa. Deshacer la salida del token, para que muestre delimitaresAux en vez de delimitadores
+------>La lista de delimitadoresAux en algun momento se sobreescribe o se inicializa. Deshacer la salida del token, para que muestre delimitaresAux en vez de delimitadores
 LA p06 hacer metodos

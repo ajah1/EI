@@ -33,6 +33,7 @@ public:
 	void AnyadirDelimitadoresPalabra(const std::string& p_nuevoDelimiters);
 	void PasarAminuscSinAcentos (const bool& p_PasarAminuscSinAcentos);
 	void CasosEspeciales (const bool& p_nuevoCasosEspeciales);
+	void SetDelimitadoresPalabraAux (const std::string p_del);
 
 	// Quita los acentos y pasa a minúsculas las mayúsculas 
 	void EliminarMinusAcentos(std::string&) const;

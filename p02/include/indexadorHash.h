@@ -6,7 +6,6 @@
 
 class IndexadorHash {
 
-
 friend std::ostream& operator<<(std::ostream& s, const IndexadorHash& p);
 
 public:
@@ -61,7 +60,7 @@ private:
 	// Leer las stopwords del fichero
 	void ObtenerPalParada();
 	// Indexar los tokens guardados en ficheros
-	void indexar_tokens();
+	void indexar_tokens(const std::string&);
 	// Comprobar si el token es stop word
 	bool EsParada(const std::string& p_token);
 	// Actualizar el objeto InformacionTermino de un indice ya indexado
@@ -70,6 +69,16 @@ private:
 	double GetFileSize(std::string filename);
 	// Dado un id de doc devuelve su nombre en un string
 	int getDocId (std::string p_ruta) const;
+	// Sobrecarga () _indice
+	void CopiaIndice(std::unordered_map<std::string, InformacionTermino> p_indice);
+	// Sobrecarga() _indiceDOcs
+	void CopiaIndiceDocs(std::unordered_map<std::string, InfDoc> p_indiceDocs);
+	// Sobre carga() _indicePregunta
+	void CopiaindicePregunta(std::unordered_map<std::string, InformacionTerminoPregunta> p_indicepregunta);
+	// SobreCarga ()
+	void CopiaStopWords(std::unordered_set<std::string> p_parada);
+	void CopiaICD (const InfColeccionDocs& p_id);
+
 
 	IndexadorHash();
 	/* Este constructor se pone en la parte privada porque no se permitirá
