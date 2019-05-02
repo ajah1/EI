@@ -1,2 +1,1 @@
 corpus_corto/fichero1.txt
-corpus_corto/fichero2.txt

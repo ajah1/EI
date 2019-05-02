@@ -279,3 +279,13 @@ InfDoc::InfDoc(const int p_idDoc, const int p_numPal, const int p_numPalSinParad
 	_numPalDiferentes(p_numPalDiferentes),
 	_tamBytes(p_tamBytes)
 {}
+
+std::unordered_map<long int, InfTermDoc>& 
+InformacionTermino::apuntarListaDocs() {
+	return _l_docs;
+}
+
+InfTermDoc::InfTermDoc (int p_ft, int p_pos) {
+	_ft = p_ft;
+	_posTerm.push_back(p_pos);
+}

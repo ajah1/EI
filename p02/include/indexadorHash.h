@@ -31,8 +31,8 @@ public:
 	bool DevuelvePregunta(InformacionPregunta& inf) const;
 	void ImprimirIndexacionPregunta();
 	void ImprimirPregunta();
-	bool Devuelve(const std::string& word, InformacionTermino& inf) const;
-	bool Devuelve(const std::string& word, const std::string& nomDoc, InfTermDoc& InfDoc) const;
+	bool Devuelve(const std::string& word, InformacionTermino& inf);
+	bool Devuelve(const std::string& word, const std::string& nomDoc, InfTermDoc& InfDoc);
 	bool Existe(const std::string& word) const;
 	bool Borra(const std::string& word);
 	bool BorraDoc(const std::string& nomDoc);
@@ -65,9 +65,11 @@ private:
 	// Comprobar si el token es stop word
 	bool EsParada(const std::string& p_token);
 	// Actualizar el objeto InformacionTermino de un indice ya indexado
-	void actualizar_token_indexado(std::string& p_token);
+	void actualizar_token_indexado(std::string& p_token, int aux_idDoc);
 	// OBtener el size en B de un archivo
 	double GetFileSize(std::string filename);
+	// Dado un id de doc devuelve su nombre en un string
+	int getDocId (std::string p_ruta) const;
 
 	IndexadorHash();
 	/* Este constructor se pone en la parte privada porque no se permitirá
