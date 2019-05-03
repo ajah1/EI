@@ -47,7 +47,7 @@ IndexadorHash::IndexarDirectorio(const std::string& dirAIndexar) {
 		// Asegurarme que borro los .tk
 		std::string cmd = "rm -f "+dirAIndexar+"/*.tk";
 		system(cmd.c_str());
-		cmd="find "+dirAIndexar+" -type f > .lista_fich";
+		cmd="find "+dirAIndexar+" -type f | sort -n > .lista_fich";
 		system(cmd.c_str()); //Ejecuta el comando cmd en el tablero de comandos
 		return Indexar(".lista_fich");
 	}
