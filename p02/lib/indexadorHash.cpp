@@ -4,18 +4,22 @@
 #include <stack>
 #include <sys/stat.h>
 
+/////////////////////////////////////////////////////////////////
+// MAPA PARA LISTAR DADO UNA RUTA DE UN DOCUMENTO EL ID ASOCIADO
+////////////////////////////////////////////////////////////////
+std::unordered_map<std::string, long int> _documentos;
+
+
 IndexadorHash::IndexadorHash() {}
+
 IndexadorHash::~IndexadorHash() {}
 
-IndexadorHash::IndexadorHash(
-	const std::string& fichStopWords, 
-	const std::string& delimitadores,
-	const bool& detectComp, 			
-	const bool& minuscSinAcentos, 
+IndexadorHash::IndexadorHash (
+	const std::string& fichStopWords, const std::string& delimitadores,
+	const bool& detectComp, const bool& minuscSinAcentos, 
 	const std::string& dirIndice, 		
 	const int& tStemmer, 
-	const bool& almEnDisco, 			
-	const bool& almPosTerm) {
+	const bool& almEnDisco, const bool& almPosTerm) {
 
 		_ficheroStopWords = fichStopWords;
 
@@ -31,42 +35,41 @@ IndexadorHash::IndexadorHash(
 
 		ObtenerPalParada();
 }
-
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
 bool
 IndexadorHash::IndexarDirectorio(const std::string& dirAIndexar) {
 	struct stat dir;
-	// Compruebo la existencia del directorio
-	int err=stat(dirAIndexar.c_str(), &dir);
+	int err = stat(dirAIndexar.c_str(), &dir);
 
 	if(err==-1 || !S_ISDIR(dir.st_mode)){
 		return false;
-	}
-	else {
-		// Hago una lista en un fichero con find>fich
-		//std::string cmd="find "+dirAIndexar+" -follow |sort > .lista_fich"; //Extrae todas las rutas de los ficheros a un archivo .lista_fich
-		// Asegurarme que borro los .tk
+	} else {
+		// Borrar los *.tk que otras ejecuciones
 		std::string cmd = "rm -f "+dirAIndexar+"/*.tk";
 		system(cmd.c_str());
+		// Obtener la lista de ficheros a indexar
 		cmd="find "+dirAIndexar+" -type f | sort -n > .lista_fich";
-		system(cmd.c_str()); //Ejecuta el comando cmd en el tablero de comandos
+		system(cmd.c_str());
 		return Indexar(".lista_fich");
 	}
 }
-
-
-
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
 bool 
 IndexadorHash::Indexar (const std::string& ficheroDocumentos) {
-	
 	// Tokenizar los documentos
 	_tok.TokenizarListaFicheros(ficheroDocumentos);
-
 	// Indexar los tokens
 	indexar_tokens(ficheroDocumentos);
 
 	return true;
 }
-
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
 bool 
 IndexadorHash::Devuelve(const std::string& word, InformacionTermino& inf) {
 	if (_indice.find(word) != _indice.end()) {
@@ -76,43 +79,33 @@ IndexadorHash::Devuelve(const std::string& word, InformacionTermino& inf) {
 	return false;
 }
 
-std::unordered_map<std::string, long int> _documentos;
-
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
 bool 
 IndexadorHash::BorraDoc(const std::string& nomDoc) {
 	// Comprobar si el documeto existe
 	if (_indiceDocs.find(nomDoc) != _indiceDocs.end()) {
-		int id_doc = getDocId(nomDoc);	// Necesitamos el id del documento
-		// 1. Borrar Por cada token indexado la informacion del documento
-
-		// Si _l_docs pasa a ser 0 borrar i del _indice
-
-
+		// Borrar Por cada token indexado la informacion del documento
+		int id_doc = getDocId(nomDoc);		// Necesitamos el id del documento
 		for (auto& i : _indice) {
+			// Referencia a la variable privada _l_docs
 			auto& lista_doc = i.second.apuntarListaDocs();
 			// Comprobar si en _l_docs está el documento
 			auto d = lista_doc.find(id_doc);
-			if (d != lista_doc.end()) { // i(indice) se encuentra en el d(docuemnto)
-				//std::cout << i.first << "  \n" << i.second << '\n';
-				// Restar la ft
+			if (d != lista_doc.end()) {				// Restar la ft
 				i.second.decftc(d->second.getft()); // dec a la ftc la ft del d
-				// Borrar d de la _l_docs
-				lista_doc.erase(id_doc);
-				//std::cout << i.second << '\n';
-				//std::cout << "_-----------\n";
+				lista_doc.erase(id_doc);			// Borrar d de la _l_docs
 			}
 		}
 
 		std::stack<std::string> s;
-
+		// Lista en una pila S los indices cuya _l_docs pasa a ser 0
 		for (auto it=_indice.begin(); it!=_indice.end(); ++it) {
-			auto l = it->second.apuntarListaDocs();
-			if (l.size() == 0) {
-				s.push(it->first);
-				//_informacionColeccionDocs.setnumTotalPalDiferentes(_informacionColeccionDocs.getnumTotalPalDiferentes()-1);
-			}
+			auto l = it->second.apuntarListaDocs();	// Referencia a _l_docs
+			if (l.size() == 0) {s.push(it->first);}	// IF _l_docs.size() == 0 THEN store i key
 		}
-
+		// Borrar de _indice aquellos i que almacena la pila
 		std::string i = "";
 		while (!s.empty()) {
 			i = s.top();
@@ -120,30 +113,20 @@ IndexadorHash::BorraDoc(const std::string& nomDoc) {
 			_indice.erase(i);
 		}
 
-
-		// Restar contadores de informacionCOlecccionDOcs
-		auto& d_borrar = _indiceDocs.find(nomDoc)->second;
+		// Actualizar los valores de la infColDocs
+		auto& d_borrar = _indiceDocs.find(nomDoc)->second; 
 		_informacionColeccionDocs.setnumTotalPalSinParada(
 			_informacionColeccionDocs.getnumTotalPalSinParada()-d_borrar.getnumPalSinParada());
-			//long int _numTotalPal; // No total de palabras en la colección
 		_informacionColeccionDocs.setnumTotalPal(
 			_informacionColeccionDocs.getnumTotalPal()-d_borrar.getnumPal());
-			//long int _numDocs; // No total de documentos en la colección
 		_informacionColeccionDocs.setnumDocs(_informacionColeccionDocs.getnumDocs()-1);
-			//long int _numTotalPalDiferentes;
-		_informacionColeccionDocs.setnumTotalPalDiferentes(
-			_indice.size());
-			//long int _tamBytes; // Tamaño total en bytes de la colección
+		_informacionColeccionDocs.setnumTotalPalDiferentes(_indice.size());
 		_informacionColeccionDocs.settamBytes(
 			_informacionColeccionDocs.gettamBytes()-d_borrar.gettamBytes());
 
-
-
-
-		// Borrar de _indiceDOcs 
-		_indiceDocs.erase(nomDoc);
-		// Borrar del auxiliasr _documentos
-		_documentos.erase(nomDoc);
+		// Borrar el documento 
+		_indiceDocs.erase(nomDoc);		// de _indiceDOcs
+		_documentos.erase(nomDoc);		// del auxiliar _documentos
 
 		return true;
 	}
@@ -151,31 +134,42 @@ IndexadorHash::BorraDoc(const std::string& nomDoc) {
 	return false;
 }
 
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
 IndexadorHash::IndexadorHash(const std::string& directorioIndexacion) {
 
 }
 
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
 bool
 IndexadorHash::GuardarIndexacion() const {
 	return false;
 }
 
 
-int 
+/////////////////////////////////////////////////////////////
+// DADA LA RUTA DE UN FICHERO DEVUELVE EL ID ASOCIADO
+/////////////////////////////////////////////////////////////
+int
 IndexadorHash::getDocId (std::string p_ruta) const { 
 	if (_documentos.find(p_ruta) != _documentos.end())
 		return _documentos.find(p_ruta)->second;
 	return -1;
 }
 
+/////////////////////////////////////////////////////////////
+// TRUE SI EL STRING ESTA EN LA VARIABLE PRIVADA _STOPWORDS
+/////////////////////////////////////////////////////////////
 bool 
 IndexadorHash::Devuelve(const std::string& word, const std::string& nomDoc, InfTermDoc& InfDoc) {
-	// 1. word esta indexado
+	// SI word esta indexado
 	if (_indice.find(word) != _indice.end()) {
-		// 2. esta en la lista de documentos
-			// Obtener el string de un documento a partir del id
-			// comprobar que el id obtenido pertenece a _l_docs
+		// Obtener el id de un documento a partir del string
 		int id_doc = getDocId( nomDoc );
+		// comprobar que el id obtenido pertenece a _l_docs
 		auto& lista_doc = _indice.find(word)->second.apuntarListaDocs();
 		if (id_doc != -1 && lista_doc.find(id_doc) != lista_doc.end()) {
 			InfDoc = lista_doc.find(id_doc)->second;
@@ -185,13 +179,16 @@ IndexadorHash::Devuelve(const std::string& word, const std::string& nomDoc, InfT
 
 	return false;
 }
-
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
 bool 
 IndexadorHash::Existe(const std::string& word) const {
 	return _indice.find(word) != _indice.end();
 }
-
-
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
 void
 IndexadorHash::indexar_tokens(const std::string& ficherodocumentos) {
 
@@ -203,81 +200,75 @@ IndexadorHash::indexar_tokens(const std::string& ficherodocumentos) {
 
     // Contadores para informacionTermino
    	long int aux_idDoc = 1;
-	int aux_numPal = 0, aux_numParada = 0;
-	std::unordered_set<std::string> aux_diferentes;
-	std::unordered_set<std::string> dif;
-
+	int aux_numPal = 0, aux_numParada = 0,
 	// Contadores para InformacionColeccionDocs
-	int aux_numdocs = 0, aux_numtotalpal = 0, aux_numTotalPalSinParada = 0;
-	int aux_numTotalPalDiferentes = 0, aux_tamBytes = 0;
-	int aux_posicion = 0;
+		aux_numdocs = 0, 				aux_numtotalpal = 0, aux_numTotalPalSinParada = 0,
+		aux_numTotalPalDiferentes = 0, 	aux_tamBytes = 0, 	 aux_posicion = 0;
+	// 
+	std::unordered_set<std::string> aux_diferentes, dif;
+
 	
 	// Por cada fichero tokenizado, procesar sus tokens
     while ((read = getline(&line, &len, fp)) != -1) {
        line[read-1] = 0;
        std::string aux_line = line;
        std::string f_tokens = aux_line+".tk";
-       // std::cout << f_tokens << '\n';
-       ++aux_numdocs;		// Update numero de documentos con tokens
-       _documentos.insert({aux_line, aux_idDoc});
+
+       ++aux_numdocs;								// Update numero de documentos con tokens
+       _documentos.insert({aux_line, aux_idDoc});	// Inserta el documento en la lista
 
    		// Abrir fichero con los tokens
        	std::ifstream file;
        	file.open(f_tokens);
        	std::string token = "";
+
        	// Indexar el token leido
-       	aux_posicion = 0;
+       	aux_posicion = 0;							// Posicion del token a 0
        	while (getline(file, token)) {
-       		// un nuevo token
-       		//std::cout << "leyendo token->" << token << "<-\n";
-       		// comrpobar si es parado o vacio
-       		if (token != "") {
+       		if (token != "") {		// comrpobar si es parado o vacio
        			++aux_numPal;
 	       		if (!EsParada(token)) {
 	       			// Indexar el token
 	       			if  (_indice.find(token)  == _indice.end()) {
-	       				//std::cout << "indexar el token:-->" << token << "<--\n";
-	       				
-	       				_indice.insert({token, InformacionTermino(1)});
+	       				_indice.insert({token, InformacionTermino(1)});				// Insertar el indice
 	       				// Añadir en la lista de documentos del termino el primer documento
 	       				auto* lista_doc = &_indice.find(token)->second.apuntarListaDocs();
 	       				lista_doc->insert({aux_idDoc, InfTermDoc(1, aux_posicion)});
 	       				aux_diferentes.insert(token);
 	       				dif.insert(token);
-
 	       			// Ya está indexado, actualizar informacionTerminod el token
 		       		} else {
-		       			//std::cout << "actualizar ft" << std::endl;
 		       			actualizar_token_indexado(token, aux_idDoc, aux_posicion);
 						// IF: p_token no pertenece a diferentes THEN insertar el token
 						if (aux_diferentes.find(token) == aux_diferentes.end()) {
 							aux_diferentes.insert(token);
 						}
-		       		}
-		       		
-	       		} else {
-	       			++aux_numParada;
-	       		}
+		       		}		       		
+	       		} else { ++aux_numParada; }
+	       		
 	       		++aux_posicion;
 	       	}
        	}
 
        	// informacionColeccionDocs
-       	aux_numtotalpal += aux_numPal;
-       	aux_numTotalPalDiferentes += aux_diferentes.size();
-       	aux_numTotalPalSinParada += (aux_numPal-aux_numParada);
-       	
+       	aux_numtotalpal 			+= aux_numPal;
+       	aux_numTotalPalDiferentes 	+= aux_diferentes.size();
+       	aux_numTotalPalSinParada 	+= (aux_numPal-aux_numParada);
        	// InformacionTermino
-       	_indiceDocs.insert({aux_line,InfDoc(aux_idDoc++, aux_numPal, (aux_numPal-aux_numParada), aux_diferentes.size(), GetFileSize(aux_line))});
-       	
+       	_indiceDocs.insert({aux_line,InfDoc(aux_idDoc++, 
+       		aux_numPal, 
+       		(aux_numPal-aux_numParada), 
+       		aux_diferentes.size(), 
+       		GetFileSize(aux_line))}
+       	);
        	// informacionColeccionDocs
-       	aux_tamBytes += GetFileSize(aux_line);					// Actualizar B
-		aux_numPal = aux_numParada = 0;	// Setear auxiliares
+       	aux_tamBytes 	+= GetFileSize(aux_line);	// Actualizar B
+		aux_numPal 		= aux_numParada = 0;		// Setear auxiliares
 		aux_diferentes.clear();
 
     }
 
-    // Información recogida de la colección de documentos indexada
+    // Información de la colección de documentos indexada
 	_informacionColeccionDocs.setnumDocs (aux_numdocs);
 	_informacionColeccionDocs.setnumTotalPal (aux_numtotalpal);
 	_informacionColeccionDocs.settamBytes (aux_tamBytes); 
@@ -286,9 +277,11 @@ IndexadorHash::indexar_tokens(const std::string& ficherodocumentos) {
 
     fclose(fp);
     if (line) free(line);
-
 }
 
+/////////////////////////////////////////////////////////////
+// DADA LA RUTA DE UN ARCHIVO DEVUELVE EL SIZE EN BYTES
+/////////////////////////////////////////////////////////////
 double 
 IndexadorHash::GetFileSize(std::string filename){
     struct stat stat_buf;
@@ -296,58 +289,17 @@ IndexadorHash::GetFileSize(std::string filename){
     return rc == 0 ? stat_buf.st_size : -1;
 }
 
-void
-IndexadorHash::actualizar_token_indexado(std::string& p_token, int aux_idDoc, int aux_posicion) {
-	// Acceder al token de _indice
-	InformacionTermino* inft = &_indice.find(p_token)->second;
-	inft->incFTC();
-
-	// Del token actualizar su _l_docs
-	auto lista_doc = &_indice.find(p_token)->second.apuntarListaDocs();
-	auto busca = lista_doc->find(aux_idDoc);
-	// IF no existe el documento THEN insertar en _l_docs
-	if (busca == lista_doc->end())
-		lista_doc->insert({aux_idDoc, InfTermDoc(1, aux_posicion)});
-	else { // THEN actualizar el existente
-		busca->second.UpdatePosTerm(aux_posicion);
-	}
-}
+/////////////////////////////////////////////////////////////
+// TRUE SI EL STRING ESTA EN LA VARIABLE PRIVADA _STOPWORDS
+/////////////////////////////////////////////////////////////
 bool
 IndexadorHash::EsParada(const std::string& p_token) {
 	return (_stopWords.find(p_token) != _stopWords.end());
 }
-int 
-IndexadorHash::NumPalIndexadas() const {
-	return _indice.size();
-}
-bool 
-IndexadorHash::ListarDocs(const std::string& nomDoc) {
-	//corpus_corto/fichero1.txt	idDoc: 1	numPal: 6	numPalSinParada: 4	numPalDiferentes: 3	tamBytes: 30
-	if (_indiceDocs.find(nomDoc) != _indiceDocs.end()) {
-		InfDoc* infdoc = &_indiceDocs.find(nomDoc)->second;
-		std::cout 	
-			<< nomDoc
-			<< "\tidDoc: " 				<< infdoc->getidDoc()
-			<< "\tnumPal: " 			<< infdoc->getnumPal()
-			<< "\tnumPalSinParada: " 	<< infdoc->getnumPalSinParada()
-			<< "\tnumPalDiferentes: " 	<< infdoc->getnumPalDiferentes()
-			<< "\ttamBytes: " 			<< infdoc->gettamBytes() << '\n';
-		return true;
-	} else {
-		return false;
-	}
-}
-void 
-IndexadorHash::ListarInfColeccDocs() const {
-	std::cout
-		<< "numDocs: " 					<< _informacionColeccionDocs.getnumDocs()
-		<< "\tnumTotalPal: " 			<< _informacionColeccionDocs.getnumTotalPal()
-		<< "\tnumTotalPalSinParada: " 	<< _informacionColeccionDocs.getnumTotalPalSinParada()
-		<< "\tnumTotalPalDiferentes: " 	<< _informacionColeccionDocs.getnumTotalPalDiferentes()
-		<< "\ttamBytes: " 				<< _informacionColeccionDocs.gettamBytes() 
-		<< '\n';
-}
 
+/////////////////////////////////////////////////////////////
+// GUARDAR EN _stopwords LAS PALABRAS DE PARADA
+/////////////////////////////////////////////////////////////
 void
 IndexadorHash::ObtenerPalParada() {
 	std::ifstream file;
@@ -368,6 +320,72 @@ IndexadorHash::ObtenerPalParada() {
 	file.close();
 }
 
+//////////////////////////////////////////////////////////////////////////////
+////// 			     FUNCIONES AUX                                     		///// 
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+// TRUE SI EL STRING ESTA EN LA VARIABLE PRIVADA _STOPWORDS
+/////////////////////////////////////////////////////////////
+void
+IndexadorHash::actualizar_token_indexado(std::string& p_token, int aux_idDoc, int aux_posicion) {
+	// Acceder al token de _indice
+	InformacionTermino* inft = &_indice.find(p_token)->second;
+	inft->incFTC();
+	// Del token actualizar su _l_docs
+	auto lista_doc = &_indice.find(p_token)->second.apuntarListaDocs();
+	auto busca = lista_doc->find(aux_idDoc);
+	// IF no existe el documento THEN insertar en _l_docs
+	if (busca == lista_doc->end())
+		lista_doc->insert({aux_idDoc, InfTermDoc(1, aux_posicion)});
+	else // THEN actualizar el existente
+		busca->second.UpdatePosTerm(aux_posicion);
+}
+void IndexadorHash::CopiaIndice(std::unordered_map<std::string, InformacionTermino> p_indice) {
+	for (auto& i : p_indice) {
+		_indice.insert({i.first, i.second});
+	}
+}
+void IndexadorHash::CopiaIndiceDocs(std::unordered_map<std::string, InfDoc> p_indiceDocs) {
+	for (auto& i : p_indiceDocs) {
+		_indiceDocs.insert({i.first, i.second});
+	}
+}
+void IndexadorHash::CopiaindicePregunta(std::unordered_map<std::string, InformacionTerminoPregunta> p_indicepregunta) {
+	for (auto& i : p_indicepregunta) {
+		_indicePregunta.insert({i.first, i.second});
+	}
+}
+void IndexadorHash::CopiaStopWords(std::unordered_set<std::string> p_parada) {
+	for (auto& i : p_parada) {
+		_stopWords.insert(i);
+	}
+}
+void IndexadorHash::CopiaICD (const InfColeccionDocs& p_id) {
+	_informacionColeccionDocs.setnumDocs(p_id.getnumDocs());
+	_informacionColeccionDocs.setnumTotalPal(p_id.getnumTotalPal());
+	_informacionColeccionDocs.settamBytes(p_id.gettamBytes());
+	_informacionColeccionDocs.setnumTotalPalSinParada(p_id.getnumTotalPalSinParada());
+	_informacionColeccionDocs.setnumTotalPalDiferentes(p_id.getnumTotalPalDiferentes());
+}
+IndexadorHash::IndexadorHash(const IndexadorHash& p_i) {
+	CopiaIndice(p_i._indice);
+	CopiaIndiceDocs(p_i._indiceDocs);
+	CopiaICD(p_i._informacionColeccionDocs);
+	CopiaindicePregunta(p_i._indicePregunta);
+	CopiaStopWords(p_i._stopWords);
+
+	// InformacionPregunta _infPregunta;
+	//_infPregunta(p_i._infPregunta);
+
+	_pregunta 			= p_i._pregunta;
+	_ficheroStopWords 	= p_i._ficheroStopWords;
+	_tok 				= p_i._tok;
+	_directorioIndice 	= p_i._directorioIndice;
+	_tipoStemmer 		= p_i._tipoStemmer;
+	_almacenarEnDisco 	= p_i._almacenarEnDisco;
+	_almacenarPosTerm 	= p_i._almacenarPosTerm;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 ////// 			     GETTERS-SETTERS                                     ///// 
@@ -377,7 +395,6 @@ IndexadorHash::ListarPalParada() const {
 	for (auto word : _stopWords)
 		std::cout << word << std::endl;
 }
-
 std::string 
 IndexadorHash::DevolverDelimitadores () const {
 	return _tok.DelimitadoresPalabra();
@@ -414,7 +431,14 @@ std::string
 IndexadorHash::DevolverFichPalParada() const {
 	return _ficheroStopWords;
 }
+int 
+IndexadorHash::NumPalIndexadas() const {
+	return _indice.size();
+}
 
+//////////////////////////////////////////////////////////////////////////////
+////// 			     IMPRIMIR INFO                                    ///// 
+//////////////////////////////////////////////////////////////////////////////
 std::ostream& operator<<(std::ostream& s, const IndexadorHash& p) { 
 	return s 	
 		<< "Fichero con el listado de palabras de parada: " 		
@@ -432,61 +456,28 @@ std::ostream& operator<<(std::ostream& s, const IndexadorHash& p) {
 		<< "Se almacenaran las posiciones de los terminos: " 		
 			<< p._almacenarPosTerm;  
 }
-
-void IndexadorHash::CopiaIndice(std::unordered_map<std::string, InformacionTermino> p_indice) {
-	for (auto& i : p_indice) {
-		_indice.insert({i.first, i.second});
+void 
+IndexadorHash::ListarInfColeccDocs() const {
+	std::cout
+	<< "numDocs: " 					<< _informacionColeccionDocs.getnumDocs()
+	<< "\tnumTotalPal: " 			<< _informacionColeccionDocs.getnumTotalPal()
+	<< "\tnumTotalPalSinParada: " 	<< _informacionColeccionDocs.getnumTotalPalSinParada()
+	<< "\tnumTotalPalDiferentes: " 	<< _informacionColeccionDocs.getnumTotalPalDiferentes()
+	<< "\ttamBytes: " 				<< _informacionColeccionDocs.gettamBytes() 
+	<< '\n';
+}
+bool 
+IndexadorHash::ListarDocs (const std::string& nomDoc) {
+	if (_indiceDocs.find(nomDoc) != _indiceDocs.end()) {
+		InfDoc* infdoc = &_indiceDocs.find(nomDoc)->second;
+		std::cout 	
+			<< nomDoc
+			<< "\tidDoc: " 				<< infdoc->getidDoc()
+			<< "\tnumPal: " 			<< infdoc->getnumPal()
+			<< "\tnumPalSinParada: " 	<< infdoc->getnumPalSinParada()
+			<< "\tnumPalDiferentes: " 	<< infdoc->getnumPalDiferentes()
+			<< "\ttamBytes: " 			<< infdoc->gettamBytes() << '\n';
+		return true;
 	}
-}
-void IndexadorHash::CopiaIndiceDocs(std::unordered_map<std::string, InfDoc> p_indiceDocs) {
-	for (auto& i : p_indiceDocs) {
-		_indiceDocs.insert({i.first, i.second});
-	}
-}
-
-void IndexadorHash::CopiaindicePregunta(std::unordered_map<std::string, InformacionTerminoPregunta> p_indicepregunta) {
-	for (auto& i : p_indicepregunta) {
-		_indicePregunta.insert({i.first, i.second});
-	}
-}
-void IndexadorHash::CopiaStopWords(std::unordered_set<std::string> p_parada) {
-	for (auto& i : p_parada) {
-		_stopWords.insert(i);
-	}
-}
-
-void IndexadorHash::CopiaICD (const InfColeccionDocs& p_id) {
-	_informacionColeccionDocs.setnumDocs(p_id.getnumDocs());
-	_informacionColeccionDocs.setnumTotalPal(p_id.getnumTotalPal());
-	_informacionColeccionDocs.settamBytes(p_id.gettamBytes());
-	_informacionColeccionDocs.setnumTotalPalSinParada(p_id.getnumTotalPalSinParada());
-	_informacionColeccionDocs.setnumTotalPalDiferentes(p_id.getnumTotalPalDiferentes());
-}
-
-IndexadorHash::IndexadorHash(const IndexadorHash& p_i) {
-	//std::unordered_map<std::string, InformacionTermino> _indice;
-	CopiaIndice(p_i._indice);
-	//std::unordered_map<std::string, InfDoc> _indiceDocs;
-	CopiaIndiceDocs(p_i._indiceDocs);
-	//InfColeccionDocs _informacionColeccionDocs;
-	CopiaICD(p_i._informacionColeccionDocs);
-
-	//std::unordered_map<std::string, InformacionTerminoPregunta> _indicePregunta;
-	CopiaindicePregunta(p_i._indicePregunta);
-
-
-	// InformacionPregunta _infPregunta;
-	//_infPregunta(p_i._infPregunta);
-
-	//std::unordered_set<std::string> _stopWords;
-	CopiaStopWords(p_i._stopWords);
-
-	_pregunta = p_i._pregunta;
-	_ficheroStopWords = p_i._ficheroStopWords;
-	_tok = p_i._tok;
-	_directorioIndice = p_i._directorioIndice;
-	_tipoStemmer = p_i._tipoStemmer;
-	_almacenarEnDisco = p_i._almacenarEnDisco;
-	_almacenarPosTerm = p_i._almacenarPosTerm;
-
+	return false;
 }

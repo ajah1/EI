@@ -13,18 +13,17 @@ public:
 	InfTermDoc (int p_ft, int p_pos);
 	~InfTermDoc (); // Pone ft = 0
 	InfTermDoc & operator= (const InfTermDoc &);
-
+	/////////////////////////////////////////////////////////////////
+	///  FUNCIONES AUX
+	/////////////////////////////////////////////////////////////////
+	// Inserta la posicion en la lista de posicion e incrementa la ft
 	void UpdatePosTerm(int pos) {++_ft; _posTerm.push_back(pos);}
+	// Getter para la _ft
 	int getft() {return _ft;}
+
 private:
-	int _ft; // Frecuencia del término en el documento
+	int _ft;
 	std::list<int> _posTerm;
-	/* Solo se almacenará esta información si el campo privado del indexador
-	almacenarPosTerm == true*/
-	/* Lista de números de palabra en los que aparece el término en el
-	documento. Los números de palabra comenzarán desde cero (la primera
-	palabra del documento). Se numerarán las palabras de parada. Estará
-	ordenada de menor a mayor posición.*/
 };
 
 
@@ -37,17 +36,20 @@ public:
 	InformacionTermino ();  // Inicializa ftc = 0
 	~InformacionTermino (); // Pone ftc = 0 y vacía l_docs
 	InformacionTermino & operator= (const InformacionTermino &);
-	
-	void incFTC() { ++_ftc;}
-	void decftc(int d) {_ftc -= d;}
-	int getftc() {return _ftc;};
+	/////////////////////////////////////////////////////////////////
+	///  FUNCIONES AUX
+	/////////////////////////////////////////////////////////////////
+	// Incrementar en 1 la _ftc
+	void incFTC () 		{ ++_ftc;}
+	// Decrementar a la ftc el valor d
+	void decftc (int d) {_ftc -= d;}
+	// Getter para la ftc
+	int getftc () 		{return _ftc;};
+	// Devuelve una referencia al campo privado _l_docs
 	std::unordered_map<long int, InfTermDoc>& apuntarListaDocs();
 private:
-	int _ftc; // Frecuencia total del término en la colección
+	int _ftc;
 	std::unordered_map<long int, InfTermDoc> _l_docs;
-	/* Tabla Hash que se accederá por el id del documento, devolviendo un
-	objeto de la clase InfTermDoc que contiene toda la información de
-	aparición del término en el documento*/
 };
 
 
@@ -67,6 +69,7 @@ struct Fecha
 	}
 };
 
+
 class InfDoc {
 friend std::ostream& operator<<(std::ostream& s, const InfDoc& p);
 
@@ -75,10 +78,12 @@ public:
 	InfDoc ();
 	~InfDoc ();
 	InfDoc& operator= (const InfDoc &);
-
-   	//idDoc: 1	numPal: 6	numPalSinParada: 4	numPalDiferentes: 3	tamBytes: 30
 	InfDoc(const int p_idDoc, const int p_numPal, const int p_numPalSinParada, 
-		const int p_numPalDiferentes, const int p_tamBytes);
+			const int p_numPalDiferentes, const int p_tamBytes);
+	/////////////////////////////////////////////////////////////////
+	///  FUNCIONES AUX
+	/////////////////////////////////////////////////////////////////
+	// Getters
 	long int getidDoc() const;
 	int getnumPal() const;
 	int getnumPalSinParada() const;
@@ -88,18 +93,13 @@ public:
 
 private:
 	long int _idDoc;
-	/* Identificador del documento. El primer documento indexado en la
-	colección será el identificador 1*/
-	int _numPal; 		  // No total de palabras del documento
-	int _numPalSinParada; // No total de palabras sin stop-words del documento
+	int _numPal;
+	int _numPalSinParada;
 	int _numPalDiferentes;
-	/* No total de palabras diferentes que no sean stop-words (sin acumular
-	la frecuencia de cada una de ellas)*/
-	int _tamBytes; 		  // Tamaño en bytes del documento
-	Fecha _fechaModificacion;
-	/* Atributo correspondiente a la fecha y hora de modificación del
-	documento. El tipo “Fecha/hora” lo elegirá/implementará el alumno*/
+	int _tamBytes;
+	Fecha _fechaModificacion; /* fecha y hora de modificación del documento.*/
 };
+
 
 class InfColeccionDocs {
 friend std::ostream& operator<<(std::ostream& s, const InfColeccionDocs& p);
@@ -110,16 +110,19 @@ public:
 	~InfColeccionDocs ();
 	InfColeccionDocs & operator= (const InfColeccionDocs &);
 
-	void setnumDocs (long int n) {_numDocs = n;} // No total de documentos en la colección
-	void setnumTotalPal (long int n) {_numTotalPal = n;} // No total de palabras en la colección
-	void settamBytes (long int n) {_tamBytes = n;} // Tamaño total en bytes de la colección
-	void setnumTotalPalSinParada (long int n) {_numTotalPalSinParada = n;} // No total de palabras sin stop-words en la colección
+	/////////////////////////////////////////////////////////////////
+	///  FUNCIONES AUX
+	/////////////////////////////////////////////////////////////////
+	// Getters y Setters
+	void setnumDocs (long int n) {_numDocs = n;}
+	void setnumTotalPal (long int n) {_numTotalPal = n;}
+	void settamBytes (long int n) {_tamBytes = n;}
+	void setnumTotalPalSinParada (long int n) {_numTotalPalSinParada = n;}
 	void setnumTotalPalDiferentes (long int n) {_numTotalPalDiferentes = n;}
-
-	long int getnumDocs () const {return _numDocs;} // No total de documentos en la colección
-	long int getnumTotalPal () const {return _numTotalPal;} // No total de palabras en la colección
-	long int gettamBytes () const {return _tamBytes;} // Tamaño total en bytes de la colección
-	long int getnumTotalPalSinParada () const {return _numTotalPalSinParada;} // No total de palabras sin stop-words en la colección
+	long int getnumDocs () const {return _numDocs;} 
+	long int getnumTotalPal () const {return _numTotalPal;} 
+	long int gettamBytes () const {return _tamBytes;} 
+	long int getnumTotalPalSinParada () const {return _numTotalPalSinParada;}
 	long int getnumTotalPalDiferentes () const {return _numTotalPalDiferentes;}
 
 private:
@@ -128,9 +131,6 @@ private:
 	long int _tamBytes; // Tamaño total en bytes de la colección
 	long int _numTotalPalSinParada; // No total de palabras sin stop-words en la colección
 	long int _numTotalPalDiferentes;
-	/* No total de palabras diferentes en la colección que no sean stop-
-	words (sin acumular la frecuencia de cada una de ellas)*/
-	
 };
 
 
@@ -145,14 +145,7 @@ public:
 
 private:
 	int _ft;
-	 // Frecuencia total del término en la pregunta
 	std::list<int> _posTerm;
-	/* Solo se almacenará esta información si el campo privado del indexador
-	almacenarPosTerm == true*/
-	/* Lista de números de palabra en los que aparece el término en la
-	pregunta. Los números de palabra comenzarán desde cero (la primera
-	palabra de la pregunta). Se numerarán las palabras de parada. Estará
-	ordenada de menor a mayor posición.*/
 };
 
 
