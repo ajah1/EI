@@ -1,0 +1,3 @@
+./lib/indexadorHash.cpp
+./lib/indexadorInformacion.cpp
+./lib/tokenizador.cpp

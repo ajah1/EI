@@ -641,6 +641,10 @@ Tokenizador::AnyadirDelimitadoresPalabra (const std::string& p_newDel) {
 		}
 	}
 }
+void
+Tokenizador::SetDelimitadoresPalabraAux (std::string p_del) {
+	_delimitersAux = p_del;
+}
 //////////////////////////////////////////////////////////////////////////////
 ////// 			SOBRECARGA DE OPERADORES                                 ///// 
 //////////////////////////////////////////////////////////////////////////////
@@ -648,7 +652,7 @@ std::ostream&
 operator<< (std::ostream& p_os, const Tokenizador& p_tk)
 {	
 	if (p_tk._casosEspeciales)
-		p_os << "DELIMITADORES: " 					  << p_tk._delimiters
+		p_os << "DELIMITADORES: " 					  << p_tk._delimitersAux
 			 << " TRATA CASOS ESPECIALES: " 		  << p_tk._casosEspeciales 
 			 << " PASAR A MINUSCULAS Y SIN ACENTOS: " << p_tk._pasarAminuscSinAcentos;
 	 else 

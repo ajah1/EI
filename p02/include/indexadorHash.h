@@ -64,7 +64,7 @@ private:
 	// Comprobar si el token es stop word
 	bool EsParada(const std::string& p_token);
 	// Actualizar el objeto InformacionTermino de un indice ya indexado
-	void actualizar_token_indexado(std::string& p_token, int aux_idDoc);
+	void actualizar_token_indexado(std::string& p_token, int aux_idDoc, int aux_posicion);
 	// OBtener el size en B de un archivo
 	double GetFileSize(std::string filename);
 	// Dado un id de doc devuelve su nombre en un string

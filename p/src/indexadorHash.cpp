@@ -22,6 +22,7 @@ IndexadorHash::IndexadorHash(
 		_tok.DelimitadoresPalabra(delimitadores);
 		_tok.CasosEspeciales(detectComp);
 		_tok.PasarAminuscSinAcentos(minuscSinAcentos);
+		_tok.SetDelimitadoresPalabraAux(delimitadores);
 
 		_directorioIndice = dirIndice;
 		_tipoStemmer = tStemmer;

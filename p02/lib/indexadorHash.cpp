@@ -109,6 +109,7 @@ IndexadorHash::BorraDoc(const std::string& nomDoc) {
 			auto l = it->second.apuntarListaDocs();
 			if (l.size() == 0) {
 				s.push(it->first);
+				//_informacionColeccionDocs.setnumTotalPalDiferentes(_informacionColeccionDocs.getnumTotalPalDiferentes()-1);
 			}
 		}
 
@@ -128,10 +129,10 @@ IndexadorHash::BorraDoc(const std::string& nomDoc) {
 		_informacionColeccionDocs.setnumTotalPal(
 			_informacionColeccionDocs.getnumTotalPal()-d_borrar.getnumPal());
 			//long int _numDocs; // No total de documentos en la colección
-		_informacionColeccionDocs.setnumDocs(_informacionColeccionDocs.getnumDocs());
+		_informacionColeccionDocs.setnumDocs(_informacionColeccionDocs.getnumDocs()-1);
 			//long int _numTotalPalDiferentes;
 		_informacionColeccionDocs.setnumTotalPalDiferentes(
-			_informacionColeccionDocs.getnumTotalPalDiferentes()-d_borrar.getnumPalDiferentes());
+			_indice.size());
 			//long int _tamBytes; // Tamaño total en bytes de la colección
 		_informacionColeccionDocs.settamBytes(
 			_informacionColeccionDocs.gettamBytes()-d_borrar.gettamBytes());
@@ -202,11 +203,14 @@ IndexadorHash::indexar_tokens(const std::string& ficherodocumentos) {
 
     // Contadores para informacionTermino
    	long int aux_idDoc = 1;
-	int aux_numPal = 0, aux_numParada = 0, aux_numPalDiferentes = 0;
+	int aux_numPal = 0, aux_numParada = 0;
+	std::unordered_set<std::string> aux_diferentes;
+	std::unordered_set<std::string> dif;
 
 	// Contadores para InformacionColeccionDocs
 	int aux_numdocs = 0, aux_numtotalpal = 0, aux_numTotalPalSinParada = 0;
 	int aux_numTotalPalDiferentes = 0, aux_tamBytes = 0;
+	int aux_posicion = 0;
 	
 	// Por cada fichero tokenizado, procesar sus tokens
     while ((read = getline(&line, &len, fp)) != -1) {
@@ -222,6 +226,7 @@ IndexadorHash::indexar_tokens(const std::string& ficherodocumentos) {
        	file.open(f_tokens);
        	std::string token = "";
        	// Indexar el token leido
+       	aux_posicion = 0;
        	while (getline(file, token)) {
        		// un nuevo token
        		//std::cout << "leyendo token->" << token << "<-\n";
@@ -236,32 +241,39 @@ IndexadorHash::indexar_tokens(const std::string& ficherodocumentos) {
 	       				_indice.insert({token, InformacionTermino(1)});
 	       				// Añadir en la lista de documentos del termino el primer documento
 	       				auto* lista_doc = &_indice.find(token)->second.apuntarListaDocs();
-	       				lista_doc->insert({aux_idDoc, InfTermDoc(1, -1000)});
-	       				
+	       				lista_doc->insert({aux_idDoc, InfTermDoc(1, aux_posicion)});
+	       				aux_diferentes.insert(token);
+	       				dif.insert(token);
 
-	       				++aux_numPalDiferentes;
 	       			// Ya está indexado, actualizar informacionTerminod el token
 		       		} else {
 		       			//std::cout << "actualizar ft" << std::endl;
-		       			actualizar_token_indexado(token, aux_idDoc);
+		       			actualizar_token_indexado(token, aux_idDoc, aux_posicion);
+						// IF: p_token no pertenece a diferentes THEN insertar el token
+						if (aux_diferentes.find(token) == aux_diferentes.end()) {
+							aux_diferentes.insert(token);
+						}
 		       		}
+		       		
 	       		} else {
 	       			++aux_numParada;
 	       		}
+	       		++aux_posicion;
 	       	}
        	}
 
        	// informacionColeccionDocs
        	aux_numtotalpal += aux_numPal;
-       	aux_numTotalPalDiferentes += aux_numPalDiferentes;
+       	aux_numTotalPalDiferentes += aux_diferentes.size();
        	aux_numTotalPalSinParada += (aux_numPal-aux_numParada);
        	
        	// InformacionTermino
-       	_indiceDocs.insert({aux_line,InfDoc(aux_idDoc++, aux_numPal, (aux_numPal-aux_numParada), aux_numPalDiferentes, GetFileSize(aux_line))});
+       	_indiceDocs.insert({aux_line,InfDoc(aux_idDoc++, aux_numPal, (aux_numPal-aux_numParada), aux_diferentes.size(), GetFileSize(aux_line))});
        	
        	// informacionColeccionDocs
        	aux_tamBytes += GetFileSize(aux_line);					// Actualizar B
-		aux_numPal = aux_numParada = aux_numPalDiferentes = 0;	// Setear auxiliares
+		aux_numPal = aux_numParada = 0;	// Setear auxiliares
+		aux_diferentes.clear();
 
     }
 
@@ -270,7 +282,7 @@ IndexadorHash::indexar_tokens(const std::string& ficherodocumentos) {
 	_informacionColeccionDocs.setnumTotalPal (aux_numtotalpal);
 	_informacionColeccionDocs.settamBytes (aux_tamBytes); 
 	_informacionColeccionDocs.setnumTotalPalSinParada (aux_numTotalPalSinParada);
-	_informacionColeccionDocs.setnumTotalPalDiferentes(aux_numTotalPalDiferentes);
+	_informacionColeccionDocs.setnumTotalPalDiferentes(dif.size());
 
     fclose(fp);
     if (line) free(line);
@@ -285,7 +297,7 @@ IndexadorHash::GetFileSize(std::string filename){
 }
 
 void
-IndexadorHash::actualizar_token_indexado(std::string& p_token, int aux_idDoc) {
+IndexadorHash::actualizar_token_indexado(std::string& p_token, int aux_idDoc, int aux_posicion) {
 	// Acceder al token de _indice
 	InformacionTermino* inft = &_indice.find(p_token)->second;
 	inft->incFTC();
@@ -295,9 +307,9 @@ IndexadorHash::actualizar_token_indexado(std::string& p_token, int aux_idDoc) {
 	auto busca = lista_doc->find(aux_idDoc);
 	// IF no existe el documento THEN insertar en _l_docs
 	if (busca == lista_doc->end())
-		lista_doc->insert({aux_idDoc, InfTermDoc(1, -1000)});
+		lista_doc->insert({aux_idDoc, InfTermDoc(1, aux_posicion)});
 	else { // THEN actualizar el existente
-		busca->second.UpdatePosTerm(-1000);
+		busca->second.UpdatePosTerm(aux_posicion);
 	}
 }
 bool
@@ -315,11 +327,11 @@ IndexadorHash::ListarDocs(const std::string& nomDoc) {
 		InfDoc* infdoc = &_indiceDocs.find(nomDoc)->second;
 		std::cout 	
 			<< nomDoc
-			<< " idDoc: " 				<< infdoc->getidDoc()
-			<< "	numPal: " 			<< infdoc->getnumPal()
-			<< "	numPalSinParada: " 	<< infdoc->getnumPalSinParada()
-			<< " numPalDiferentes: " 	<< infdoc->getnumPalDiferentes()
-			<< " tamBytes: " 			<< infdoc->gettamBytes() << '\n';
+			<< "\tidDoc: " 				<< infdoc->getidDoc()
+			<< "\tnumPal: " 			<< infdoc->getnumPal()
+			<< "\tnumPalSinParada: " 	<< infdoc->getnumPalSinParada()
+			<< "\tnumPalDiferentes: " 	<< infdoc->getnumPalDiferentes()
+			<< "\ttamBytes: " 			<< infdoc->gettamBytes() << '\n';
 		return true;
 	} else {
 		return false;
@@ -328,11 +340,12 @@ IndexadorHash::ListarDocs(const std::string& nomDoc) {
 void 
 IndexadorHash::ListarInfColeccDocs() const {
 	std::cout
-		<< "numDocs: " << _informacionColeccionDocs.getnumDocs()
-		<< " numTotalPal: " << _informacionColeccionDocs.getnumTotalPal()
-		<< " numTotalPalSinParada: " << _informacionColeccionDocs.getnumTotalPalSinParada()
-		<< " numTotalPalDiferentes: " << _informacionColeccionDocs.getnumTotalPalDiferentes()
-		<< " tamBytes: " << _informacionColeccionDocs.gettamBytes() << '\n';
+		<< "numDocs: " 					<< _informacionColeccionDocs.getnumDocs()
+		<< "\tnumTotalPal: " 			<< _informacionColeccionDocs.getnumTotalPal()
+		<< "\tnumTotalPalSinParada: " 	<< _informacionColeccionDocs.getnumTotalPalSinParada()
+		<< "\tnumTotalPalDiferentes: " 	<< _informacionColeccionDocs.getnumTotalPalDiferentes()
+		<< "\ttamBytes: " 				<< _informacionColeccionDocs.gettamBytes() 
+		<< '\n';
 }
 
 void

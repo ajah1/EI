@@ -214,7 +214,7 @@ operator<< (std::ostream& p_os, const InformacionTermino& p) {
 std::ostream& 
 operator<< (std::ostream& p_os, const InfDoc& p_id) {
 	return p_os 
-	<< "idDoc: " 				<< p_id._idDoc 
+	<< "\tidDoc: " 				<< p_id._idDoc 
 	<< "\tnumPal: "  			<< p_id._numPal
 	<< "\tnumPalSinParada: " 	<< p_id._numPalSinParada 
 	<< "\tnumPalDiferentes: " 	<< p_id._numPalDiferentes
