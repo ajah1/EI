@@ -611,7 +611,7 @@ Tokenizador::CasosEspeciales (const bool& p_nuevoCasosEspeciales) {
 	_casosEspeciales = p_nuevoCasosEspeciales;
 }
 bool 
-Tokenizador::CasosEspeciales () {
+Tokenizador::CasosEspeciales () const{
 	return _casosEspeciales;
 }
 void 
@@ -619,7 +619,7 @@ Tokenizador::PasarAminuscSinAcentos (const bool& p_PasarAminuscSinAcentos) {
 	_pasarAminuscSinAcentos = p_PasarAminuscSinAcentos;
 }
 bool 
-Tokenizador::PasarAminuscSinAcentos () {
+Tokenizador::PasarAminuscSinAcentos () const{
 	return _pasarAminuscSinAcentos;
 }
 void 

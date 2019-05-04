@@ -35,6 +35,83 @@ IndexadorHash::IndexadorHash (
 
 		ObtenerPalParada();
 }
+
+
+bool 
+IndexadorHash::IndexarPregunta(const std::string& preg) {
+	std::list<std::string> tokens;
+	std::string p_aux = preg;
+	_tok.TokenizarGeneral(p_aux, tokens);
+
+	// Posicion actual del token
+	int posicion 	= 0,
+	// contadores para _infPregunta 
+		aux_ntp 	= 0,	//numTotalPal
+		aux_ntpsp 	= 0;	//numTotalPalSinParada
+
+	// IF(al menos un token es valido) THEN Vaciar los campos
+	_indicePregunta.clear();
+	_infPregunta.~InformacionPregunta();
+
+	for (auto& t : tokens) {
+		if (t != "") {
+			if (!EsParada(t)) {
+				// IF: t no está indexado THEN insertar en _indicePregunta
+				if (_indicePregunta.find(t) == _indicePregunta.end()) {
+					_indicePregunta.insert({t, InformacionTerminoPregunta(0)});
+				}
+				// Actualizar la _ft del t. Y anyadir la nueva posicion
+				auto& t_infpreg = _indicePregunta.find(t)->second;
+				t_infpreg.IncFt();					// ++_ft
+				t_infpreg.NuevaPosicion(posicion);	// _posTerm.push_back(posicion)
+				
+				++aux_ntpsp;
+			}
+
+			// Calcular la posicion del sigueinte token
+			++posicion;
+			// 
+			++aux_ntp;
+		}
+	}
+
+
+	if (_indicePregunta.size() > 0) {
+		// indexar la pregunta
+		_pregunta = preg;
+		// actualizar _infPregunta
+		_infPregunta.setNumTotalPal(aux_ntp);
+		_infPregunta.setNumTotalPalSinParada(aux_ntpsp);
+		_infPregunta.setNumTotalPalDiferentes(_indicePregunta.size());
+		return true;
+	}
+
+	return false;
+}
+
+bool 	 
+IndexadorHash::DevuelvePregunta(
+	const std::string& word, 
+	InformacionTerminoPregunta& inf) const {
+
+	if (_indicePregunta.find(word) != _indicePregunta.end()) {
+		inf = _indicePregunta.find(word)->second;
+		return true;
+	}
+
+	return false;
+}
+bool 
+IndexadorHash::DevuelvePregunta (std::string& preg) const {
+	preg = _pregunta;
+	return _indicePregunta.size() > 0;
+}
+bool 
+IndexadorHash::DevuelvePregunta(InformacionPregunta& inf) const {
+	inf = _infPregunta;
+	return _indicePregunta.size() > 0;
+}
+
 /////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////
@@ -133,22 +210,6 @@ IndexadorHash::BorraDoc(const std::string& nomDoc) {
 
 	return false;
 }
-
-/////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////
-IndexadorHash::IndexadorHash(const std::string& directorioIndexacion) {
-
-}
-
-/////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////
-bool
-IndexadorHash::GuardarIndexacion() const {
-	return false;
-}
-
 
 /////////////////////////////////////////////////////////////
 // DADA LA RUTA DE UN FICHERO DEVUELVE EL ID ASOCIADO
@@ -480,4 +541,261 @@ IndexadorHash::ListarDocs (const std::string& nomDoc) {
 		return true;
 	}
 	return false;
+}
+
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
+IndexadorHash::IndexadorHash(const std::string& directorioIndexacion) {
+	_directorioIndice = directorioIndexacion;
+	LeerIndice();
+	LeerIndiceDocs();
+	LeerInformacionColeccionDocs();
+	LeerTokenizador();
+	LeerVariables();
+}
+
+void
+IndexadorHash::LeerVariables() {
+	std::ifstream file;
+	std::string s = _directorioIndice+"/variables.txt";
+	file.open(s.c_str());
+	std::string linea;
+
+	while(!file.eof()){
+		getline(file, _pregunta);
+		getline(file, _ficheroStopWords);
+		getline(file, linea);
+		_tipoStemmer=atoi(linea.c_str());
+		getline(file, linea);
+		_almacenarEnDisco=atoi(linea.c_str());
+		getline(file, linea);
+		_almacenarPosTerm=atoi(linea.c_str());
+	}
+}
+
+void
+IndexadorHash::LeerTokenizador() {
+	std::ifstream file;
+	std::string s = _directorioIndice+"/tokenizador.txt";
+	file.open(s.c_str());
+	std::string linea;
+
+	while (getline(file, linea)) {
+		_tok.CasosEspeciales(atoi(linea.c_str()));
+		getline(file, linea);
+		_tok.DelimitadoresPalabra(linea);
+		getline(file, linea);
+		_tok.PasarAminuscSinAcentos(atoi(linea.c_str()));
+	}
+}
+
+void IndexadorHash::LeerInformacionColeccionDocs() {
+	std::string linea = "";
+	std::string s = _directorioIndice+"/informacionColeccionDocs.txt";
+	
+	std::ifstream f;
+	f.open(s.c_str());
+
+	while(getline(f, linea)){
+		_informacionColeccionDocs.setnumDocs((atoi(linea.c_str())));
+		getline(f, linea);
+		_informacionColeccionDocs.setnumTotalPal((atoi(linea.c_str())));
+		getline(f, linea);
+		_informacionColeccionDocs.setnumTotalPalSinParada((atoi(linea.c_str())));
+		getline(f, linea);
+		_informacionColeccionDocs.setnumTotalPalDiferentes((atoi(linea.c_str())));
+		getline(f, linea);
+		_informacionColeccionDocs.settamBytes((atoi(linea.c_str())));
+	}
+	f.close();
+}
+
+void IndexadorHash::LeerIndiceDocs() {
+	std::string linea, termino;
+	std::list<std::string> tokens;
+	InfDoc id;
+
+	std::string s = _directorioIndice+"/indiceDocs.txt";
+	std::ifstream f;
+	f.open(s.c_str());
+
+	_tok.DelimitadoresPalabra("\t ");
+
+	while (getline(f, linea)) {
+		
+		_tok.TokenizarGeneral(linea,tokens);
+
+		for(auto t = tokens.begin(); t != tokens.end(); ++t){
+			termino = (*t);
+			++t; ++t;
+			id.setidDoc((atoi((*t).c_str())));
+			++t; ++t;
+			id.setNumPal((atoi((*t).c_str())));
+			++t; ++t;
+			id.setNumPalSinParada((atoi((*t).c_str())));
+			++t; ++t;
+			id.setNumPalDiferentes((atoi((*t).c_str())));
+			++t; ++t;
+			id.setTamBytes((atoi((*t).c_str())));
+		}
+		_indiceDocs.insert({termino,id});
+	}
+
+	f.close();
+}
+
+void
+IndexadorHash::LeerIndice() {
+	std::string file, linea, termino;
+	std::list<std::string> tokens;
+	std::list<int> lista;
+	
+
+	std::list<std::string>::iterator itAux;
+	std::unordered_map<long int,InfTermDoc> l_docs_aux;
+
+	std::ifstream f;
+
+	std::string s = _directorioIndice+"/indice.txt";
+	f.open(s.c_str());
+
+	InfTermDoc itd;
+
+	_tok.DelimitadoresPalabra("\t ");//Para tokenizar los indices
+	_tok.CasosEspeciales(false);
+	_tok.PasarAminuscSinAcentos(false);
+
+	while(getline(f, linea)){
+
+		l_docs_aux.clear();
+		lista.clear();
+		InformacionTermino it;
+
+		_tok.Tokenizar(linea,tokens);
+		//std::cout << "linea: " << linea << std::endl;
+		for(auto t= tokens.begin();t!= tokens.end();++t){
+			int fd = 0, idDoc = 0;
+			if (t == tokens.begin()) {
+				termino=(*t);
+				++t;
+				++t;
+				++t;
+				it.setFtc((atoi((*t).c_str())));
+				++t;
+				++t;
+				fd = atoi((*t).c_str());
+			} else {	// Empieza en Id.DOc
+				++t;//numero a leer
+				idDoc = atoi((*t).c_str());
+				++t;//ft
+				++t;// valor a leer
+				itd.setFt(atoi((*t).c_str()));
+				++t;
+				// Leer ft posiciones
+				for (int i = 0; i < itd.getft(); ++i) {
+					lista.push_back(atoi((*t).c_str()));
+					if (i != itd.getft()-1)
+						++t;
+				}
+				itd.setPosTerm(lista);
+				l_docs_aux.insert({idDoc,itd});
+			}
+		}
+		it.setDocs(l_docs_aux);
+		_indice.insert({termino,it});
+	}
+
+}
+
+/////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////
+bool
+IndexadorHash::GuardarIndexacion() const {
+	struct stat dir;
+	// Compruebo la existencia del directorio
+	int err = stat(_directorioIndice.c_str(), &dir);
+	//Tokenizador tokaux(tok);
+
+	if(err==-1 || !S_ISDIR(dir.st_mode)){//Si no existe el directorio lo creamos
+		std::string cmd = "mkdir " + _directorioIndice+ " rm -f "+_directorioIndice+"/.*"; //Crea el directorio
+		system(cmd.c_str()); //Ejecuta el comando cmd en el tablero de comandos
+	}
+
+	GuardarIndice();
+	GuardarIndiceDocs();
+	GuardarInformacionColeccionDocs();
+	GuardarTokenizador();
+	GuardarVariables();
+
+	return false;
+}
+
+void
+IndexadorHash::GuardarIndice () const{
+	std::ofstream ofile;
+	std::string s =  _directorioIndice+"/indice.txt";
+	ofile.open(s.c_str(), std::ios::out);
+
+	for(auto i = _indice.begin(); i != _indice.end(); ++i){
+		ofile << i->first << '\t'<< i->second << '\n';
+	}
+
+	ofile.close();
+}
+void
+IndexadorHash::GuardarIndiceDocs () const {
+	std::ofstream ofile;
+	std::string s =  _directorioIndice+"/indiceDocs.txt";
+	ofile.open(s.c_str(), std::ios::out);
+
+	//for(auto& id : _indiceDocs){
+	for(auto id = _indiceDocs.begin(); id != _indiceDocs.end(); ++id){
+		ofile << id->first << '\t' << id->second << '\n';
+	}
+
+	ofile.close();
+}
+void 
+IndexadorHash::GuardarInformacionColeccionDocs () const {
+	std::ofstream ofile;
+	std::string s =  _directorioIndice+"/informacionColeccionDocs.txt";
+	ofile.open(s.c_str(), std::ios::out);
+
+	ofile << _informacionColeccionDocs.getnumDocs() << '\n'
+		<< _informacionColeccionDocs.getnumTotalPal() << '\n'
+		<< _informacionColeccionDocs.getnumTotalPalSinParada() << '\n'
+		<< _informacionColeccionDocs.getnumTotalPalDiferentes() << '\n'
+		<< _informacionColeccionDocs.gettamBytes();
+
+	ofile.close();
+}
+void 
+IndexadorHash::GuardarTokenizador () const {
+	std::ofstream ofile;
+	std::string s =  _directorioIndice+"/tokenizador.txt";
+	ofile.open(s.c_str(), std::ios::out);
+
+	ofile 
+		<< _tok.CasosEspeciales() << '\n' 
+		<< _tok.DelimitadoresPalabra() << '\n' 
+		<< _tok.PasarAminuscSinAcentos();
+
+	ofile.close();
+}
+void
+IndexadorHash::GuardarVariables () const {
+	std::ofstream ofile;
+	std::string s =  _directorioIndice+"/variables.txt";
+	ofile.open(s.c_str(), std::ios::out);
+
+	ofile 
+		<< _pregunta << '\n' 
+		<< _ficheroStopWords << '\n' 
+		<< _tipoStemmer << '\n'
+		<< _almacenarEnDisco  << '\n'
+		<< _almacenarPosTerm;
+
+	ofile.close();
 }

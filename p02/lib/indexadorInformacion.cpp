@@ -289,3 +289,10 @@ InfTermDoc::InfTermDoc (int p_ft, int p_pos) {
 	_ft = p_ft;
 	_posTerm.push_back(p_pos);
 }
+
+void 
+InformacionTermino::setDocs (std::unordered_map<long int, InfTermDoc> l) {
+	for (auto& d : l) {
+		_l_docs.insert({d.first, d.second});
+	}
+}

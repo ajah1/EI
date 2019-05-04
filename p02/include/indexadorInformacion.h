@@ -20,6 +20,8 @@ public:
 	void UpdatePosTerm(int pos) {++_ft; _posTerm.push_back(pos);}
 	// Getter para la _ft
 	int getft() {return _ft;}
+	void setFt(int ft) { _ft = ft;}
+	void setPosTerm(std::list<int> lista) {_posTerm = lista;}
 
 private:
 	int _ft;
@@ -47,6 +49,10 @@ public:
 	int getftc () 		{return _ftc;};
 	// Devuelve una referencia al campo privado _l_docs
 	std::unordered_map<long int, InfTermDoc>& apuntarListaDocs();
+	//
+	void setFtc(int ftc) { _ftc = ftc;} 
+	//
+	void setDocs (std::unordered_map<long int, InfTermDoc> l);
 private:
 	int _ftc;
 	std::unordered_map<long int, InfTermDoc> _l_docs;
@@ -90,7 +96,12 @@ public:
 	int getnumPalDiferentes() const;
 	int gettamBytes() const;
 	std::string getDocNombre (int id) const;
-
+	//
+	void setidDoc(int i) {_idDoc = i;}
+	void setNumPal(int i) {_numPal = i;}
+	void setNumPalSinParada(int i) {_numPalSinParada = i;}
+	void setNumPalDiferentes(int i) {_numPalDiferentes = i;}
+	void setTamBytes(int i) {_tamBytes = i;}
 private:
 	long int _idDoc;
 	int _numPal;
@@ -142,6 +153,13 @@ public:
 	InformacionTerminoPregunta ();
 	~InformacionTerminoPregunta ();
 	InformacionTerminoPregunta & operator= (const InformacionTerminoPregunta&);
+	
+	//
+	InformacionTerminoPregunta (int p_ft) { _ft = p_ft; }
+	//
+	void IncFt() { _ft++; }
+	//	
+	void NuevaPosicion(int p_posicion) { _posTerm.push_back(p_posicion); }
 
 private:
 	int _ft;
@@ -157,6 +175,11 @@ public:
 	InformacionPregunta ();
 	~InformacionPregunta ();
 	InformacionPregunta & operator= (const InformacionPregunta &);
+
+	//
+	void setNumTotalPal (int p) {_numTotalPal += p;} 
+	void setNumTotalPalSinParada (int p) {_numTotalPalSinParada += p;}
+	void setNumTotalPalDiferentes (int p) {_numTotalPalDiferentes += p;}
 private:
 	long int _numTotalPal; // No total de palabras en la pregunta
 	long int _numTotalPalSinParada; // No total de palabras sin stop-words en la pregunta

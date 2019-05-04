@@ -26,8 +26,8 @@ public:
 	bool TokenizarDirectorio (const std::string& p_i) const;
 	// GETTERS
 	std::string DelimitadoresPalabra() const;
-	bool PasarAminuscSinAcentos ();
-	bool CasosEspeciales ();
+	bool PasarAminuscSinAcentos () const;
+	bool CasosEspeciales () const;
 	// SETTERS
 	void DelimitadoresPalabra(const std::string& p_nuevoDelimiters);
 	void AnyadirDelimitadoresPalabra(const std::string& p_nuevoDelimiters);
@@ -37,6 +37,9 @@ public:
 
 	// Quita los acentos y pasa a minúsculas las mayúsculas 
 	void EliminarMinusAcentos(std::string&) const;
+
+	// Tokeniza el string sin tener en cuenta los casos especiales
+	void TokenizarGeneral(std::string&, std::list<std::string>&) const;
 
 private:
 	std::string _delimiters 		= "";
@@ -102,8 +105,6 @@ private:
 	std::string ObtenerString (const char* p_i, const char* p_f) const;
 	// Devuelve true si _delimiters contiene el char
 	bool EsDelimiter(const char& p_d) const;
-	// Tokeniza el string sin tener en cuenta los casos especiales
-	void TokenizarGeneral(std::string&, std::list<std::string>&) const;
 	// Tokeniza el string teniendo en cuenta los casos especiales
 	void TokenizarEspecial(std::string&, std::list<std::string>&) const;
 };

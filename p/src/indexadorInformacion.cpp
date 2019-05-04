@@ -214,7 +214,7 @@ operator<< (std::ostream& p_os, const InformacionTermino& p) {
 std::ostream& 
 operator<< (std::ostream& p_os, const InfDoc& p_id) {
 	return p_os 
-	<< "idDoc: " 				<< p_id._idDoc 
+	<< "\tidDoc: " 				<< p_id._idDoc 
 	<< "\tnumPal: "  			<< p_id._numPal
 	<< "\tnumPalSinParada: " 	<< p_id._numPalSinParada 
 	<< "\tnumPalDiferentes: " 	<< p_id._numPalDiferentes
@@ -248,7 +248,7 @@ operator<< (std::ostream& s, const InformacionPregunta& p) {
 
 
 //////////////////////////////////////////////////////////////////////////////
-////// 			OTROS                                 ///// 
+////// 			FUNCIONES PARTE PRIVADA                                 ///// 
 //////////////////////////////////////////////////////////////////////////////
 long int 
 InfDoc::getidDoc() const { 
@@ -288,4 +288,11 @@ InformacionTermino::apuntarListaDocs() {
 InfTermDoc::InfTermDoc (int p_ft, int p_pos) {
 	_ft = p_ft;
 	_posTerm.push_back(p_pos);
+}
+
+void 
+InformacionTermino::setDocs (std::unordered_map<long int, InfTermDoc> l) {
+	for (auto& d : l) {
+		_l_docs.insert({d.first, d.second});
+	}
 }
