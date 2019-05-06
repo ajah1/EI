@@ -1,0 +1,2 @@
+corpus_corto/fichero2.txt		idDoc: 2	numPal: 5	numPalSinParada: 5	numPalDiferentes: 4	tamBytes: 23
+corpus_corto/fichero1.txt		idDoc: 1	numPal: 6	numPalSinParada: 6	numPalDiferentes: 5	tamBytes: 30
