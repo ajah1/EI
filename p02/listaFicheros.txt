@@ -1,4 +1,3 @@
-/fichero.txt
 corpus/aas-100-mg-comprimidos-20-comprimidos.txt
 corpus/aas-100-mg-comprimidos-500-comprimidos.txt
 corpus/aas-500-mg-comprimidos-20-comprimidos.txt

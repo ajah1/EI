@@ -11,7 +11,9 @@ public:
  	double VSimilitud() const; 
  	long int IdDoc() const; 
  	bool operator< (const ResultadoRI& lhs) const; 
-
+ 	ResultadoRI(const ResultadoRI&);
+ 	int GetNumPregunta() const {return numPregunta;}
+ 	double GetVSimilitud() const {return vSimilitud;}
 private: 
 	double vSimilitud; 
 	long int idDoc; 
@@ -37,6 +39,7 @@ friend std::ostream& operator<<(std::ostream& s, const Buscador& p) {
 }
 
  public:
+ 	Buscador();
 	Buscador(const std::string& directorioIndexacion, const int& f);
 	Buscador(const Buscador&); 
 	~Buscador(); 
@@ -57,10 +60,17 @@ friend std::ostream& operator<<(std::ostream& s, const Buscador& p) {
 	void DevolverParametrosBM25(double& kk1, double& kb) const; // Devuelve el valor de “k1” y “b”
 
 private: 
-	Buscador(); 
 	int _formSimilitud; // 0: DFR, 1: BM25
 	std::priority_queue< ResultadoRI > _docsOrdenados;
 	double _c; // Constante del modelo DFR 
 	double _k1; // Constante del modelo BM25 
 	double _b; // Constante del modelo BM25 
+
+	/////////////////////////////////////////////////////////////////////////////
+	// FUNCIONES AUXILIARES
+	/////////////////////////////////////////////////////////////////////////////
+	float DFR (const int& p_idDoc);
+	float BM25 (const int& p_idDoc);
+	void LiberarCola(std::priority_queue< ResultadoRI>&) const;
+
 };	

@@ -65,6 +65,15 @@ public:
 	void ListarTerminos() const;
 	bool ListarTerminos(const std::string& nomDoc) const;
 	bool ListarDocs(const std::string& nomDoc);
+
+	// Devuelve el numero de elementos en _indiceDocs
+	int getIndiceDocsSize() const {return _indiceDocs.size();}
+	// Hace falta que sea público para los delegados
+	IndexadorHash();
+	// Getter de _pregunta
+	std::string GetPregunta() const {return _pregunta;}
+	//
+	std::string GetNombreDocumento (int p_idDoc) const;
 	
 private:
 
@@ -106,7 +115,6 @@ private:
 	void LeerInformacionColeccionDocs();
 	void LeerTokenizador();
 	void LeerVariables ();
-	IndexadorHash();
 
 	std::unordered_map<std::string, InformacionTermino> _indice;
 	// Índice de términos indexados accesible por el término

@@ -1,4 +1,4 @@
-
+#include <cstring>
 #include "indexadorHash.h"
 #include <fstream>
 #include <stack>
@@ -446,7 +446,37 @@ IndexadorHash::IndexadorHash(const IndexadorHash& p_i) {
 	_almacenarEnDisco 	= p_i._almacenarEnDisco;
 	_almacenarPosTerm 	= p_i._almacenarPosTerm;
 }
+std::string 
+IndexadorHash::GetNombreDocumento (int p_idDoc) const {
+	
+	// Obtener la ruta del archivo asociado al p_idDOc
+	bool find = false;
+	std::string ruta("");
+	for (auto it = _documentos.begin(); it != _documentos.end() && !find; ++it) {
+		if (it->second == p_idDoc) {
+			ruta = it->first;
+			find = true;
+		}
+	}
 
+	// Borra la ruta y la extensión del archivo
+	std::list<std::string> url;
+	Tokenizador tokenizer("/", false, false);
+	tokenizer.Tokenizar(ruta, url);
+
+	// Mover el iterador hasta la última posición
+	auto it = url.begin();
+	for (int i = 1; i < url.size(); ++i) {
+		it++;
+	}
+
+	// Guardar el contenido del iterador
+	std::string last_token = *it;
+	// Obtener el nombre sin la extension
+	std::string nombreDoc = last_token.substr(0, last_token.find('.'));
+
+	return nombreDoc;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 ////// 			     GETTERS-SETTERS                                     ///// 

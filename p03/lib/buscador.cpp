@@ -8,6 +8,11 @@ ResultadoRI::ResultadoRI(const double& kvSimilitud, const long int& kidDoc, cons
 	idDoc = kidDoc; 
 	numPregunta = np; 
 }
+ResultadoRI::ResultadoRI(const ResultadoRI& p_r) { 
+	vSimilitud 	= p_r.vSimilitud; 
+	idDoc 		= p_r.idDoc; 
+	numPregunta = p_r.numPregunta; 
+}
 double ResultadoRI::VSimilitud() const { 
 	return vSimilitud; 
 }
@@ -42,6 +47,10 @@ Buscador::Buscador(const std::string& directorioIndexacion, const int& f) :
 	_b(0.75)
 {}
 
+Buscador::Buscador() :
+	IndexadorHash()
+{}
+
 Buscador::~Buscador() {
 	_formSimilitud = 0;
 	_c = _k1 = _b = 0.0;
@@ -61,6 +70,13 @@ Buscador::operator= (const Buscador& p_b) {
 /////////////////////////////////////////////////////////////////////////////
 // FUNCIONES AUXILIARES
 /////////////////////////////////////////////////////////////////////////////
+void
+Buscador::LiberarCola(std::priority_queue< ResultadoRI>& cola) const{
+	while (!cola.empty()) {
+		cola.pop();
+	}
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 // GETTERS / SETTERS
@@ -91,3 +107,99 @@ Buscador::CambiarFormulaSimilitud(const int& f) {
 // SOBRECARGA OPERADOR SALIDA
 /////////////////////////////////////////////////////////////////////////////
 
+bool 
+Buscador::Buscar(const int& numDocumentos) {
+	// IF no hay pregunta indexada THEN return false
+	std::string pregunta("");
+	if (!DevuelvePregunta(pregunta)) {
+		return false;
+	}
+
+	// Borrar la memoria de _docsOrdenados
+	while (!_docsOrdenados.empty()) {
+		_docsOrdenados.pop();
+	}
+
+	// Almacena todos los resultados
+	std::priority_queue< ResultadoRI > aux_queue;
+
+	// Delegado al metodo a aplicar
+	Buscador b;
+	float (Buscador::*fp_metodo)(const int&) = &Buscador::DFR;
+
+	if (_formSimilitud == 1) {
+		fp_metodo = &Buscador::BM25;
+	}
+
+	for (int i = 1; i <= getIndiceDocsSize(); ++i) {
+		aux_queue.push(ResultadoRI((b.*fp_metodo)(i),i,0));
+	}
+
+	if (!aux_queue.empty()) {
+		// Hay menos documentos que los pedidos solo hacer push
+		if (aux_queue.size() < numDocumentos) {
+			while (!aux_queue.empty()) {
+				_docsOrdenados.push(aux_queue.top());
+				aux_queue.pop();
+			}
+		// Almacenrar numDocumentos de resultados de _docsOrdenados
+		} else {
+			for (int i = 0; i < numDocumentos; ++i) {
+				_docsOrdenados.push(aux_queue.top());
+				aux_queue.pop();
+			}
+
+			LiberarCola(aux_queue);
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+void
+Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const {
+	// Si numDocumentos es mayor que los guardados imprimir todos
+	if (numDocumentos > _docsOrdenados.size()) {
+		std::cout << "sin implementar \n";
+	} else {
+		//0 DFR fichero1 0 1.5 pal1 pal7
+		std::priority_queue<ResultadoRI> aux(_docsOrdenados);
+		for (int i = 0; i < numDocumentos; ++i) {
+			ResultadoRI top_r(aux.top());
+
+			std::string formula = "DFR";
+			if (_formSimilitud == 1) formula = "BM25";
+			std::string pregunta = "ConjuntoDePreguntas";
+			if (top_r.GetNumPregunta() == 0) {
+				pregunta = GetPregunta();
+			}
+
+			std::cout
+				<< top_r.GetNumPregunta() 	<< ' '
+				<< formula 	 			<< ' '
+				<< GetNombreDocumento(i+1) << ' '
+				<< i << ' '
+				<< top_r.GetVSimilitud() << ' '
+				<< pregunta << '\n';
+
+			aux.pop();
+		}
+
+		LiberarCola (aux);
+	}
+}
+
+float 
+Buscador::DFR (const int& p_idDoc) {
+	std::clog << "llamada a DFR \n";
+	return 9.9f;
+}
+
+
+float 
+Buscador::BM25 (const int& p_idDoc) {
+	std::clog << "llamada a BM25 \n";
+	return 9.9f;
+}
