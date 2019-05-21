@@ -1,6 +1,6 @@
 .PHONY= clean
 CC=g++
-OPTIONS= -g -std=gnu++0x -Wall
+OPTIONS= -ggdb -std=gnu++0x -Wall
 DEBUG= #-D DEBUG
 LIBDIR=lib
 INCLUDEDIR=include

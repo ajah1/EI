@@ -18,15 +18,18 @@ double kk1; double kb;
 
 a.IndexarPregunta("pal1 pal2");
 
-if(a.Buscar(1))
-	a.ImprimirResultadoBusqueda(1);
-
 a.CambiarFormulaSimilitud(1);
 
 if(a.Buscar(1))
 	a.ImprimirResultadoBusqueda(1);
 
-}
+/*a.CambiarFormulaSimilitud(1);
+
+if(a.Buscar(1))
+	a.ImprimirResultadoBusqueda(1);
+*/}
+
+
 /*
 0 DFR fichero1 0 1.5 pal1 pal7
 0 BM25 fichero1 0 -0.660377 pal1 pal2

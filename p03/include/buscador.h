@@ -69,8 +69,8 @@ private:
 	/////////////////////////////////////////////////////////////////////////////
 	// FUNCIONES AUXILIARES
 	/////////////////////////////////////////////////////////////////////////////
-	float DFR (const int& p_idDoc);
-	float BM25 (const int& p_idDoc);
+	double DFR (const int& p_idDoc);
+	double BM25 (const int& p_idDoc);
 	void LiberarCola(std::priority_queue< ResultadoRI>&) const;
 
 };	

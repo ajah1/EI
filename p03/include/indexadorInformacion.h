@@ -19,7 +19,7 @@ public:
 	// Inserta la posicion en la lista de posicion e incrementa la ft
 	void UpdatePosTerm(int pos) {++_ft; _posTerm.push_back(pos);}
 	// Getter para la _ft
-	int getft() {return _ft;}
+	int getft() const {return _ft;}
 	void setFt(int ft) { _ft = ft;}
 	void setPosTerm(std::list<int> lista) {_posTerm = lista;}
 
@@ -53,6 +53,10 @@ public:
 	void setFtc(int ftc) { _ftc = ftc;} 
 	//
 	void setDocs (std::unordered_map<long int, InfTermDoc> l);
+	//
+	const std::unordered_map<long int, InfTermDoc>& getDocs() const {
+		return _l_docs;
+	}
 private:
 	int _ftc;
 	std::unordered_map<long int, InfTermDoc> _l_docs;

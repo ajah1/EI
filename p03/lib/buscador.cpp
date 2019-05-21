@@ -1,4 +1,5 @@
 #include "buscador.h"
+#include "math.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CLASE RESULTADORI
@@ -124,15 +125,14 @@ Buscador::Buscar(const int& numDocumentos) {
 	std::priority_queue< ResultadoRI > aux_queue;
 
 	// Delegado al metodo a aplicar
-	Buscador b;
-	float (Buscador::*fp_metodo)(const int&) = &Buscador::DFR;
+	double (Buscador::*fp_metodo)(const int&) = &Buscador::DFR;
 
 	if (_formSimilitud == 1) {
 		fp_metodo = &Buscador::BM25;
 	}
 
 	for (int i = 1; i <= getIndiceDocsSize(); ++i) {
-		aux_queue.push(ResultadoRI((b.*fp_metodo)(i),i,0));
+		aux_queue.push(ResultadoRI((this->*fp_metodo)(i),i,0));
 	}
 
 	if (!aux_queue.empty()) {
@@ -156,6 +156,46 @@ Buscador::Buscar(const int& numDocumentos) {
 	}
 
 	return false;
+}
+
+double 
+Buscador::BM25 (const int& Doc) {
+	/*std::clog << "llamada a BM25 \n";
+	double sim=0.0;
+	double idf,numpal,medianumpal;
+
+	std::unordered_map<std::string, InfDoc> aux;
+	aux = getIndiceDocs();
+
+	//std::cout << "size: " << aux.size() << '\n';
+
+	for(auto i=getIndiceDocs().begin();i!=getIndiceDocs().end();++i){
+
+		if(i->second.getidDoc()==Doc){
+			numpal=i->second.getnumPalSinParada();
+		}
+		medianumpal+=i->second.getnumPalSinParada();
+	}
+
+	medianumpal=medianumpal/getIndiceDocs().size();
+
+	InformacionTermino it;
+	for(auto i=getIndicePregunta().begin();i!=getIndicePregunta().end();++i){//Para cada término de la pregunta
+		if(getIndice().find(i->first)!=getIndice().end()){
+			it=getIndice().find(i->first)->second;
+			idf=log10((getIndiceDocs().size()-(it.getDocs().size()+0.5))/(it.getDocs().size()+0.5));
+			if(it.getDocs().find(Doc)!=it.getDocs().end()){
+				sim+=fabs(idf*((it.getDocs().find(Doc)->second.getft()*(_k1+1))/(it.getDocs().find(Doc)->second.getft()+(_k1*(1-_b+(_b*(numpal/medianumpal)))))));
+			}
+			else{
+				//Numeros absolutos --> fabs(num);
+				sim+=fabs(idf*(0*(_k1+1))/(0+(_k1*(1-_b+(_b*(numpal/medianumpal))))));
+			}
+		}
+
+	}*/
+	
+	return sim;
 }
 
 void
@@ -185,21 +225,18 @@ Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const {
 				<< pregunta << '\n';
 
 			aux.pop();
+			std::cout << "size: " << _docsOrdenados.size() << std::endl;
 		}
 
 		LiberarCola (aux);
 	}
+	std::cout << "size: " << _docsOrdenados.size() << std::endl;
 }
 
-float 
+double 
 Buscador::DFR (const int& p_idDoc) {
 	std::clog << "llamada a DFR \n";
 	return 9.9f;
 }
 
 
-float 
-Buscador::BM25 (const int& p_idDoc) {
-	std::clog << "llamada a BM25 \n";
-	return 9.9f;
-}

@@ -74,6 +74,16 @@ public:
 	std::string GetPregunta() const {return _pregunta;}
 	//
 	std::string GetNombreDocumento (int p_idDoc) const;
+	//
+	const std::unordered_map<std::string, InfDoc>& getIndiceDocs() const {
+		return _indiceDocs;
+	}
+	const std::unordered_map<std::string, InformacionTermino>& getIndice() const {
+		return _indice;
+	}
+	const std::unordered_map<std::string, InformacionTerminoPregunta>& getIndicePregunta() const {
+		return _indicePregunta;
+	}
 	
 private:
 
