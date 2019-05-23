@@ -3,7 +3,7 @@
 #include <fstream>
 #include <stack>
 #include <sys/stat.h>
-
+#include <algorithm>
 /////////////////////////////////////////////////////////////////
 // MAPA PARA LISTAR DADO UNA RUTA DE UN DOCUMENTO EL ID ASOCIADO
 ////////////////////////////////////////////////////////////////
@@ -41,6 +41,7 @@ bool
 IndexadorHash::IndexarPregunta(const std::string& preg) {
 	std::list<std::string> tokens;
 	std::string p_aux = preg;
+	std::transform(p_aux.begin(), p_aux.end(), p_aux.begin(), ::tolower);
 	_tok.TokenizarGeneral(p_aux, tokens);
 
 	// Posicion actual del token
@@ -78,7 +79,7 @@ IndexadorHash::IndexarPregunta(const std::string& preg) {
 
 	if (_indicePregunta.size() > 0) {
 		// indexar la pregunta
-		_pregunta = preg;
+		_pregunta = p_aux;
 		// actualizar _infPregunta
 		_infPregunta.setNumTotalPal(aux_ntp);
 		_infPregunta.setNumTotalPalSinParada(aux_ntpsp);

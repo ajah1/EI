@@ -84,6 +84,9 @@ public:
 	const std::unordered_map<std::string, InformacionTerminoPregunta>& getIndicePregunta() const {
 		return _indicePregunta;
 	}
+	//
+	InformacionPregunta& getInfPregunta() { return _infPregunta; }
+
 	
 private:
 

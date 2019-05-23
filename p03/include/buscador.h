@@ -59,6 +59,15 @@ friend std::ostream& operator<<(std::ostream& s, const Buscador& p) {
 	void CambiarParametrosBM25(const double& kk1, const double& kb); // Cambia el valor de “k1 = kk1; b = kb;” 
 	void DevolverParametrosBM25(double& kk1, double& kb) const; // Devuelve el valor de “k1” y “b”
 
+	//
+	int CalculateFQID (std::string token_pregunta, int idDoc);
+	double CalculateAVGDL ();
+	int CalculateNQI (std::string token_pregunta);
+	int CalculateFTQ(std::string termino_pregunta);
+	int CalculateFT(std::string termino_pregunta);
+	int CalculateNT(std::string termino_pregunta);
+	double CalculateFTDD(int ftd, double c, double avr_ld, int ld);
+	int CalculateFTD(std::string token, int d);
 private: 
 	int _formSimilitud; // 0: DFR, 1: BM25
 	std::priority_queue< ResultadoRI > _docsOrdenados;

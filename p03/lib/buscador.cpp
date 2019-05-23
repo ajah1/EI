@@ -158,85 +158,283 @@ Buscador::Buscar(const int& numDocumentos) {
 	return false;
 }
 
-double 
-Buscador::BM25 (const int& Doc) {
-	/*std::clog << "llamada a BM25 \n";
-	double sim=0.0;
-	double idf,numpal,medianumpal;
+int
+Buscador::CalculateNQI (std::string token_pregunta) {
 
-	std::unordered_map<std::string, InfDoc> aux;
-	aux = getIndiceDocs();
+	auto& ref_indice = getIndice();
+	int nqi = 0;
 
-	//std::cout << "size: " << aux.size() << '\n';
-
-	for(auto i=getIndiceDocs().begin();i!=getIndiceDocs().end();++i){
-
-		if(i->second.getidDoc()==Doc){
-			numpal=i->second.getnumPalSinParada();
-		}
-		medianumpal+=i->second.getnumPalSinParada();
+	if (ref_indice.find(token_pregunta) != ref_indice.end()) {
+		nqi = ref_indice.find(token_pregunta)->second.getNumDocs();
 	}
 
-	medianumpal=medianumpal/getIndiceDocs().size();
+	return nqi;
+}
 
-	InformacionTermino it;
-	for(auto i=getIndicePregunta().begin();i!=getIndicePregunta().end();++i){//Para cada término de la pregunta
-		if(getIndice().find(i->first)!=getIndice().end()){
-			it=getIndice().find(i->first)->second;
-			idf=log10((getIndiceDocs().size()-(it.getDocs().size()+0.5))/(it.getDocs().size()+0.5));
-			if(it.getDocs().find(Doc)!=it.getDocs().end()){
-				sim+=fabs(idf*((it.getDocs().find(Doc)->second.getft()*(_k1+1))/(it.getDocs().find(Doc)->second.getft()+(_k1*(1-_b+(_b*(numpal/medianumpal)))))));
-			}
-			else{
-				//Numeros absolutos --> fabs(num);
-				sim+=fabs(idf*(0*(_k1+1))/(0+(_k1*(1-_b+(_b*(numpal/medianumpal))))));
-			}
-		}
+double
+Buscador::CalculateAVGDL () {
 
-	}*/
+	int c_palabras_no_parada = 0;
+
+	for (auto& doc : getIndiceDocs()) {
+		c_palabras_no_parada +=  doc.second.getnumPalSinParada();
+	}
 	
+	return 1.0 * c_palabras_no_parada / getIndiceDocs().size();
+}
+
+int
+Buscador::CalculateFQID (std::string token_pregunta, int idDoc) {
+
+	int fqid = 0;
+
+	// Buscar el termino en _indice
+	const auto& indice = getIndice().find(token_pregunta);
+	if (indice != getIndice().end()) {
+		// Buscar el el idDoc en la lista de docs en la que aparece i
+		const auto& infotermdoc = indice->second.getDocs().find(idDoc);
+		if (infotermdoc != indice->second.getDocs().end()) {
+			fqid = infotermdoc->second.getft();
+		}
+	}
+
+	return fqid;
+}
+
+double 
+Buscador::BM25 (const int& docID) {
+	//std::clog << "llamada a BM25 \n";
+
+	// score(D, Q) : valor de similitud para el documento D respecto a la pregunta Q que realiza el usuario
+	double score = 0.0;
+	// n : número de términos (no de parada) de la query Q  
+	//int n = getInfPregunta().getnumTotalPalSinParada(); //getIndicePregunta().size();
+	// f(qi, D) : la frecuencia del término qi en el documento D
+	int fqid = 0;
+	// |D| : el número de palabras (no de parada) del documento D
+	int Dnumpal = 0;
+	// avgdl: la media de todas las |D| en la colección
+	double avgdl = CalculateAVGDL();
+	// N: cantidad de documentos en la colección
+	int N = getIndiceDocs().size();
+	// n(qi): número de documentos en los que aparece el término qi
+	int nqi = 0;
+	// constantes para configuración: k1 = 1,2 b = 0,75
+	double k1 	= _k1;
+	double b 	= _b;
+
+	// Auxiliar Data
+	double leftOperand 	= 0.0;	// IDF(qi)	
+	double rightOperand = 0.0;	// Division
+	// set Dnumpal value
+	for (auto& d : getIndiceDocs()) {
+		if (d.second.getidDoc() == docID) {
+			Dnumpal = d.second.getnumPalSinParada();
+		}
+	}
+
+	// Sumatorio desde i=1 hasta n
+	//for (int i = 0; i < n; ++i) {
+	for (auto& i_pregunta : getIndicePregunta()) {
+		
+		leftOperand = rightOperand = 0.0;
+
+		nqi = CalculateNQI(i_pregunta.first);
+		fqid = CalculateFQID(i_pregunta.first, docID);
+
+		// Calculate left operand
+		leftOperand = log10((N - nqi + 0.5) / (nqi + 0.5));
+		// Calculate right operand
+		rightOperand = (fqid * (k1 + 1)) / (fqid + k1 * (1 - b + b * (Dnumpal/avgdl)));
+
+		// Update score
+		score += leftOperand * rightOperand;
+	}
+	
+	return score;
+}
+
+
+/*double
+Buscador::CalculateAVRLD() {
+
+	int c_palabras_no_parada = 0;
+
+	for (auto& doc : getIndiceDocs()) {
+		c_palabras_no_parada +=  doc.second.getnumPalSinParada();
+	}
+	
+	return 1.0 * c_palabras_no_parada / getIndiceDocs().size();
+}*/
+
+double
+Buscador::DFR (const int& p_idDoc) {
+	//std::clog << "llamada a DFR \n";
+
+	double sim = 0.0;
+	// q: la query o pregunta que realiza el usuario 
+	std::string q = GetPregunta();
+	// d: el documento del que se calcula su valor de similitud sim(q, d) respecto a la pregunta q que realiza el usuario 
+	int d = p_idDoc;
+	// k: número de términos (no de parada) de la query q 
+	int k = getInfPregunta().getnumTotalPalSinParada();
+	// wi,q: peso en la query del término i de la query q 
+	double wiq = 0.0;
+	// wi,d: peso en el documento del término i de la query q
+	double wid = 0.0; 
+	// ft: número total de veces que el término t aparece en toda la colección 
+	int ft = 0;
+	// ft,d: número de veces que el término t aparece en el documento d
+	int ftd = 0;
+	// t,q: número de veces que el término t aparece en la query q 
+	int ftq = 0;
+	// nt: número de documentos en los que aparece el término t 
+	int nt = 0;
+	// ld: longitud en palabras (no de parada) del documento 
+	int ld = 0;
+	// avr_ld: media en palabras (no de parada) del tamaño de los documentos 
+	double avr_ld = CalculateAVGDL();
+	// N: cantidad de documentos en la colección 
+	int N = getIndiceDocs().size();
+	// Valor recomendado de c = 2
+	int c = _c;
+
+
+	// Set ld value
+	for (auto& d : getIndiceDocs()) {
+		if (d.second.getidDoc() == p_idDoc) {
+			ld = d.second.getnumPalSinParada();
+		}
+	}
+
+	// Auxiliar data
+	//double leftOperand = 0.0;
+	//double rightOperand = 0.0;
+
+	// for (i=i ... k)
+	for (auto& termino_pregunta : getIndicePregunta()) {
+
+		//////////////////////////// calculate wiq
+		// Wtq = ftq / k
+		ftq = CalculateFTQ(termino_pregunta.first);
+		wiq = 1.0 * ftq / k;
+
+		//////////////////////////// calculate wid
+		// wid = leftOperand * rightOperand
+		ftd = CalculateFTD(termino_pregunta.first, d);
+		ft 	= CalculateFT(termino_pregunta.first);
+		nt 	= CalculateNT(termino_pregunta.first);
+		double lambdat = 1.0 * ft / N;
+		double ftdd = CalculateFTDD(ftd, c, avr_ld, ld);
+
+		double leftOperand = 
+			(log2(1 + lambdat) + ftdd * log2((1 + lambdat) / (lambdat)));
+		double rightOperand = 
+			(ft + 1) / (nt * (ftdd + 1));
+
+		wid = leftOperand * rightOperand;
+
+		
+		//std::cout << "sim_token : " << wiq * wid<< std::endl;
+		
+		// Update sim value
+		sim += wiq * wid;
+	}
+
+
 	return sim;
+}
+// ft,d: número de veces que el término t aparece en el documento d
+int
+Buscador::CalculateFTD(std::string token, int d) {
+	int ftd = 0;
+
+	const auto& ref_indice = getIndice().find(token);
+	if (ref_indice != getIndice().end()) {
+		const auto& ref_ldocs = ref_indice->second.getldocs().find(d);
+		if (ref_ldocs != ref_indice->second.getldocs().end()) {
+			ftd = ref_ldocs->second.getft();
+		}
+	}
+
+	return ftd;
+}
+
+double
+Buscador::CalculateFTDD(int ftd, double c, double avr_ld, int ld) {
+	return (double)ftd * log2(1 + (c * avr_ld) / ld);
+}
+
+int
+Buscador::CalculateNT(std::string termino_pregunta) {
+	int nt = 0;
+
+	const auto& ref_indice = getIndice();
+	if (ref_indice.find(termino_pregunta) != ref_indice.end()) {
+		nt = ref_indice.find(termino_pregunta)->second.getNumDocs();
+	}
+
+	return nt;
+}
+
+int
+Buscador::CalculateFTQ(std::string termino_pregunta) {
+	int ftq = 0;
+
+	const auto& r_indice_pregunta = getIndicePregunta();
+	if (r_indice_pregunta.find(termino_pregunta) != r_indice_pregunta.end()) {
+		ftq = r_indice_pregunta.find(termino_pregunta)->second.getft();
+	}
+
+	return ftq;
+}
+
+int
+Buscador::CalculateFT(std::string termino_pregunta) {
+	auto& ref_indice = getIndice();
+	int nqi = 0;
+
+	if (ref_indice.find(termino_pregunta) != ref_indice.end()) {
+		nqi = ref_indice.find(termino_pregunta)->second.getftc();
+	}
+
+	return nqi;
 }
 
 void
 Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const {
+	int n_docs = numDocumentos;
+
 	// Si numDocumentos es mayor que los guardados imprimir todos
-	if (numDocumentos > _docsOrdenados.size()) {
-		std::cout << "sin implementar \n";
-	} else {
-		//0 DFR fichero1 0 1.5 pal1 pal7
-		std::priority_queue<ResultadoRI> aux(_docsOrdenados);
-		for (int i = 0; i < numDocumentos; ++i) {
-			ResultadoRI top_r(aux.top());
+	if (numDocumentos > _docsOrdenados.size())
+		n_docs = _docsOrdenados.size();
 
-			std::string formula = "DFR";
-			if (_formSimilitud == 1) formula = "BM25";
-			std::string pregunta = "ConjuntoDePreguntas";
-			if (top_r.GetNumPregunta() == 0) {
-				pregunta = GetPregunta();
-			}
+	//0 DFR fichero1 0 1.5 pal1 pal7
+	std::priority_queue<ResultadoRI> aux(_docsOrdenados);
+	for (int i = 0; i < numDocumentos; ++i) {
+		ResultadoRI top_r(aux.top());
 
-			std::cout
-				<< top_r.GetNumPregunta() 	<< ' '
-				<< formula 	 			<< ' '
-				<< GetNombreDocumento(i+1) << ' '
-				<< i << ' '
-				<< top_r.GetVSimilitud() << ' '
-				<< pregunta << '\n';
-
-			aux.pop();
-			std::cout << "size: " << _docsOrdenados.size() << std::endl;
+		std::string formula = "DFR";
+		if (_formSimilitud == 1) formula = "BM25";
+		std::string pregunta = "ConjuntoDePreguntas";
+		if (top_r.GetNumPregunta() == 0) {
+			pregunta = GetPregunta();
 		}
 
-		LiberarCola (aux);
+		std::cout
+			<< top_r.GetNumPregunta() 	<< ' '
+			<< formula 	 			<< ' '
+			<< GetNombreDocumento(i+1) << ' '
+			<< i << ' '
+			<< top_r.GetVSimilitud() << ' '
+			<< pregunta << '\n';
+
+		aux.pop();
 	}
-	std::cout << "size: " << _docsOrdenados.size() << std::endl;
+
+	LiberarCola (aux);
+	
 }
 
-double 
-Buscador::DFR (const int& p_idDoc) {
-	std::clog << "llamada a DFR \n";
-	return 9.9f;
-}
 
 

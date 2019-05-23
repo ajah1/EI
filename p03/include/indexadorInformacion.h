@@ -46,7 +46,7 @@ public:
 	// Decrementar a la ftc el valor d
 	void decftc (int d) {_ftc -= d;}
 	// Getter para la ftc
-	int getftc () 		{return _ftc;};
+	int getftc () 	const	{return _ftc;};
 	// Devuelve una referencia al campo privado _l_docs
 	std::unordered_map<long int, InfTermDoc>& apuntarListaDocs();
 	//
@@ -55,6 +55,11 @@ public:
 	void setDocs (std::unordered_map<long int, InfTermDoc> l);
 	//
 	const std::unordered_map<long int, InfTermDoc>& getDocs() const {
+		return _l_docs;
+	}
+	//
+	int getNumDocs() const { return _l_docs.size(); }
+	const std::unordered_map<long int, InfTermDoc>& getldocs() const {
 		return _l_docs;
 	}
 private:
@@ -164,6 +169,8 @@ public:
 	void IncFt() { _ft++; }
 	//	
 	void NuevaPosicion(int p_posicion) { _posTerm.push_back(p_posicion); }
+	//
+	int getft() const { return _ft; }
 
 private:
 	int _ft;
@@ -184,6 +191,7 @@ public:
 	void setNumTotalPal (int p) {_numTotalPal += p;} 
 	void setNumTotalPalSinParada (int p) {_numTotalPalSinParada += p;}
 	void setNumTotalPalDiferentes (int p) {_numTotalPalDiferentes += p;}
+	int getnumTotalPalSinParada() { return _numTotalPalSinParada; }
 private:
 	long int _numTotalPal; // No total de palabras en la pregunta
 	long int _numTotalPalSinParada; // No total de palabras sin stop-words en la pregunta
