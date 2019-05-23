@@ -411,7 +411,7 @@ Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const {
 
 	//0 DFR fichero1 0 1.5 pal1 pal7
 	std::priority_queue<ResultadoRI> aux(_docsOrdenados);
-	for (int i = 0; i < numDocumentos; ++i) {
+	for (int i = 0; i < n_docs; ++i) {
 		ResultadoRI top_r(aux.top());
 
 		std::string formula = "DFR";
