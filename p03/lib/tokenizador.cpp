@@ -528,11 +528,10 @@ Tokenizador::TokenizarEspecial(std::string& s, std::list<std::string>& p_tokens)
 /////////////////////////////////////////////////////////////
 void 
 Tokenizador::TokenizarGeneral(std::string& s, std::list<std::string>& p_tokens) const {
-	using namespace std;
-	string::size_type lastPos 	= s.find_first_not_of(_delimiters, 0);
-	string::size_type pos 		= s.find_first_of(_delimiters, lastPos);
+	std::string::size_type lastPos 	= s.find_first_not_of(_delimiters, 0);
+	std::string::size_type pos 		= s.find_first_of(_delimiters, lastPos);
 
-	while(string::npos != pos || string::npos != lastPos) {
+	while(std::string::npos != pos || std::string::npos != lastPos) {
 		p_tokens.push_back(s.substr(lastPos, pos - lastPos));
 		lastPos = s.find_first_not_of(_delimiters, pos);
 		pos 	= s.find_first_of(_delimiters, lastPos);

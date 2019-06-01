@@ -1,5 +1,6 @@
 #include "buscador.h"
 #include "math.h"
+#include <fstream>
 
 /////////////////////////////////////////////////////////////////////////////
 // CLASE RESULTADORI
@@ -158,6 +159,35 @@ Buscador::Buscar(const int& numDocumentos) {
 	return false;
 }
 
+bool 
+Buscador::Buscar(
+	const std::string& dirPreguntas, const int& numDocumentos, 
+	const int& numPregInicio, const int& numPregFin) 
+{
+	// Obtener fichero
+		// Indexar la pregunta
+		// Buscar(numDocs)
+	std::ifstream file;
+
+	for (int i=numPregInicio; i<=numPregFin; ++i) {
+       	std::cout << "................. " << i << std::endl;
+       	file.open(dirPreguntas+std::to_string(i)+".txt");
+       	std::string line("");
+       	std::string query("");
+       	while (getline(file, line)) {
+       		query += "\n" + line;
+       	}
+       	std::cout << query << std::endl;
+       	file.close();
+	}
+
+	return false;
+}
+
+
+
+
+
 int
 Buscador::CalculateNQI (std::string token_pregunta) {
 
@@ -267,10 +297,12 @@ Buscador::CalculateAVRLD() {
 	return 1.0 * c_palabras_no_parada / getIndiceDocs().size();
 }*/
 
+/////////////////////////////////////////////// DFR /////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 double
 Buscador::DFR (const int& p_idDoc) {
 	//std::clog << "llamada a DFR \n";
-
+	//std::cout << "IDDOC: " << p_idDoc << "...................:" << std::endl;
 	double sim = 0.0;
 	// q: la query o pregunta que realiza el usuario 
 	std::string q = GetPregunta();
@@ -291,7 +323,7 @@ Buscador::DFR (const int& p_idDoc) {
 	// nt: número de documentos en los que aparece el término t 
 	int nt = 0;
 	// ld: longitud en palabras (no de parada) del documento 
-	int ld = 0;
+	double ld = 0;
 	// avr_ld: media en palabras (no de parada) del tamaño de los documentos 
 	double avr_ld = CalculateAVGDL();
 	// N: cantidad de documentos en la colección 
@@ -333,13 +365,13 @@ Buscador::DFR (const int& p_idDoc) {
 			(ft + 1) / (nt * (ftdd + 1));
 
 		wid = leftOperand * rightOperand;
-
 		
-		//std::cout << "sim_token : " << wiq * wid<< std::endl;
+		//std::cout << "sim para el token ->" << termino_pregunta.first << "<- "<< wiq * wid<< std::endl;
 		
 		// Update sim value
 		sim += wiq * wid;
 	}
+
 
 
 	return sim;
@@ -401,6 +433,10 @@ Buscador::CalculateFT(std::string termino_pregunta) {
 	return nqi;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 void
 Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const {
 	int n_docs = numDocumentos;
@@ -435,6 +471,3 @@ Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const {
 	LiberarCola (aux);
 	
 }
-
-
-

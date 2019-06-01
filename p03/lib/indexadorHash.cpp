@@ -584,6 +584,7 @@ IndexadorHash::IndexadorHash(const std::string& directorioIndexacion) {
 	LeerInformacionColeccionDocs();
 	LeerTokenizador();
 	LeerVariables();
+	ObtenerPalParada();
 }
 
 void

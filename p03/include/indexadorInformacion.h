@@ -22,6 +22,8 @@ public:
 	int getft() const {return _ft;}
 	void setFt(int ft) { _ft = ft;}
 	void setPosTerm(std::list<int> lista) {_posTerm = lista;}
+	std::list<int>&
+	getposterm() { return _posTerm; }
 
 private:
 	int _ft;
@@ -62,6 +64,10 @@ public:
 	const std::unordered_map<long int, InfTermDoc>& getldocs() const {
 		return _l_docs;
 	}
+	std::unordered_map<long int, InfTermDoc>&
+	getldocs () { return _l_docs; }
+
+
 private:
 	int _ftc;
 	std::unordered_map<long int, InfTermDoc> _l_docs;
