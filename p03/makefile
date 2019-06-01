@@ -20,7 +20,7 @@ $(LIBDIR)/%.o : $(LIBDIR)/%.cpp $(INCLUDEDIR)/%.h
 run: $(EJECUTABLE)
 	./$^
 
-corrector: $(EJECUTABLE)
+corrector: all $(EJECUTABLE)
 	/bin/bash ./corrigeAlumno.sh
 
 memory: memory.cpp

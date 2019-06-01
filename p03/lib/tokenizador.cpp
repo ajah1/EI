@@ -306,16 +306,17 @@ Tokenizador::Tokenizar (const std::string& p_str, std::list<std::string>& p_toke
 	// Copia del String a tokenizar
 	std::string s(p_str);
 	// IF: pasar == true, eliminar antes de tokenizar
-	if (_pasarAminuscSinAcentos) {
-		EliminarMinusAcentos(s);
-	}
+	//if (_pasarAminuscSinAcentos) {
+	//	EliminarMinusAcentos(s);
+	//}
 	// IF: CASOSESPECIALES == FALSE
-	if (!_casosEspeciales) {
+	//if (!_casosEspeciales) {
 		TokenizarGeneral(s, p_tokens);
+		//TokenizarEspecial(s, p_tokens);
 	// ELSE: TOKENIZAR CON LOS CASOS ESPECIALES
-	} else if (!p_str.empty()) {
-		TokenizarEspecial(s, p_tokens);
-	}
+	//} else if (!p_str.empty()) {
+	//	TokenizarEspecial(s, p_tokens);
+	//}
 }
 ////////////////////////////////////////////////////////////////////
 // Tokeniza el fichero i guardando la salida en el fichero f (una

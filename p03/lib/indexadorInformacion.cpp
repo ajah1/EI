@@ -195,19 +195,19 @@ InformacionPregunta::operator= (const InformacionPregunta& p_ip) {
 //////////////////////////////////////////////////////////////////////////////
 std::ostream& 
 operator<< (std::ostream& p_os, const InfTermDoc& p) {
-	p_os << "ft: " << p._ft;
+	p_os << p._ft;
 
 	for (int posicion : p._posTerm) {
-		p_os << "\t" << posicion;	
+		p_os << " " << posicion;	
 	}
 	return p_os;
 }
 std::ostream&
 operator<< (std::ostream& p_os, const InformacionTermino& p) {
-	p_os << "Frecuencia total: " << p._ftc << "\tfd: " << p._l_docs.size();
+	//p_os << "Frecuencia total: " << p._ftc << "\tfd: " << p._l_docs.size();
 
 	for (auto it = p._l_docs.begin(); it != p._l_docs.end(); ++it) {
-		p_os << "\tId.Doc: " << it->first << "\t" << it->second;
+		p_os << it->first << " " << it->second << "   ";
 	}
 	return p_os;
 }

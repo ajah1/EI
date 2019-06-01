@@ -2,7 +2,10 @@
 #include <string> 
 #include <list> 
 #include <sys/resource.h> 
-#include “tokenizador.h” 
+
+#include "tokenizador.h"
+#include "buscador.h"
+#include "indexadorHash.h"
 
 using namespace std; 
 
@@ -13,14 +16,17 @@ double getcputime(void) {
 	tim=ru.ru_utime; 
 	double t=(double)tim.tv_sec + (double)tim.tv_usec / 1000000.0; 
 	tim=ru.ru_stime; 
-	t+=(double)tim.tv_sec + (double)tim.tv_usec / 1000000.0; return t;
+	t+=(double)tim.tv_sec + (double)tim.tv_usec / 1000000.0; 
+	return t;
 } 
 
 int main() { 
+	double aa = getcputime();
 	IndexadorHash b("./StopWordsEspanyol.txt", ". ,:", false, false, "./indicePruebaEspanyol", 0, false, false);
-	b.Indexar("ficherosTimes.txt"); b.GuardarIndexacion(); 
+	b.Indexar("listaFicheros.txt"); 
+	b.GuardarIndexacion(); 
 	Buscador a("./indicePruebaEspanyol", 0); 
-	a.IndexarPregunta("KENNEDY ADMINISTRATION PRESSURE ON NGO DINH DIEM TO STOP SUPPRESSING THE BUDDHISTS . "); 
+	/*a.IndexarPregunta("KENNEDY ADMINISTRATION PRESSURE ON NGO DINH DIEM TO STOP SUPPRESSING THE BUDDHISTS . "); 
 	a.Buscar(423); 
 	a.ImprimirResultadoBusqueda(423); 
 	double bb=getcputime()-aa; 
@@ -30,5 +36,5 @@ int main() {
 	a.Buscar("/home/tad/12-13/eiBuscador/CorpusTime/Preguntas/", 423, 1, 83); 
 	a.ImprimirResultadoBusqueda(423); 
 	double bbB=getcputime()-aaB; c
-	out << "\nHa tardado " << bbB << " segundos\n\n"; 
+	out << "\nHa tardado " << bbB << " segundos\n\n"; */
 }

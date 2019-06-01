@@ -302,7 +302,7 @@ Buscador::CalculateAVRLD() {
 double
 Buscador::DFR (const int& p_idDoc) {
 	//std::clog << "llamada a DFR \n";
-	//std::cout << "IDDOC: " << p_idDoc << "...................:" << std::endl;
+	std::cout << "IDDOC: " << p_idDoc << "...................:" << std::endl;
 	double sim = 0.0;
 	// q: la query o pregunta que realiza el usuario 
 	std::string q = GetPregunta();
@@ -366,7 +366,7 @@ Buscador::DFR (const int& p_idDoc) {
 
 		wid = leftOperand * rightOperand;
 		
-		//std::cout << "sim para el token ->" << termino_pregunta.first << "<- "<< wiq * wid<< std::endl;
+		std::cout << "sim para el token ->" << termino_pregunta.first << "<- "<< wiq * wid<< std::endl;
 		
 		// Update sim value
 		sim += wiq * wid;

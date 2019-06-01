@@ -4,6 +4,7 @@
 #include <stack>
 #include <sys/stat.h>
 #include <algorithm>
+#include <sstream>
 /////////////////////////////////////////////////////////////////
 // MAPA PARA LISTAR DADO UNA RUTA DE UN DOCUMENTO EL ID ASOCIADO
 ////////////////////////////////////////////////////////////////
@@ -679,64 +680,61 @@ void IndexadorHash::LeerIndiceDocs() {
 
 void
 IndexadorHash::LeerIndice() {
-	std::string file, linea, termino;
-	std::list<std::string> tokens;
-	std::list<int> lista;
+	//p_os << "Frecuencia total: " << p._ftc << "\tfd: " << p._l_docs.size();
+	std::ifstream ifile;
+	std::ifstream ifile1;
+	std::string s =  _directorioIndice+"/indiceInfo.txt";
+	std::string s1 =  _directorioIndice+"/indicePos.txt";
+	ifile.open(s.c_str());
+	ifile1.open(s1.c_str());
+
 	
 
-	std::list<std::string>::iterator itAux;
-	std::unordered_map<long int,InfTermDoc> l_docs_aux;
+	std::string palabra, line;
+	int ftc = 0;
+	int l_docs_size = 0;
+	while (std::getline(ifile, line))
+	{
+		InfTermDoc infotermdoc; 
+		InformacionTermino infotermino;
+		//std::cout << line << std::endl;
+	    std::istringstream iss(line);
+	    iss >> palabra >> ftc >> l_docs_size;
+	    infotermino.setFtc(ftc);
 
-	std::ifstream f;
+	    long int iddoc = 0;
+	    int ft = 0;
+	    std::getline(ifile1, line);
 
-	std::string s = _directorioIndice+"/indice.txt";
-	f.open(s.c_str());
+	    
+    	std::istringstream iss1(line);
+    	//std::cout << line << std::endl;
 
-	InfTermDoc itd;
 
-	_tok.DelimitadoresPalabra("\t ");//Para tokenizar los indices
-	_tok.CasosEspeciales(false);
-	_tok.PasarAminuscSinAcentos(false);
+    	int posicion;
+    	for (int j = 0; j < l_docs_size; ++j ) {
+			iss1 >> iddoc >> ft;
+			infotermdoc.setFt(ft);
+			//std::cout << "iddoc: " << iddoc << "   ft: " << ft;
+	    	for (int i = 0; i < ft; ++i) {
+	    		iss1 >> posicion;
+	    		//std::cout << "   pos: " << posicion;
+	    		infotermdoc.getposterm().push_back(posicion);
+		    }
+		    //std::cout << std::endl;
+    	}
+	    
+	    infotermino.getDocs().insert({iddoc,  infotermdoc});
 
-	while(getline(f, linea)){
-
-		l_docs_aux.clear();
-		lista.clear();
-		InformacionTermino it;
-
-		_tok.Tokenizar(linea,tokens);
-		//std::cout << "linea: " << linea << std::endl;
-		for(auto t= tokens.begin();t!= tokens.end();++t){
-			int fd = 0, idDoc = 0;
-			if (t == tokens.begin()) {
-				termino=(*t);
-				++t;
-				++t;
-				++t;
-				it.setFtc((atoi((*t).c_str())));
-				++t;
-				++t;
-				fd = atoi((*t).c_str());
-			} else {	// Empieza en Id.DOc
-				++t;//numero a leer
-				idDoc = atoi((*t).c_str());
-				++t;//ft
-				++t;// valor a leer
-				itd.setFt(atoi((*t).c_str()));
-				++t;
-				// Leer ft posiciones
-				for (int i = 0; i < itd.getft(); ++i) {
-					lista.push_back(atoi((*t).c_str()));
-					if (i != itd.getft()-1)
-						++t;
-				}
-				itd.setPosTerm(lista);
-				l_docs_aux.insert({idDoc,itd});
-			}
-		}
-		it.setDocs(l_docs_aux);
-		_indice.insert({termino,it});
+	   // std::cout << std::endl;
+	   // std::cout << std::endl;
+	   // std::cout << std::endl;
+	   // std::cout << std::endl;
+	    _indice.insert({palabra, infotermino});
 	}
+
+	ifile.close();
+	ifile1.close();
 
 }
 
@@ -767,14 +765,25 @@ IndexadorHash::GuardarIndexacion() const {
 void
 IndexadorHash::GuardarIndice () const{
 	std::ofstream ofile;
-	std::string s =  _directorioIndice+"/indice.txt";
-	ofile.open(s.c_str(), std::ios::out);
+	std::ofstream ofile1;
+	std::string s =  _directorioIndice+"/indiceInfo.txt";
+	std::string s1 =  _directorioIndice+"/indicePos.txt";
+	ofile.open(s.c_str());
+	ofile1.open(s1.c_str());
 
 	for(auto i = _indice.begin(); i != _indice.end(); ++i){
-		ofile << i->first << '\t'<< i->second << '\n';
+		// p_os << "Frecuencia total: " << p._ftc << "\tfd: " << p._l_docs.size();
+		ofile 	
+			<< i->first
+			<< ' ' << i->second.getftc() 
+			<< ' ' << i->second.getNumDocs() 
+			<< '\n';
+		ofile1 
+			<< i->second << '\n';
 	}
 
 	ofile.close();
+	ofile1.close();
 }
 void
 IndexadorHash::GuardarIndiceDocs () const {

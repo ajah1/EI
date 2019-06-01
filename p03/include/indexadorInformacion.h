@@ -52,11 +52,14 @@ public:
 	// Devuelve una referencia al campo privado _l_docs
 	std::unordered_map<long int, InfTermDoc>& apuntarListaDocs();
 	//
-	void setFtc(int ftc) { _ftc = ftc;} 
+	void setFtc(int& ftc) { _ftc = ftc;} 
 	//
 	void setDocs (std::unordered_map<long int, InfTermDoc> l);
 	//
 	const std::unordered_map<long int, InfTermDoc>& getDocs() const {
+		return _l_docs;
+	}
+	std::unordered_map<long int, InfTermDoc>& getDocs() {
 		return _l_docs;
 	}
 	//
