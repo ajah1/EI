@@ -26,7 +26,7 @@ int main() {
 	b.Indexar("listaFicheros.txt"); 
 	b.GuardarIndexacion(); 
 	Buscador a("./indicePruebaEspanyol", 0); 
-	/*a.IndexarPregunta("KENNEDY ADMINISTRATION PRESSURE ON NGO DINH DIEM TO STOP SUPPRESSING THE BUDDHISTS . "); 
+	a.IndexarPregunta("KENNEDY ADMINISTRATION PRESSURE ON NGO DINH DIEM TO STOP SUPPRESSING THE BUDDHISTS . "); 
 	a.Buscar(423); 
 	a.ImprimirResultadoBusqueda(423); 
 	double bb=getcputime()-aa; 
@@ -35,6 +35,6 @@ int main() {
 	double aaB=getcputime(); 
 	a.Buscar("/home/tad/12-13/eiBuscador/CorpusTime/Preguntas/", 423, 1, 83); 
 	a.ImprimirResultadoBusqueda(423); 
-	double bbB=getcputime()-aaB; c
-	out << "\nHa tardado " << bbB << " segundos\n\n"; */
+	double bbB=getcputime()-aaB; 
+	cout << "\nHa tardado " << bbB << " segundos\n\n";
 }

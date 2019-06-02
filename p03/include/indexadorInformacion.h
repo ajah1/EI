@@ -21,9 +21,9 @@ public:
 	// Getter para la _ft
 	int getft() const {return _ft;}
 	void setFt(int ft) { _ft = ft;}
-	void setPosTerm(std::list<int> lista) {_posTerm = lista;}
-	std::list<int>&
-	getposterm() { return _posTerm; }
+	void setPosTerm(std::list<int>& lista) {_posTerm = lista;}
+	std::list<int>& getposterm() { return _posTerm; }
+	void pushTerm(int& term) { _posTerm.push_back(term);}
 
 private:
 	int _ft;
@@ -52,7 +52,7 @@ public:
 	// Devuelve una referencia al campo privado _l_docs
 	std::unordered_map<long int, InfTermDoc>& apuntarListaDocs();
 	//
-	void setFtc(int& ftc) { _ftc = ftc;} 
+	void setFtc(int ftc) { _ftc = ftc;} 
 	//
 	void setDocs (std::unordered_map<long int, InfTermDoc> l);
 	//

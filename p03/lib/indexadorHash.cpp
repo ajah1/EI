@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////
 std::unordered_map<std::string, long int> _documentos;
 
+long int incide_size = 0;
 
 IndexadorHash::IndexadorHash() {}
 
@@ -338,6 +339,8 @@ IndexadorHash::indexar_tokens(const std::string& ficherodocumentos) {
 	_informacionColeccionDocs.setnumTotalPalSinParada (aux_numTotalPalSinParada);
 	_informacionColeccionDocs.setnumTotalPalDiferentes(dif.size());
 
+	incide_size = _indice.size();
+
     fclose(fp);
     if (line) free(line);
 }
@@ -580,6 +583,7 @@ IndexadorHash::ListarDocs (const std::string& nomDoc) {
 /////////////////////////////////////////////////////////////
 IndexadorHash::IndexadorHash(const std::string& directorioIndexacion) {
 	_directorioIndice = directorioIndexacion;
+	_indice.reserve(incide_size);
 	LeerIndice();
 	LeerIndiceDocs();
 	LeerInformacionColeccionDocs();
@@ -661,15 +665,15 @@ void IndexadorHash::LeerIndiceDocs() {
 
 		for(auto t = tokens.begin(); t != tokens.end(); ++t){
 			termino = (*t);
-			++t; ++t;
+			++t; //++t;
 			id.setidDoc((atoi((*t).c_str())));
-			++t; ++t;
+			++t;// ++t;
 			id.setNumPal((atoi((*t).c_str())));
-			++t; ++t;
+			++t;// ++t;
 			id.setNumPalSinParada((atoi((*t).c_str())));
-			++t; ++t;
+			++t; //++t;
 			id.setNumPalDiferentes((atoi((*t).c_str())));
-			++t; ++t;
+			++t; //++t;
 			id.setTamBytes((atoi((*t).c_str())));
 		}
 		_indiceDocs.insert({termino,id});
@@ -688,8 +692,6 @@ IndexadorHash::LeerIndice() {
 	ifile.open(s.c_str());
 	ifile1.open(s1.c_str());
 
-	
-
 	std::string palabra, line;
 	int ftc = 0;
 	int l_docs_size = 0;
@@ -705,11 +707,9 @@ IndexadorHash::LeerIndice() {
 	    long int iddoc = 0;
 	    int ft = 0;
 	    std::getline(ifile1, line);
-
 	    
     	std::istringstream iss1(line);
     	//std::cout << line << std::endl;
-
 
     	int posicion;
     	for (int j = 0; j < l_docs_size; ++j ) {
@@ -719,18 +719,13 @@ IndexadorHash::LeerIndice() {
 	    	for (int i = 0; i < ft; ++i) {
 	    		iss1 >> posicion;
 	    		//std::cout << "   pos: " << posicion;
-	    		infotermdoc.getposterm().push_back(posicion);
+	    		//infotermdoc.getposterm().push_back(posicion);
+	    		infotermdoc.pushTerm(posicion);
 		    }
-		    //std::cout << std::endl;
+		    infotermino.getDocs().insert({iddoc, infotermdoc});
     	}
-	    
-	    infotermino.getDocs().insert({iddoc,  infotermdoc});
 
-	   // std::cout << std::endl;
-	   // std::cout << std::endl;
-	   // std::cout << std::endl;
-	   // std::cout << std::endl;
-	    _indice.insert({palabra, infotermino});
+	    //_indice.insert({palabra, infotermino});
 	}
 
 	ifile.close();

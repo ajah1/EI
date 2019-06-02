@@ -214,11 +214,11 @@ operator<< (std::ostream& p_os, const InformacionTermino& p) {
 std::ostream& 
 operator<< (std::ostream& p_os, const InfDoc& p_id) {
 	return p_os 
-	<< "\tidDoc: " 				<< p_id._idDoc 
-	<< "\tnumPal: "  			<< p_id._numPal
-	<< "\tnumPalSinParada: " 	<< p_id._numPalSinParada 
-	<< "\tnumPalDiferentes: " 	<< p_id._numPalDiferentes
-	<< "\ttamBytes: " 			<< p_id._tamBytes;	
+	<< " " 				<< p_id._idDoc 
+	<< " "  			<< p_id._numPal
+	<< " " 	<< p_id._numPalSinParada 
+	<< " " 	<< p_id._numPalDiferentes
+	<< " " 			<< p_id._tamBytes;	
 }
 std::ostream& 
 operator<< (std::ostream& s, const InfColeccionDocs& p) {
