@@ -1,3 +1,5 @@
+g++ -ggdb -std=gnu++0x -Wall  -Iinclude src/main.cpp lib/indexadorInformacion.o lib/indexadorHash.o lib/tokenizador.o lib/buscador.o lib/stemmer.o -o practica3
+./practica3
 1 DFR 304 35109 4.3464 ConjuntoDePreguntas
 1 DFR 326 35108 4.25046 ConjuntoDePreguntas
 1 DFR 308 35107 4.20057 ConjuntoDePreguntas

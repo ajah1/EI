@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <algorithm>
 #include <sstream>
+#include "stemmer.h"
 /////////////////////////////////////////////////////////////////
 // MAPA PARA LISTAR DADO UNA RUTA DE UN DOCUMENTO EL ID ASOCIADO
 ////////////////////////////////////////////////////////////////
@@ -55,16 +56,20 @@ IndexadorHash::IndexarPregunta(const std::string& preg) {
 	// IF(al menos un token es valido) THEN Vaciar los campos
 	_indicePregunta.clear();
 	_infPregunta.~InformacionPregunta();
-
+	int v = 2;
+	stemmerPorter stem;
 	for (auto& t : tokens) {
 		if (t != "") {
-			if (EsParada(t) == false) {
+			std::string aux = t;
+			std::transform(aux.begin(), aux.end(), aux.begin(), ::tolower);
+			if (EsParada(aux) == false) {
+				stem.stemmer(aux, v);
 				// IF: t no está indexado THEN insertar en _indicePregunta
-				if (_indicePregunta.find(t) == _indicePregunta.end()) {
-					_indicePregunta.insert({t, InformacionTerminoPregunta(0)});
+				if (_indicePregunta.find(aux) == _indicePregunta.end()) {
+					_indicePregunta.insert({aux, InformacionTerminoPregunta(0)});
 				}
 				// Actualizar la _ft del t. Y anyadir la nueva posicion
-				auto& t_infpreg = _indicePregunta.find(t)->second;
+				auto& t_infpreg = _indicePregunta.find(aux)->second;
 				t_infpreg.IncFt();					// ++_ft
 				t_infpreg.NuevaPosicion(posicion);	// _posTerm.push_back(posicion)
 				
@@ -285,27 +290,33 @@ IndexadorHash::indexar_tokens(const std::string& ficherodocumentos) {
        	std::ifstream file;
        	file.open(f_tokens);
        	std::string token = "";
-
+int v = 2;
+stemmerPorter stem;
        	// Indexar el token leido
        	aux_posicion = 0;							// Posicion del token a 0
        	while (getline(file, token)) {
        		if (token != "") {		// comrpobar si es parado o vacio
        			++aux_numPal;
-	       		if (!EsParada(token)) {
+				std::string aux = token;
+				std::transform(aux.begin(), aux.end(), aux.begin(), ::tolower);
+	       		if (!EsParada(aux)) {
 	       			// Indexar el token
-	       			if  (_indice.find(token)  == _indice.end()) {
-	       				_indice.insert({token, InformacionTermino(1)});				// Insertar el indice
+	       			//std::cout << aux << " ==> ";
+	       			stem.stemmer(aux, v);
+	       			//std::cout << aux << std::endl;
+	       			if  (_indice.find(aux)  == _indice.end()) {
+	       				_indice.insert({aux, InformacionTermino(1)});				// Insertar el indice
 	       				// Añadir en la lista de documentos del termino el primer documento
-	       				auto* lista_doc = &_indice.find(token)->second.apuntarListaDocs();
+	       				auto* lista_doc = &_indice.find(aux)->second.apuntarListaDocs();
 	       				lista_doc->insert({aux_idDoc, InfTermDoc(1, aux_posicion)});
-	       				aux_diferentes.insert(token);
-	       				dif.insert(token);
+	       				aux_diferentes.insert(aux);
+	       				dif.insert(aux);
 	       			// Ya está indexado, actualizar informacionTerminod el token
 		       		} else {
-		       			actualizar_token_indexado(token, aux_idDoc, aux_posicion);
+		       			actualizar_token_indexado(aux, aux_idDoc, aux_posicion);
 						// IF: p_token no pertenece a diferentes THEN insertar el token
-						if (aux_diferentes.find(token) == aux_diferentes.end()) {
-							aux_diferentes.insert(token);
+						if (aux_diferentes.find(aux) == aux_diferentes.end()) {
+							aux_diferentes.insert(aux);
 						}
 		       		}		       		
 	       		} else { ++aux_numParada; }
