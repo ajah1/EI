@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <list>
 #include <iostream>
-
+#include <vector>
 class InfTermDoc {
 friend std::ostream& operator<<(std::ostream&, const InfTermDoc&);
 
@@ -21,13 +21,14 @@ public:
 	// Getter para la _ft
 	int getft() const {return _ft;}
 	void setFt(int ft) { _ft = ft;}
-	void setPosTerm(std::list<int>& lista) {_posTerm = lista;}
-	std::list<int>& getposterm() { return _posTerm; }
+	void setPosTerm(std::vector<int>& lista) {_posTerm = lista;}
+	std::vector<int>& getposterm() { return _posTerm; }
 	void pushTerm(int& term) { _posTerm.push_back(term);}
 
 private:
 	int _ft;
-	std::list<int> _posTerm;
+	//std::list<int> _posTerm;
+	std::vector<int> _posTerm;
 };
 
 
@@ -200,7 +201,7 @@ public:
 	void setNumTotalPal (int p) {_numTotalPal += p;} 
 	void setNumTotalPalSinParada (int p) {_numTotalPalSinParada += p;}
 	void setNumTotalPalDiferentes (int p) {_numTotalPalDiferentes += p;}
-	int getnumTotalPalSinParada() { return _numTotalPalSinParada; }
+	long int getnumTotalPalSinParada() { return _numTotalPalSinParada; }
 private:
 	long int _numTotalPal; // No total de palabras en la pregunta
 	long int _numTotalPalSinParada; // No total de palabras sin stop-words en la pregunta

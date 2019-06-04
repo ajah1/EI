@@ -10,7 +10,7 @@
 ////////////////////////////////////////////////////////////////
 std::unordered_map<std::string, long int> _documentos;
 
-long int incide_size = 0;
+//long int incide_size = 0;
 
 IndexadorHash::IndexadorHash() {}
 
@@ -43,7 +43,7 @@ bool
 IndexadorHash::IndexarPregunta(const std::string& preg) {
 	std::list<std::string> tokens;
 	std::string p_aux = preg;
-	std::transform(p_aux.begin(), p_aux.end(), p_aux.begin(), ::tolower);
+	//std::transform(p_aux.begin(), p_aux.end(), p_aux.begin(), ::tolower);
 	_tok.TokenizarGeneral(p_aux, tokens);
 
 	// Posicion actual del token
@@ -58,7 +58,7 @@ IndexadorHash::IndexarPregunta(const std::string& preg) {
 
 	for (auto& t : tokens) {
 		if (t != "") {
-			if (!EsParada(t)) {
+			if (EsParada(t) == false) {
 				// IF: t no está indexado THEN insertar en _indicePregunta
 				if (_indicePregunta.find(t) == _indicePregunta.end()) {
 					_indicePregunta.insert({t, InformacionTerminoPregunta(0)});
@@ -339,7 +339,7 @@ IndexadorHash::indexar_tokens(const std::string& ficherodocumentos) {
 	_informacionColeccionDocs.setnumTotalPalSinParada (aux_numTotalPalSinParada);
 	_informacionColeccionDocs.setnumTotalPalDiferentes(dif.size());
 
-	incide_size = _indice.size();
+	//incide_size = _indice.size();
 
     fclose(fp);
     if (line) free(line);
@@ -360,7 +360,23 @@ IndexadorHash::GetFileSize(std::string filename){
 /////////////////////////////////////////////////////////////
 bool
 IndexadorHash::EsParada(const std::string& p_token) {
-	return (_stopWords.find(p_token) != _stopWords.end());
+	std::string p_aux = p_token;
+	std::transform(p_aux.begin(), p_aux.end(), p_aux.begin(), ::tolower);
+	
+	/*if (p_aux == "yo") {
+		std::cout << p_token << std::endl;
+		std::cin.get();
+	}*/
+	//bool encontrar = false;
+	for (std::string& p : _stopWords) {
+		if (p ==  p_aux) {
+			//std::cout << "encontrar\n";
+			//std::cin.get();
+			return true;
+		}
+	}
+	return false;
+	//return (_stopWords.find(p_token) != _stopWords.end());
 }
 
 /////////////////////////////////////////////////////////////
@@ -372,15 +388,12 @@ IndexadorHash::ObtenerPalParada() {
 	file.open(_ficheroStopWords);
 	
 	std::string line = "";
-
-	if (!DevolverPasarAminuscSinAcentos()) {
-		while (getline(file, line))
-			_stopWords.insert(line);
-	} else {
-		while (getline(file, line)) {
-			//_tok.EliminarMinusAcentos(line);
-			_stopWords.insert(line);
-		}
+	_stopWords.reserve(500);	// maximo 430 stopwords :D
+	while (getline(file, line)) {
+		//std::transform(line.begin(), line.end(), line.begin(), ::tolower);
+//		_stopWords.insert(line);
+		_stopWords.push_back(line);
+		//std::cout << line << std::endl;
 	}
 
 	file.close();
@@ -421,9 +434,9 @@ void IndexadorHash::CopiaindicePregunta(std::unordered_map<std::string, Informac
 		_indicePregunta.insert({i.first, i.second});
 	}
 }
-void IndexadorHash::CopiaStopWords(std::unordered_set<std::string> p_parada) {
+void IndexadorHash::CopiaStopWords(std::vector<std::string> p_parada) {
 	for (auto& i : p_parada) {
-		_stopWords.insert(i);
+		_stopWords.push_back(i);
 	}
 }
 void IndexadorHash::CopiaICD (const InfColeccionDocs& p_id) {
@@ -455,12 +468,21 @@ std::string
 IndexadorHash::GetNombreDocumento (int p_idDoc) const {
 	
 	// Obtener la ruta del archivo asociado al p_idDOc
+	/*
 	bool find = false;
 	std::string ruta("");
 	for (auto it = _documentos.begin(); it != _documentos.end() && !find; ++it) {
 		if (it->second == p_idDoc) {
 			ruta = it->first;
 			find = true;
+		}
+	}*/
+
+	std::string ruta("");
+	for (auto& d : _indiceDocs) {
+		if (d.second.getidDoc() == p_idDoc) {
+			ruta = d.first;
+			break;
 		}
 	}
 
@@ -583,7 +605,7 @@ IndexadorHash::ListarDocs (const std::string& nomDoc) {
 /////////////////////////////////////////////////////////////
 IndexadorHash::IndexadorHash(const std::string& directorioIndexacion) {
 	_directorioIndice = directorioIndexacion;
-	_indice.reserve(incide_size);
+	//_indice.reserve(incide_size);
 	LeerIndice();
 	LeerIndiceDocs();
 	LeerInformacionColeccionDocs();
@@ -719,13 +741,12 @@ IndexadorHash::LeerIndice() {
 	    	for (int i = 0; i < ft; ++i) {
 	    		iss1 >> posicion;
 	    		//std::cout << "   pos: " << posicion;
-	    		//infotermdoc.getposterm().push_back(posicion);
-	    		infotermdoc.pushTerm(posicion);
+	    		infotermdoc.getposterm().push_back(posicion);
 		    }
 		    infotermino.getDocs().insert({iddoc, infotermdoc});
     	}
 
-	    //_indice.insert({palabra, infotermino});
+	    _indice.insert({palabra, infotermino});
 	}
 
 	ifile.close();

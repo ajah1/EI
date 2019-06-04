@@ -1,6 +1,6 @@
 #include "buscador.h"
 #include "math.h"
-
+#include <fstream>
 /////////////////////////////////////////////////////////////////////////////
 // CLASE RESULTADORI
 /////////////////////////////////////////////////////////////////////////////
@@ -45,7 +45,8 @@ Buscador::Buscador(const std::string& directorioIndexacion, const int& f) :
 	_formSimilitud(0),
 	_c(2),
 	_k1(1.2),
-	_b(0.75)
+	_b(0.75),
+	_esConjunto(false)
 {}
 
 Buscador::Buscador() :
@@ -107,9 +108,41 @@ Buscador::CambiarFormulaSimilitud(const int& f) {
 /////////////////////////////////////////////////////////////////////////////
 // SOBRECARGA OPERADOR SALIDA
 /////////////////////////////////////////////////////////////////////////////
+int numerodelapregunta = 0;
+int numerodepreguntas = 0;
+bool 
+Buscador::Buscar
+(	const std::string& dirPreguntas, 
+	const int& numDocumentos,
+	const int& numPregInicio, 
+	const int& numPregFin) 
+{
+	numerodepreguntas = numPregFin - numPregInicio;
+	// Borrar la memoria de _docsOrdenados
+	while (!_docsOrdenados.empty()) {
+		_docsOrdenados.pop();
+	}
+	std::ifstream query_file; 
+	for (int i = numPregInicio; i <= numPregFin; ++i) {
+		query_file.open(dirPreguntas+std::to_string(i)+".txt");
+		std::string query(""), line("");
+		while (std::getline(query_file, line)) {
+			query += line;
+		}
+		query_file.close();
+		numerodelapregunta = i;
+
+		IndexarPregunta(query);
+		Buscar(numDocumentos);
+	}
+	_esConjunto = true;
+	return true;
+}
+
 
 bool 
 Buscador::Buscar(const int& numDocumentos) {
+	_esConjunto = false;
 	// IF no hay pregunta indexada THEN return false
 	std::string pregunta("");
 	if (!DevuelvePregunta(pregunta)) {
@@ -117,9 +150,9 @@ Buscador::Buscar(const int& numDocumentos) {
 	}
 
 	// Borrar la memoria de _docsOrdenados
-	while (!_docsOrdenados.empty()) {
-		_docsOrdenados.pop();
-	}
+	//while (!_docsOrdenados.empty()) {
+	//	_docsOrdenados.pop();
+	//}
 
 	// Almacena todos los resultados
 	std::priority_queue< ResultadoRI > aux_queue;
@@ -130,9 +163,10 @@ Buscador::Buscar(const int& numDocumentos) {
 	if (_formSimilitud == 1) {
 		fp_metodo = &Buscador::BM25;
 	}
-
+	
 	for (int i = 1; i <= getIndiceDocsSize(); ++i) {
-		aux_queue.push(ResultadoRI((this->*fp_metodo)(i),i,0));
+		//std::cout << numerodelapregunta << std::endl;
+		aux_queue.push(ResultadoRI((this->*fp_metodo)(i),i,numerodelapregunta));
 	}
 
 	if (!aux_queue.empty()) {
@@ -151,7 +185,7 @@ Buscador::Buscar(const int& numDocumentos) {
 
 			LiberarCola(aux_queue);
 		}
-
+		//std::cout << _docsOrdenados.size() << std::endl;
 		return true;
 	}
 
@@ -159,7 +193,7 @@ Buscador::Buscar(const int& numDocumentos) {
 }
 
 int
-Buscador::CalculateNQI (std::string token_pregunta) {
+Buscador::CalculateNQI (const std::string& token_pregunta) {
 
 	auto& ref_indice = getIndice();
 	int nqi = 0;
@@ -184,7 +218,7 @@ Buscador::CalculateAVGDL () {
 }
 
 int
-Buscador::CalculateFQID (std::string token_pregunta, int idDoc) {
+Buscador::CalculateFQID (const std::string& token_pregunta, const int& idDoc) {
 
 	int fqid = 0;
 
@@ -278,7 +312,7 @@ Buscador::DFR (const int& p_idDoc) {
 	// q: la query o pregunta que realiza el usuario 
 	std::string q = GetPregunta();
 	// d: el documento del que se calcula su valor de similitud sim(q, d) respecto a la pregunta q que realiza el usuario 
-	int d = p_idDoc;
+	//int d = p_idDoc;
 	// k: número de términos (no de parada) de la query q 
 	int k = getInfPregunta().getnumTotalPalSinParada();
 	// wi,q: peso en la query del término i de la query q 
@@ -324,24 +358,25 @@ Buscador::DFR (const int& p_idDoc) {
 
 		//////////////////////////// calculate wid
 		// wid = leftOperand * rightOperand
-		ftd = CalculateFTD(termino_pregunta.first, d);
+		ftd = CalculateFTD(termino_pregunta.first, p_idDoc);
 		ft 	= CalculateFT(termino_pregunta.first);
 		nt 	= CalculateNT(termino_pregunta.first);
-		double lambdat = 1.0 * ft / N;
-		double ftdd = CalculateFTDD(ftd, c, avr_ld, ld);
+		if (ftd == 0 || ft == 0 || nt == 0) {
+			
+		} else {
+			double lambdat = 1.0 * ft / N;
+			double ftdd = CalculateFTDD(ftd, c, avr_ld, ld);
 
-		double leftOperand = 
-			(log2(1 + lambdat) + ftdd * log2((1 + lambdat) / (lambdat)));
-		double rightOperand = 
-			(ft + 1) / (nt * (ftdd + 1));
+			double leftOperand = 
+				(log2(1 + lambdat) + ftdd * log2((1 + lambdat) / (lambdat)));
+			double rightOperand = 
+				(ft + 1) / (nt * (ftdd + 1));
 
-		wid = leftOperand * rightOperand;
-
-		
-		//std::cout << "sim para el token ->" << termino_pregunta.first << "<- "<< wiq * wid<< std::endl;
-		
-		// Update sim value
-		sim += wiq * wid;
+			wid = leftOperand * rightOperand;
+			
+			// Update sim value
+			sim += wiq * wid;
+		}
 	}
 
 
@@ -350,7 +385,7 @@ Buscador::DFR (const int& p_idDoc) {
 }
 // ft,d: número de veces que el término t aparece en el documento d
 int
-Buscador::CalculateFTD(std::string token, int d) {
+Buscador::CalculateFTD(const std::string& token, const int& d) {
 	int ftd = 0;
 
 	const auto& ref_indice = getIndice().find(token);
@@ -365,12 +400,12 @@ Buscador::CalculateFTD(std::string token, int d) {
 }
 
 double
-Buscador::CalculateFTDD(int ftd, double c, double avr_ld, int ld) {
+Buscador::CalculateFTDD(const int& ftd, const double& c, const double& avr_ld, const int& ld) {
 	return (double)ftd * log2(1 + (c * avr_ld) / ld);
 }
 
 int
-Buscador::CalculateNT(std::string termino_pregunta) {
+Buscador::CalculateNT(const std::string& termino_pregunta) {
 	int nt = 0;
 
 	const auto& ref_indice = getIndice();
@@ -382,7 +417,7 @@ Buscador::CalculateNT(std::string termino_pregunta) {
 }
 
 int
-Buscador::CalculateFTQ(std::string termino_pregunta) {
+Buscador::CalculateFTQ(const std::string& termino_pregunta) {
 	int ftq = 0;
 
 	const auto& r_indice_pregunta = getIndicePregunta();
@@ -394,11 +429,12 @@ Buscador::CalculateFTQ(std::string termino_pregunta) {
 }
 
 int
-Buscador::CalculateFT(std::string termino_pregunta) {
+Buscador::CalculateFT(const std::string& termino_pregunta) {
+	//std::cout << "E:E :" << termino_pregunta << std::endl;
 	auto& ref_indice = getIndice();
 	int nqi = 0;
-
-	if (ref_indice.find(termino_pregunta) != ref_indice.end()) {
+	auto aux = ref_indice.find(termino_pregunta);
+	if (aux != ref_indice.end()) {
 		nqi = ref_indice.find(termino_pregunta)->second.getftc();
 	}
 
@@ -409,8 +445,11 @@ Buscador::CalculateFT(std::string termino_pregunta) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+
+
+
 void
-Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const {
+Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) {
 	int n_docs = numDocumentos;
 
 	// Si numDocumentos es mayor que los guardados imprimir todos
@@ -419,26 +458,47 @@ Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) const {
 
 	//0 DFR fichero1 0 1.5 pal1 pal7
 	std::priority_queue<ResultadoRI> aux(_docsOrdenados);
-	for (int i = 0; i < n_docs; ++i) {
-		ResultadoRI top_r(aux.top());
 
-		std::string formula = "DFR";
-		if (_formSimilitud == 1) formula = "BM25";
-		std::string pregunta = "ConjuntoDePreguntas";
-		if (top_r.GetNumPregunta() == 0) {
-			pregunta = GetPregunta();
+
+	if (!_esConjunto) {
+
+		for (int i = 0; i < n_docs; ++i) {
+			ResultadoRI top_r(_docsOrdenados.top());
+
+			std::string formula = "DFR";
+			if (_formSimilitud == 1) formula = "BM25";
+
+			std::cout
+				<< top_r.GetNumPregunta() 	<< ' '
+				<< formula 	 			<< ' '
+				<< GetNombreDocumento(top_r.getidDoc()) << ' '
+				<< i << ' '
+				<< top_r.GetVSimilitud() << ' '
+				<< GetPregunta() << '\n';
+
+			_docsOrdenados.pop();
 		}
+	} else {
+		//for (int i = 0; i < _docsOrdenados.size(); ++i) {
+		for (int i = _docsOrdenados.size(); i > 0; --i) {
+		
+			ResultadoRI top_r(_docsOrdenados.top());
 
-		std::cout
-			<< top_r.GetNumPregunta() 	<< ' '
-			<< formula 	 			<< ' '
-			<< GetNombreDocumento(i+1) << ' '
-			<< i << ' '
-			<< top_r.GetVSimilitud() << ' '
-			<< pregunta << '\n';
+			std::string formula = "DFR";
+			if (_formSimilitud == 1) formula = "BM25";
 
-		aux.pop();
+			std::cout
+				<< top_r.GetNumPregunta() 	<< ' '
+				<< formula 	 			<< ' '
+				<< GetNombreDocumento(top_r.getidDoc()) << ' '
+				<< i << ' '
+				<< top_r.GetVSimilitud() << ' '
+				<< "ConjuntoDePreguntas" << '\n';
+
+			_docsOrdenados.pop();
+		}
 	}
+
 
 	LiberarCola (aux);
 	

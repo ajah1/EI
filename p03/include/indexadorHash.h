@@ -3,7 +3,7 @@
 #include "tokenizador.h"
 #include "indexadorInformacion.h"
 #include <unordered_set>
-
+#include <vector>
 class IndexadorHash {
 
 friend std::ostream& operator<<(std::ostream& s, const IndexadorHash& p);
@@ -112,7 +112,7 @@ private:
 	// _indicePregunta
 	void CopiaindicePregunta(std::unordered_map<std::string, InformacionTerminoPregunta> p_indicepregunta);
 	// _stopwords
-	void CopiaStopWords(std::unordered_set<std::string> p_parada);
+	void CopiaStopWords(std::vector<std::string> p_parada);
 	// copia ICD
 	void CopiaICD (const InfColeccionDocs& p_id);
 
@@ -141,7 +141,8 @@ private:
 	// Índice de términos indexados en una pregunta. Se almacenará en memoria 
 	InformacionPregunta _infPregunta;
 	// Información recogida de la pregunta indexada. Se almacenará en memoria principal
-	std::unordered_set<std::string> _stopWords;
+	//std::unordered_set<std::string> _stopWords;
+	std::vector<std::string> _stopWords;
 	std::string _ficheroStopWords;
 	// Nombre del fichero que contiene las palabras de parada
 	Tokenizador _tok;

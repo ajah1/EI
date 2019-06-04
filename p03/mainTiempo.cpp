@@ -22,19 +22,26 @@ double getcputime(void) {
 
 int main() { 
 	double aa = getcputime();
-	IndexadorHash b("./StopWordsEspanyol.txt", ". ,:", false, false, "./indicePruebaEspanyol", 0, false, false);
-	b.Indexar("listaFicheros.txt"); 
-	b.GuardarIndexacion(); 
-	Buscador a("./indicePruebaEspanyol", 0); 
-	a.IndexarPregunta("KENNEDY ADMINISTRATION PRESSURE ON NGO DINH DIEM TO STOP SUPPRESSING THE BUDDHISTS . "); 
-	a.Buscar(423); 
-	a.ImprimirResultadoBusqueda(423); 
+
+	//IndexadorHash b("./StopWordsIngles.txt", ". ,:", false, false, "./indicePruebaIngles", 0, false, false); 
+	//b.IndexarDirectorio("CorpusTime/Documentos/");
+	//b.GuardarIndexacion(); 
+	
+	Buscador a("./indicePruebaIngles", 0); 
+	//a.IndexarPregunta("KENNEDY ADMINISTRATION PRESSURE ON NGO DINH DIEM TO STOP SUPPRESSING THE BUDDHISTS . "); 
+	//a.Buscar(423); 
+	//a.ImprimirResultadoBusqueda(423); 
+	
 	double bb=getcputime()-aa; 
 	cout << "\nHa tardado " << bb << " segundos\n\n"; 
-	time_t inicioB, finB; time(&inicioB); 
+	
+	time_t inicioB, finB; 
+	time(&inicioB); 
 	double aaB=getcputime(); 
-	a.Buscar("/home/tad/12-13/eiBuscador/CorpusTime/Preguntas/", 423, 1, 83); 
+	a.Buscar("CorpusTime/Preguntas/", 423, 1, 83); 
 	a.ImprimirResultadoBusqueda(423); 
 	double bbB=getcputime()-aaB; 
 	cout << "\nHa tardado " << bbB << " segundos\n\n";
+
+	return 0;
 }

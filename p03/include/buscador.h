@@ -13,6 +13,7 @@ public:
  	bool operator< (const ResultadoRI& lhs) const; 
  	ResultadoRI(const ResultadoRI&);
  	int GetNumPregunta() const {return numPregunta;}
+ 	int getidDoc() const {return idDoc;}
  	double GetVSimilitud() const {return vSimilitud;}
 private: 
 	double vSimilitud; 
@@ -46,7 +47,7 @@ friend std::ostream& operator<<(std::ostream& s, const Buscador& p) {
 	Buscador& operator= (const Buscador&); 
 	bool Buscar(const int& numDocumentos = 99999);
 	bool Buscar(const std::string& dirPreguntas, const int& numDocumentos, const int& numPregInicio, const int& numPregFin);
-	void ImprimirResultadoBusqueda(const int& numDocumentos = 99999) const;
+	void ImprimirResultadoBusqueda(const int& numDocumentos = 99999);
 	bool ImprimirResultadoBusqueda(const int& numDocumentos, const std::string& nombreFichero) const;
 	int DevolverFormulaSimilitud() const;
 
@@ -60,20 +61,21 @@ friend std::ostream& operator<<(std::ostream& s, const Buscador& p) {
 	void DevolverParametrosBM25(double& kk1, double& kb) const; // Devuelve el valor de “k1” y “b”
 
 	//
-	int CalculateFQID (std::string token_pregunta, int idDoc);
+	int CalculateFQID (const std::string& token_pregunta, const int& idDoc);
 	double CalculateAVGDL ();
-	int CalculateNQI (std::string token_pregunta);
-	int CalculateFTQ(std::string termino_pregunta);
-	int CalculateFT(std::string termino_pregunta);
-	int CalculateNT(std::string termino_pregunta);
-	double CalculateFTDD(int ftd, double c, double avr_ld, int ld);
-	int CalculateFTD(std::string token, int d);
+	int CalculateNQI (const std::string& token_pregunta);
+	int CalculateFTQ(const std::string& termino_pregunta);
+	int CalculateFT(const std::string& termino_pregunta);
+	int CalculateNT(const std::string& termino_pregunta);
+	double CalculateFTDD(const int& ftd, const double& c,const  double& avr_ld,const  int& ld);
+	int CalculateFTD(const std::string& token, const int& d);
 private: 
 	int _formSimilitud; // 0: DFR, 1: BM25
 	std::priority_queue< ResultadoRI > _docsOrdenados;
 	double _c; // Constante del modelo DFR 
 	double _k1; // Constante del modelo BM25 
 	double _b; // Constante del modelo BM25 
+	bool _esConjunto;
 
 	/////////////////////////////////////////////////////////////////////////////
 	// FUNCIONES AUXILIARES
