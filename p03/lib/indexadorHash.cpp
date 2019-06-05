@@ -63,7 +63,7 @@ IndexadorHash::IndexarPregunta(const std::string& preg) {
 			std::string aux = t;
 			std::transform(aux.begin(), aux.end(), aux.begin(), ::tolower);
 			if (EsParada(aux) == false) {
-				stem.stemmer(aux, v);
+				//stem.stemmer(aux, v);
 				// IF: t no está indexado THEN insertar en _indicePregunta
 				if (_indicePregunta.find(aux) == _indicePregunta.end()) {
 					_indicePregunta.insert({aux, InformacionTerminoPregunta(0)});
@@ -302,7 +302,7 @@ stemmerPorter stem;
 	       		if (!EsParada(aux)) {
 	       			// Indexar el token
 	       			//std::cout << aux << " ==> ";
-	       			stem.stemmer(aux, v);
+	       			//stem.stemmer(aux, v);
 	       			//std::cout << aux << std::endl;
 	       			if  (_indice.find(aux)  == _indice.end()) {
 	       				_indice.insert({aux, InformacionTermino(1)});				// Insertar el indice
@@ -776,7 +776,9 @@ IndexadorHash::GuardarIndexacion() const {
 	//Tokenizador tokaux(tok);
 
 	if(err==-1 || !S_ISDIR(dir.st_mode)){//Si no existe el directorio lo creamos
-		std::string cmd = "mkdir " + _directorioIndice+ " rm -f "+_directorioIndice+"/.*"; //Crea el directorio
+		std::string cmd = "rm -f "+_directorioIndice+"/.*"; //Crea el directorio
+		system(cmd.c_str()); //Ejecuta el comando cmd en el tablero de comandos
+		cmd = "mkdir " + _directorioIndice;
 		system(cmd.c_str()); //Ejecuta el comando cmd en el tablero de comandos
 	}
 

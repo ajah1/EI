@@ -105,9 +105,11 @@ Buscador::CambiarFormulaSimilitud(const int& f) {
 	_formSimilitud = f;
 	return true;
 }
-/////////////////////////////////////////////////////////////////////////////
-// SOBRECARGA OPERADOR SALIDA
-/////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+///  BUSCAR
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 int numerodelapregunta = 0;
 int numerodepreguntas = 0;
 bool 
@@ -138,8 +140,9 @@ Buscador::Buscar
 	_esConjunto = true;
 	return true;
 }
-
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+/// 
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 bool 
 Buscador::Buscar(const int& numDocumentos) {
 	_esConjunto = false;
@@ -192,6 +195,59 @@ Buscador::Buscar(const int& numDocumentos) {
 	return false;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////// BM25 /////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+double 
+Buscador::BM25 (const int& docID) {
+	//std::clog << "llamada a BM25 \n";
+
+	// score(D, Q) : valor de similitud para el documento D respecto a la pregunta Q que realiza el usuario
+	double score = 0.0;
+	// n : número de términos (no de parada) de la query Q  
+	//int n = getInfPregunta().getnumTotalPalSinParada(); //getIndicePregunta().size();
+	// f(qi, D) : la frecuencia del término qi en el documento D
+	int fqid = 0;
+	// |D| : el número de palabras (no de parada) del documento D
+	int Dnumpal = 0;
+	// avgdl: la media de todas las |D| en la colección
+	double avgdl = CalculateAVGDL();
+	// N: cantidad de documentos en la colección
+	int N = getIndiceDocs().size();
+	// n(qi): número de documentos en los que aparece el término qi
+	int nqi = 0;
+	// constantes para configuración: k1 = 1,2 b = 0,75
+	double k1 	= _k1;
+	double b 	= _b;
+
+	// Auxiliar Data
+	double leftOperand 	= 0.0;	// IDF(qi)	
+	double rightOperand = 0.0;	// Division
+	// set Dnumpal value
+	for (auto& d : getIndiceDocs()) {
+		if (d.second.getidDoc() == docID) {
+			Dnumpal = d.second.getnumPalSinParada();
+		}
+	}
+
+	// Sumatorio desde i=1 hasta n
+	//for (int i = 0; i < n; ++i) {
+	for (auto& i_pregunta : getIndicePregunta()) {
+		
+		leftOperand = rightOperand = 0.0;
+		nqi = CalculateNQI(i_pregunta.first);
+		fqid = CalculateFQID(i_pregunta.first, docID);
+		// Calculate left operand
+		leftOperand = log10((N - nqi + 0.5) / (nqi + 0.5));
+		// Calculate right operand
+		rightOperand = (fqid * (k1 + 1)) / (fqid + k1 * (1 - b + b * (Dnumpal/avgdl)));
+		// Update score
+		score += leftOperand * rightOperand;
+	}
+	
+	return score;
+}
 int
 Buscador::CalculateNQI (const std::string& token_pregunta) {
 
@@ -234,61 +290,6 @@ Buscador::CalculateFQID (const std::string& token_pregunta, const int& idDoc) {
 
 	return fqid;
 }
-
-double 
-Buscador::BM25 (const int& docID) {
-	//std::clog << "llamada a BM25 \n";
-
-	// score(D, Q) : valor de similitud para el documento D respecto a la pregunta Q que realiza el usuario
-	double score = 0.0;
-	// n : número de términos (no de parada) de la query Q  
-	//int n = getInfPregunta().getnumTotalPalSinParada(); //getIndicePregunta().size();
-	// f(qi, D) : la frecuencia del término qi en el documento D
-	int fqid = 0;
-	// |D| : el número de palabras (no de parada) del documento D
-	int Dnumpal = 0;
-	// avgdl: la media de todas las |D| en la colección
-	double avgdl = CalculateAVGDL();
-	// N: cantidad de documentos en la colección
-	int N = getIndiceDocs().size();
-	// n(qi): número de documentos en los que aparece el término qi
-	int nqi = 0;
-	// constantes para configuración: k1 = 1,2 b = 0,75
-	double k1 	= _k1;
-	double b 	= _b;
-
-	// Auxiliar Data
-	double leftOperand 	= 0.0;	// IDF(qi)	
-	double rightOperand = 0.0;	// Division
-	// set Dnumpal value
-	for (auto& d : getIndiceDocs()) {
-		if (d.second.getidDoc() == docID) {
-			Dnumpal = d.second.getnumPalSinParada();
-		}
-	}
-
-	// Sumatorio desde i=1 hasta n
-	//for (int i = 0; i < n; ++i) {
-	for (auto& i_pregunta : getIndicePregunta()) {
-		
-		leftOperand = rightOperand = 0.0;
-
-		nqi = CalculateNQI(i_pregunta.first);
-		fqid = CalculateFQID(i_pregunta.first, docID);
-
-		// Calculate left operand
-		leftOperand = log10((N - nqi + 0.5) / (nqi + 0.5));
-		// Calculate right operand
-		rightOperand = (fqid * (k1 + 1)) / (fqid + k1 * (1 - b + b * (Dnumpal/avgdl)));
-
-		// Update score
-		score += leftOperand * rightOperand;
-	}
-	
-	return score;
-}
-
-
 /*double
 Buscador::CalculateAVRLD() {
 
@@ -301,9 +302,9 @@ Buscador::CalculateAVRLD() {
 	return 1.0 * c_palabras_no_parada / getIndiceDocs().size();
 }*/
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////// DFR /////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 double
 Buscador::DFR (const int& p_idDoc) {
 	//std::clog << "llamada a DFR \n";
@@ -378,12 +379,8 @@ Buscador::DFR (const int& p_idDoc) {
 			sim += wiq * wid;
 		}
 	}
-
-
-
 	return sim;
 }
-// ft,d: número de veces que el término t aparece en el documento d
 int
 Buscador::CalculateFTD(const std::string& token, const int& d) {
 	int ftd = 0;
@@ -398,12 +395,10 @@ Buscador::CalculateFTD(const std::string& token, const int& d) {
 
 	return ftd;
 }
-
 double
 Buscador::CalculateFTDD(const int& ftd, const double& c, const double& avr_ld, const int& ld) {
 	return (double)ftd * log2(1 + (c * avr_ld) / ld);
 }
-
 int
 Buscador::CalculateNT(const std::string& termino_pregunta) {
 	int nt = 0;
@@ -415,7 +410,6 @@ Buscador::CalculateNT(const std::string& termino_pregunta) {
 
 	return nt;
 }
-
 int
 Buscador::CalculateFTQ(const std::string& termino_pregunta) {
 	int ftq = 0;
@@ -427,7 +421,6 @@ Buscador::CalculateFTQ(const std::string& termino_pregunta) {
 
 	return ftq;
 }
-
 int
 Buscador::CalculateFT(const std::string& termino_pregunta) {
 	//std::cout << "E:E :" << termino_pregunta << std::endl;
@@ -441,13 +434,11 @@ Buscador::CalculateFT(const std::string& termino_pregunta) {
 	return nqi;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Aunque el codigo sea redundante
+/// esto permite ahorra bastante condiciones
+/// al mostrar la informacion
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 void
 Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) {
 	int n_docs = numDocumentos;
@@ -499,9 +490,7 @@ Buscador::ImprimirResultadoBusqueda(const int& numDocumentos) {
 		}
 	}
 
-
 	LiberarCola (aux);
-	
 }
 
 
